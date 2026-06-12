@@ -6,6 +6,7 @@ using System.Linq;
 using Avalonia.Markup.Xaml;
 using GymApp.ViewModels;
 using GymApp.Views;
+using GymApp.Data;
 
 namespace GymApp;
 
@@ -24,8 +25,14 @@ public partial class App : Application
             {
                 DataContext = new MainWindowViewModel(),
             };
+            
+            using (var db = new AppDbContext())
+            {
+                db.Database.EnsureCreated();
+            }
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 }
+
