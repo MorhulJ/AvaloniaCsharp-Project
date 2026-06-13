@@ -7,6 +7,7 @@ using Avalonia.Markup.Xaml;
 using GymApp.ViewModels;
 using GymApp.Views;
 using GymApp.Data;
+using GymApp.Services;
 
 namespace GymApp;
 
@@ -21,18 +22,20 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = new MainWindowViewModel(),
-            };
-            
             using (var db = new AppDbContext())
             {
                 db.Database.EnsureCreated();
             }
+
+            var exerciseService = new ExerciseService(new AppDbContext());
+            var exerciseViewModel = new ExerciseViewModel(exerciseService);
+
+            desktop.MainWindow = new MainWindow
+            {
+                DataContext = exerciseViewModel,
+            };
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 }
-
