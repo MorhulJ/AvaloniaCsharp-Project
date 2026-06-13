@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using GymApp.Models;
 using GymApp.Services;
 using System.Threading.Tasks;
-
 namespace GymApp.ViewModels;
 
 public partial class GoalsViewModel : ObservableObject
@@ -30,10 +29,10 @@ public partial class GoalsViewModel : ObservableObject
         var goal = new Goal
         {
             UserId = 1,
-            ExerciseId = GoalExercise?.Id,
-            Title = GoalTitle,
-            TargetValue = GoalValue,
-            CurrentValue = CurrentValue
+            ExerciseId = goalExercise?.Id,
+            Title = goalTitle,
+            TargetValue = goalValue,
+            CurrentValue = currentValue
         };
 
         await _goalService.AddGoalAsync(goal);

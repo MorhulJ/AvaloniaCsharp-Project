@@ -53,4 +53,10 @@ public class GoalService
         
         await _db.SaveChangesAsync();
     }
+    
+    public async Task UpdateGoalAsync(Goal goal)
+    {
+        _db.Goals.Update(goal);
+        await _db.SaveChangesAsync();
+    }
 }
