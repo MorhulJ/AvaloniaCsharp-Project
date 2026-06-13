@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GymApp.ViewModels"
+             x:Class="GymApp.Views.GoalView"
+             x:DataType="vm:GoalViewModel">
+
+    <StackPanel Margin="20" Spacing="10">
+
+        <TextBlock Text="Goal title" />
+        <TextBox Text="{Binding GoalTitle}" />
+
+        <TextBlock Text="Goal exercise" />
+        <TextBox Text="{Binding GoalExercise}" />
+
+        <TextBlock Text="Goal value" />
+        <TextBox Text="{Binding GoalValue}" />
+        
+        <TextBlock Text="Current value" />
+        <TextBox Text="{Binding CurrentValue}" />
+
+        <Button Content="Save" Command="{Binding SaveGoalCommand}" />
+
+        <TextBlock Text="Goal list:" Margin="0,10,0,0" />
+        <ListBox ItemsSource="{Binding Goals}" Height="200">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Title}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+    </StackPanel>
+
+</UserControl>
