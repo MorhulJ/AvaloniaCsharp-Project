@@ -8,7 +8,7 @@ public class Goal
     public int? ExerciseId { get; set; }
     public string Title { get; set; } = "";
     public double TargetValue { get; set; }
-    public string Status { get; set; } = "InProgress";
+    public double CurrentValue { get; set; }
 
     public User User { get; set; }
     public Exercise? Exercise { get; set; }
