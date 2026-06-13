@@ -6,7 +6,7 @@ using GymApp.Services;
 using System.Threading.Tasks;
 namespace GymApp.ViewModels;
 
-public partial class ExerciseViewModel : ObservableObject
+public partial class ExerciseViewModel : ViewModelBase
 {
     private readonly  ExerciseService _exerciseService;
     

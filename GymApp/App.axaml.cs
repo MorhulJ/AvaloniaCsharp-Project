@@ -28,11 +28,20 @@ public partial class App : Application
             }
 
             var exerciseService = new ExerciseService(new AppDbContext());
+            var goalService = new GoalService(new AppDbContext());
+
             var exerciseViewModel = new ExerciseViewModel(exerciseService);
+            var goalViewModel = new GoalViewModel(goalService, exerciseService);
+
+            exerciseViewModel.LoadExercisesAsync().GetAwaiter().GetResult();
+            goalViewModel.LoadGoalsAsync().GetAwaiter().GetResult();
+            goalViewModel.LoadExercisesAsync().GetAwaiter().GetResult();
+
+            var mainWindowViewModel = new MainWindowViewModel(exerciseViewModel, goalViewModel);
 
             desktop.MainWindow = new MainWindow
             {
-                DataContext = exerciseViewModel,
+                DataContext = mainWindowViewModel,
             };
         }
 

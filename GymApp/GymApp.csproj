@@ -28,4 +28,13 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Views\ExerciseView.axaml.cs">
+        <DependentUpon>ExerciseView.axaml</DependentUpon>
+      </Compile>
+      <Compile Update="Views\GoalView.axaml.cs">
+        <DependentUpon>GoalView.axaml</DependentUpon>
+      </Compile>
+    </ItemGroup>
 </Project>
