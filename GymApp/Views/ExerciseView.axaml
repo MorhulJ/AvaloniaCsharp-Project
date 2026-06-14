@@ -21,7 +21,14 @@
         <ListBox ItemsSource="{Binding Exercises}" Height="200">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Name}" />
+                    <StackPanel Margin="0,4">
+                        <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                        <TextBlock>
+                            <Run Text="{Binding MuscleGroup}" />
+                            <Run Text=" — " />
+                            <Run Text="{Binding Description}" />
+                        </TextBlock>
+                    </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

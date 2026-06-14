@@ -10,11 +10,18 @@
         <TextBox Text="{Binding GoalTitle}" />
 
         <TextBlock Text="Goal exercise" />
-        <TextBox Text="{Binding GoalExercise}" />
+        <ComboBox ItemsSource="{Binding Exercises}"
+                  SelectedItem="{Binding GoalExercise}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
 
         <TextBlock Text="Goal value" />
         <TextBox Text="{Binding GoalValue}" />
-        
+
         <TextBlock Text="Current value" />
         <TextBox Text="{Binding CurrentValue}" />
 

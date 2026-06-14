@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core;
@@ -7,6 +8,7 @@ using Avalonia.Markup.Xaml;
 using GymApp.ViewModels;
 using GymApp.Views;
 using GymApp.Data;
+using GymApp.Models;
 using GymApp.Services;
 
 namespace GymApp;
