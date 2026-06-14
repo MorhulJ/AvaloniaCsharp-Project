@@ -11,6 +11,7 @@
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="10">
             <Button Content="Exercises" Command="{Binding ShowExercisesCommand}" />
             <Button Content="Goals" Command="{Binding ShowGoalsCommand}" />
+            <Button Content="Supplements" Command="{Binding ShowSupplementsCommand}" />
         </StackPanel>
 
         <ContentControl Content="{Binding CurrentView}" />

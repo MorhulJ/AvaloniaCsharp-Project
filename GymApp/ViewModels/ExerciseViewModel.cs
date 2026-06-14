@@ -35,7 +35,7 @@ public partial class ExerciseViewModel : ViewModelBase
 
         if (_editingExerciseId == null)
         {
-            var exercise = new Exercise
+            var exercise = new Exercise()
             {
                 Name = exerciseName,
                 MuscleGroup = muscleGroup,

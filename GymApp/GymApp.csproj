@@ -36,5 +36,11 @@
       <Compile Update="Views\GoalView.axaml.cs">
         <DependentUpon>GoalView.axaml</DependentUpon>
       </Compile>
+      <Compile Update="Views\SupplementView.cs">
+        <DependentUpon>SupplementView.axaml</DependentUpon>
+      </Compile>
+      <Compile Update="Views\SupplementView.axaml.cs">
+        <DependentUpon>SupplementView.axaml</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>
