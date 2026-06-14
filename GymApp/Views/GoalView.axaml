@@ -25,10 +25,13 @@
         <TextBlock Text="Current value" />
         <TextBox Text="{Binding CurrentValue}" />
 
-        <Button Content="Save" Command="{Binding SaveGoalCommand}" />
+        <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Content="Save" Command="{Binding SaveGoalCommand}" />
+            <Button Content="Delete" Command="{Binding DeleteGoalCommand}" />
+        </StackPanel>
 
         <TextBlock Text="Goal list:" Margin="0,10,0,0" />
-        <ListBox ItemsSource="{Binding Goals}" Height="200">
+        <ListBox ItemsSource="{Binding Goals}" SelectedItem="{Binding SelectedGoal}" Height="200">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Title}" />

@@ -19,6 +19,8 @@ public partial class ExerciseViewModel : ViewModelBase
     private string muscleGroup = "";
     [ObservableProperty]
     private string description = "";
+    [ObservableProperty]
+    private Exercise? selectedExercise;
     
     public ExerciseViewModel(ExerciseService exerciseService)
     {
@@ -54,5 +56,15 @@ public partial class ExerciseViewModel : ViewModelBase
         {
             Exercises.Add(exercise);
         }
+    }
+    
+    [RelayCommand]
+    private async Task DeleteExerciseAsync()
+    {
+        if (SelectedExercise == null)
+            return;
+
+        await _exerciseService.DeleteExerciseAsync(SelectedExercise);
+        await LoadExercisesAsync();
     }
 }
