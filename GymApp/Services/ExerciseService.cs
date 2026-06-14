@@ -40,7 +40,15 @@ public class ExerciseService
 
     public async Task UpdateExerciseAsync(Exercise exercise)
     {
-        _db.Exercises.Update(exercise);
+        var existing = await _db.Exercises.FindAsync(exercise.Id);
+    
+        if (existing == null) 
+            throw new KeyNotFoundException($"Exercise with Id={exercise.Id} is not found");
+    
+        existing.Name = exercise.Name;
+        existing.MuscleGroup = exercise.MuscleGroup;
+        existing.Description = exercise.Description;
+    
         await _db.SaveChangesAsync();
     }
 }

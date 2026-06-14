@@ -22,6 +22,8 @@ public partial class ExerciseViewModel : ViewModelBase
     [ObservableProperty]
     private Exercise? selectedExercise;
     
+    private int? _editingExerciseId;
+    
     public ExerciseViewModel(ExerciseService exerciseService)
     {
         _exerciseService = exerciseService;
@@ -30,15 +32,32 @@ public partial class ExerciseViewModel : ViewModelBase
     [RelayCommand]
     private async Task SaveExerciseAsync()
     {
-        var exercise = new Exercise
-        {
-            Name = exerciseName,
-            MuscleGroup = muscleGroup,
-            Description = description
-        };
-        
-        await _exerciseService.AddExerciseAsync(exercise);
 
+        if (_editingExerciseId == null)
+        {
+            var exercise = new Exercise
+            {
+                Name = exerciseName,
+                MuscleGroup = muscleGroup,
+                Description = description
+            };
+        
+            await _exerciseService.AddExerciseAsync(exercise);
+        } 
+        else
+        {
+            var exercise = new Exercise()
+            {
+                Id = _editingExerciseId.Value,
+                Name = exerciseName,
+                MuscleGroup = muscleGroup,
+                Description = description
+            };
+            
+            await _exerciseService.UpdateExerciseAsync(exercise);
+            
+            _editingExerciseId = null;
+        }
         ExerciseName = "";
         MuscleGroup = "";
         Description = "";
@@ -65,6 +84,23 @@ public partial class ExerciseViewModel : ViewModelBase
             return;
 
         await _exerciseService.DeleteExerciseAsync(SelectedExercise);
+        
+        ExerciseName = "";
+        MuscleGroup = "";
+        Description = "";
+        _editingExerciseId = null;
+        
         await LoadExercisesAsync();
+    }
+    
+    partial void OnSelectedExerciseChanged(Exercise? value)
+    {
+        if (value == null) return;
+    
+        ExerciseName = value.Name;
+        MuscleGroup = value.MuscleGroup;
+        Description = value.Description;
+        
+        _editingExerciseId = value.Id;
     }
 }

@@ -56,7 +56,16 @@ public class GoalService
     
     public async Task UpdateGoalAsync(Goal goal)
     {
-        _db.Goals.Update(goal);
+        var existing = await GetGoalByIdAsync(goal.Id);
+        
+        if (existing == null) 
+            throw new KeyNotFoundException($"Goal with Id={goal.Id} is not found");
+        
+        existing.Title = goal.Title;
+        existing.TargetValue = goal.TargetValue;
+        existing.CurrentValue = goal.CurrentValue;
+        existing.ExerciseId = goal.ExerciseId;
+        
         await _db.SaveChangesAsync();
     }
 }

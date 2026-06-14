@@ -1,5 +1,6 @@
 ﻿    using System;
     using System.Collections.ObjectModel;
+    using System.Linq;
     using CommunityToolkit.Mvvm.ComponentModel;
     using CommunityToolkit.Mvvm.Input;
     using GymApp.Models;
@@ -26,6 +27,8 @@
         private double currentValue;
         [ObservableProperty]
         private Goal? selectedGoal;
+        
+        private int? _editingGoalId;
 
         public GoalViewModel(GoalService goalService, ExerciseService exerciseService)
         {
@@ -36,17 +39,36 @@
         [RelayCommand]
         private async Task SaveGoalAsync()
         {
-            var goal = new Goal
-            {
-                UserId = 1,
-                ExerciseId = goalExercise?.Id,
-                Title = goalTitle,
-                TargetValue = goalValue,
-                CurrentValue = currentValue
-            };
 
-            await _goalService.AddGoalAsync(goal);
-            
+            if (_editingGoalId == null)
+            {
+                var goal = new Goal
+                {
+                    UserId = 1,
+                    ExerciseId = goalExercise?.Id,
+                    Title = goalTitle,
+                    TargetValue = goalValue,
+                    CurrentValue = currentValue
+                };
+
+                await _goalService.AddGoalAsync(goal);
+            }
+            else
+            {
+                var goal = new Goal()
+                {
+                    Id = _editingGoalId.Value,
+                    Title = goalTitle,
+                    ExerciseId = goalExercise?.Id,
+                    TargetValue = goalValue,
+                    CurrentValue = currentValue
+                };
+                
+                await _goalService.UpdateGoalAsync(goal);
+                
+                _editingGoalId = null;
+            }
+
             GoalTitle = "";
             GoalExercise = null;
             GoalValue = 0;
@@ -87,5 +109,17 @@
 
             await _goalService.DeleteGoalAsync(SelectedGoal);
             await LoadGoalsAsync();
+        }
+
+        partial void OnSelectedGoalChanged(Goal? value)
+        {
+            if (value == null) return;
+            
+            GoalTitle = value.Title;
+            GoalExercise = Exercises.FirstOrDefault(e => e.Id == value.ExerciseId);;
+            GoalValue = value.TargetValue;
+            CurrentValue =  value.CurrentValue;
+            
+            _editingGoalId = value.Id;
         }
     }
