@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GymApp.ViewModels"
+             x:Class="GymApp.Views.PersonalRecordView"
+             x:DataType="vm:PersonalRecordViewModel">
+
+    <StackPanel Margin="20" Spacing="10">
+
+        <TextBlock Text="Exercise" />
+        <ComboBox ItemsSource="{Binding Exercises}"
+                  SelectedItem="{Binding RecordExercise}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <TextBlock Text="Value (kg)" />
+        <TextBox Text="{Binding RecordValue}" />
+
+        <TextBlock Text="Date" />
+        <DatePicker SelectedDate="{Binding RecordDate}" />
+
+        <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Content="Save" Command="{Binding SaveRecordCommand}" />
+            <Button Content="Delete" Command="{Binding DeleteRecordCommand}" />
+        </StackPanel>
+
+        <TextBlock Text="Records list:" Margin="0,10,0,0" />
+        <ListBox ItemsSource="{Binding Records}"
+                 SelectedItem="{Binding SelectedRecord}"
+                 Height="200">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="0,4">
+                        <TextBlock Text="{Binding Exercise.Name}" FontWeight="Bold" />
+                        <TextBlock>
+                            <Run Text="{Binding Value}" />
+                            <Run Text="kg — " />
+                            <Run Text="{Binding Date, StringFormat='{}{0:dd.MM.yyyy}'}" />
+                        </TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+    </StackPanel>
+
+</UserControl>

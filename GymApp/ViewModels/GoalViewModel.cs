@@ -39,7 +39,6 @@
         [RelayCommand]
         private async Task SaveGoalAsync()
         {
-
             if (_editingGoalId == null)
             {
                 var goal = new Goal
@@ -113,10 +112,11 @@
 
         partial void OnSelectedGoalChanged(Goal? value)
         {
-            if (value == null) return;
+            if (value == null) 
+                return;
             
             GoalTitle = value.Title;
-            GoalExercise = Exercises.FirstOrDefault(e => e.Id == value.ExerciseId);;
+            GoalExercise = Exercises.FirstOrDefault(e => e.Id == value.ExerciseId);
             GoalValue = value.TargetValue;
             CurrentValue =  value.CurrentValue;
             

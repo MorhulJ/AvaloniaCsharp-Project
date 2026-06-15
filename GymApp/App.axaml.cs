@@ -32,18 +32,20 @@ public partial class App : Application
             var exerciseService = new ExerciseService(new AppDbContext());
             var goalService = new GoalService(new AppDbContext());
             var supplementService = new SupplementService(new AppDbContext());
+            var personalRecordService = new PersonalRecordService(new AppDbContext());
 
             var exerciseViewModel = new ExerciseViewModel(exerciseService);
             var goalViewModel = new GoalViewModel(goalService, exerciseService);
             var supplementViewModel = new SupplementViewModel(supplementService);
             var nutritionViewModel = new NutritionViewModel();
+            var personalRecordViewModel = new PersonalRecordViewModel(personalRecordService, exerciseService);
 
             exerciseViewModel.LoadExercisesAsync().GetAwaiter().GetResult();
             goalViewModel.LoadGoalsAsync().GetAwaiter().GetResult();
             goalViewModel.LoadExercisesAsync().GetAwaiter().GetResult();
             supplementViewModel.LoadSupplementAsync().GetAwaiter().GetResult();
 
-            var mainWindowViewModel = new MainWindowViewModel(exerciseViewModel, goalViewModel, supplementViewModel, nutritionViewModel);
+            var mainWindowViewModel = new MainWindowViewModel(exerciseViewModel, goalViewModel, supplementViewModel, nutritionViewModel, personalRecordViewModel);
 
             desktop.MainWindow = new MainWindow
             {

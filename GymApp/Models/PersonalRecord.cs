@@ -7,7 +7,7 @@ public class PersonalRecord
     public int UserId { get; set; }
     public int ExerciseId { get; set; }
     public double Value { get; set; }
-    public DateTime Date { get; set; }
+    public DateTimeOffset Date { get; set; }
     public string Type { get; set; } = "";
 
     public User User { get; set; }
