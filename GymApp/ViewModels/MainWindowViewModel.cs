@@ -8,15 +8,17 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly ExerciseViewModel _exerciseViewModel;
     private readonly GoalViewModel _goalViewModel;
     private readonly SupplementViewModel _supplementViewModel;
+    private readonly NutritionViewModel _nutritionViewModel;
     
     [ObservableProperty]
     private ViewModelBase currentView;
     
-    public MainWindowViewModel(ExerciseViewModel exerciseViewModel, GoalViewModel goalViewModel,  SupplementViewModel supplementViewModel)
+    public MainWindowViewModel(ExerciseViewModel exerciseViewModel, GoalViewModel goalViewModel,  SupplementViewModel supplementViewModel, NutritionViewModel nutritionViewModel)
     {
         _exerciseViewModel = exerciseViewModel;
         _goalViewModel = goalViewModel;
         _supplementViewModel = supplementViewModel;
+        _nutritionViewModel = nutritionViewModel;
 
         currentView = _exerciseViewModel;
     }
@@ -37,5 +39,11 @@ public partial class MainWindowViewModel : ViewModelBase
     private void ShowSupplements()
     {
         CurrentView = _supplementViewModel;
+    }
+
+    [RelayCommand]
+    private void ShowNutrition()
+    {
+        CurrentView =  _nutritionViewModel;
     }
 }

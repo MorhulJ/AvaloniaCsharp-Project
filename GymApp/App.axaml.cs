@@ -36,13 +36,14 @@ public partial class App : Application
             var exerciseViewModel = new ExerciseViewModel(exerciseService);
             var goalViewModel = new GoalViewModel(goalService, exerciseService);
             var supplementViewModel = new SupplementViewModel(supplementService);
+            var nutritionViewModel = new NutritionViewModel();
 
             exerciseViewModel.LoadExercisesAsync().GetAwaiter().GetResult();
             goalViewModel.LoadGoalsAsync().GetAwaiter().GetResult();
             goalViewModel.LoadExercisesAsync().GetAwaiter().GetResult();
             supplementViewModel.LoadSupplementAsync().GetAwaiter().GetResult();
 
-            var mainWindowViewModel = new MainWindowViewModel(exerciseViewModel, goalViewModel, supplementViewModel);
+            var mainWindowViewModel = new MainWindowViewModel(exerciseViewModel, goalViewModel, supplementViewModel, nutritionViewModel);
 
             desktop.MainWindow = new MainWindow
             {

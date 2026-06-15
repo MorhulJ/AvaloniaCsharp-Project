@@ -27,6 +27,8 @@
                     <StackPanel Margin="0,4">
                         <TextBlock Text="{Binding Name}" FontWeight="Bold" />
                         <TextBlock>
+                            <Run Text="{Binding Description}" />
+                            <Run Text=" — " />
                             <Run Text="{Binding DosageUnit}" />
                         </TextBlock>
                     </StackPanel>

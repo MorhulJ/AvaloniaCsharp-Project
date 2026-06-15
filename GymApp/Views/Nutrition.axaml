@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GymApp.ViewModels"
+             x:Class="GymApp.Views.NutritionView"
+             x:DataType="vm:NutritionViewModel">
+
+    <StackPanel Margin="20" Spacing="10">
+
+        <TextBlock Text="Weight (kg)" />
+        <TextBox Text="{Binding Weight}" />
+
+        <TextBlock Text="Height (cm)" />
+        <TextBox Text="{Binding Height}" />
+
+        <TextBlock Text="Age" />
+        <TextBox Text="{Binding Age}" />
+
+        <TextBlock Text="Gender" />
+        <ComboBox SelectedItem="{Binding Gender}">
+            <ComboBoxItem Content="Male" />
+            <ComboBoxItem Content="Female" />
+        </ComboBox>
+
+        <TextBlock Text="Activity level" />
+        <ComboBox SelectedItem="{Binding ActivityLevel}">
+            <ComboBoxItem Content="Sedentary" />
+            <ComboBoxItem Content="Light" />
+            <ComboBoxItem Content="Moderate" />
+            <ComboBoxItem Content="Active" />
+            <ComboBoxItem Content="VeryActive" />
+        </ComboBox>
+
+        <TextBlock Text="Goal" />
+        <ComboBox SelectedItem="{Binding Goal}">
+            <ComboBoxItem Content="Lose" />
+            <ComboBoxItem Content="Maintain" />
+            <ComboBoxItem Content="Gain" />
+        </ComboBox>
+
+        <Button Content="Calculate" Command="{Binding CalculateCommand}" />
+
+        <TextBlock Text="Results:" Margin="0,10,0,0" FontWeight="Bold" />
+        <TextBlock Text="{Binding Bmr, StringFormat='BMR: {0} kcal'}" />
+        <TextBlock Text="{Binding Tdee, StringFormat='TDEE: {0} kcal'}" />
+        <TextBlock Text="{Binding Calories, StringFormat='Calories: {0} kcal'}" />
+        <TextBlock Text="{Binding Protein, StringFormat='Protein: {0} g'}" />
+        <TextBlock Text="{Binding Fat, StringFormat='Fat: {0} g'}" />
+        <TextBlock Text="{Binding Carbs, StringFormat='Carbs: {0} g'}" />
+
+    </StackPanel>
+
+</UserControl>
