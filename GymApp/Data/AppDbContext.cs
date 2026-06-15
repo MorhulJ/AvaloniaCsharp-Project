@@ -13,7 +13,6 @@ public class AppDbContext : DbContext
     public DbSet<PersonalRecord> PersonalRecords => Set<PersonalRecord>();
     public DbSet<Supplement> Supplements => Set<Supplement>();
     public DbSet<SupplementIntake> SupplementIntakes => Set<SupplementIntake>();
-    public DbSet<BodyStats> BodyStats => Set<BodyStats>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

@@ -27,6 +27,19 @@ public partial class App : Application
             using (var db = new AppDbContext())
             {
                 db.Database.EnsureCreated();
+                
+                if (!db.Users.Any())
+                {
+                    db.Users.Add(new User
+                    {
+                        Name = "Test User",
+                        Gender = "Male",
+                        DateOfBirth = new DateTime(1990, 1, 1),
+                        weight = 80,
+                        height = 180
+                    });
+                    db.SaveChanges();
+                }
             }
 
             var exerciseService = new ExerciseService(new AppDbContext());
