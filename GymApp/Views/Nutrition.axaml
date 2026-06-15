@@ -40,8 +40,8 @@
         <Button Content="Calculate" Command="{Binding CalculateCommand}" />
 
         <TextBlock Text="Results:" Margin="0,10,0,0" FontWeight="Bold" />
-        <TextBlock Text="{Binding Bmr, StringFormat='BMR: {0} kcal'}" />
-        <TextBlock Text="{Binding Tdee, StringFormat='TDEE: {0} kcal'}" />
+        <TextBlock Text="{Binding Bmr, StringFormat='BMR (base metabolism): {0} kcal'}" />
+        <TextBlock Text="{Binding Tdee, StringFormat='TDEE (calorie expenditure): {0} kcal'}" />
         <TextBlock Text="{Binding Calories, StringFormat='Calories: {0} kcal'}" />
         <TextBlock Text="{Binding Protein, StringFormat='Protein: {0} g'}" />
         <TextBlock Text="{Binding Fat, StringFormat='Fat: {0} g'}" />
