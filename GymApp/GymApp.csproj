@@ -8,20 +8,24 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="12.0.4"/>
-        <PackageReference Include="Avalonia.Desktop" Version="12.0.4"/>
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.4"/>
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.4"/>
+        <PackageReference Include="Avalonia" Version="12.0.4" />
+        <PackageReference Include="Avalonia.Desktop" Version="12.0.4" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.4" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.4" />
         <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.1">
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1"/>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.9">
           <PrivateAssets>all</PrivateAssets>
@@ -42,7 +46,7 @@
       <Compile Update="Views\SupplementView.axaml.cs">
         <DependentUpon>SupplementView.axaml</DependentUpon>
       </Compile>
-      <Compile Update="Views\Nutrition.axaml.cs">
+      <Compile Update="Views\NutritionView.axaml.cs">
         <DependentUpon>Nutrition.axaml</DependentUpon>
       </Compile>
       <Compile Update="Views\PersonalRecordView.axaml.cs">

@@ -16,26 +16,16 @@
         <TextBox Text="{Binding Age}" />
 
         <TextBlock Text="Gender" />
-        <ComboBox SelectedItem="{Binding Gender}">
-            <ComboBoxItem Content="Male" />
-            <ComboBoxItem Content="Female" />
-        </ComboBox>
+        <ComboBox ItemsSource="{Binding GenderOptions}"
+                  SelectedItem="{Binding Gender}" />
 
         <TextBlock Text="Activity level" />
-        <ComboBox SelectedItem="{Binding ActivityLevel}">
-            <ComboBoxItem Content="Sedentary" />
-            <ComboBoxItem Content="Light" />
-            <ComboBoxItem Content="Moderate" />
-            <ComboBoxItem Content="Active" />
-            <ComboBoxItem Content="VeryActive" />
-        </ComboBox>
+        <ComboBox ItemsSource="{Binding ActivityLevelOptions}"
+                  SelectedItem="{Binding ActivityLevel}" />
 
         <TextBlock Text="Goal" />
-        <ComboBox SelectedItem="{Binding Goal}">
-            <ComboBoxItem Content="Lose" />
-            <ComboBoxItem Content="Maintain" />
-            <ComboBoxItem Content="Gain" />
-        </ComboBox>
+        <ComboBox ItemsSource="{Binding GoalOptions}"
+                  SelectedItem="{Binding Goal}" />
 
         <Button Content="Calculate" Command="{Binding CalculateCommand}" />
 

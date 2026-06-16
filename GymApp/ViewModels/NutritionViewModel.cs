@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GymApp.Services;
@@ -7,6 +8,10 @@ namespace GymApp.ViewModels;
 
 public partial class NutritionViewModel : ViewModelBase
 {
+    public List<string> GenderOptions { get; } = new() { "Male", "Female" };
+    public List<string> ActivityLevelOptions { get; } = new() { "Sedentary", "Light", "Moderate", "Active", "VeryActive" };
+    public List<string> GoalOptions { get; } = new() { "Lose", "Maintain", "Gain" };
+    
     [ObservableProperty] 
     private int weight;
     [ObservableProperty]

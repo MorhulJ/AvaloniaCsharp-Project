@@ -10,6 +10,7 @@ using GymApp.Views;
 using GymApp.Data;
 using GymApp.Models;
 using GymApp.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace GymApp;
 
@@ -26,7 +27,7 @@ public partial class App : Application
         {
             using (var db = new AppDbContext())
             {
-                db.Database.EnsureCreated();
+                db.Database.Migrate();
                 
                 if (!db.Users.Any())
                 {
