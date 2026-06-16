@@ -7,7 +7,7 @@ public class SupplementIntake
     public int UserId { get; set; }
     public int SupplementId { get; set; }
     public double Dosage { get; set; }
-    public DateTime Date { get; set; }
+    public DayOfWeek Date { get; set; }
     public TimeSpan Time { get; set; }
 
     public User User { get; set; }
