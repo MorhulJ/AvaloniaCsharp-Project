@@ -52,5 +52,8 @@
       <Compile Update="Views\PersonalRecordView.axaml.cs">
         <DependentUpon>PersonalRecordView.axaml</DependentUpon>
       </Compile>
+      <Compile Update="Views\SupplementIntakeView.axaml.cs">
+        <DependentUpon>SupplementIntakeView.axaml</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>

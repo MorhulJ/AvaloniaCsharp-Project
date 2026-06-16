@@ -10,17 +10,19 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly SupplementViewModel _supplementViewModel;
     private readonly NutritionViewModel _nutritionViewModel;
     private readonly PersonalRecordViewModel _personalRecordViewModel;
+    private readonly SupplementIntakeViewModel _supplementIntakeViewModel;
     
     [ObservableProperty]
     private ViewModelBase currentView;
     
-    public MainWindowViewModel(ExerciseViewModel exerciseViewModel, GoalViewModel goalViewModel,  SupplementViewModel supplementViewModel, NutritionViewModel nutritionViewModel, PersonalRecordViewModel personalRecordViewModel)
+    public MainWindowViewModel(ExerciseViewModel exerciseViewModel, GoalViewModel goalViewModel,  SupplementViewModel supplementViewModel, NutritionViewModel nutritionViewModel, PersonalRecordViewModel personalRecordViewModel, SupplementIntakeViewModel supplementIntakeViewModel)
     {
         _exerciseViewModel = exerciseViewModel;
         _goalViewModel = goalViewModel;
         _supplementViewModel = supplementViewModel;
         _nutritionViewModel = nutritionViewModel;
         _personalRecordViewModel = personalRecordViewModel;
+        _supplementIntakeViewModel = supplementIntakeViewModel;
 
         currentView = _exerciseViewModel;
     }
@@ -46,12 +48,18 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void ShowNutrition()
     {
-        CurrentView =  _nutritionViewModel;
+        CurrentView = _nutritionViewModel;
     }
 
     [RelayCommand]
     private void ShowPersonalRecord()
     {
-        CurrentView =  _personalRecordViewModel;
+        CurrentView = _personalRecordViewModel;
+    }
+
+    [RelayCommand]
+    private void ShowSupplementIntake()
+    {
+        CurrentView = _supplementIntakeViewModel;
     }
 }

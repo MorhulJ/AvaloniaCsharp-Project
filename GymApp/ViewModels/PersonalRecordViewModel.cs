@@ -96,5 +96,4 @@ public partial class PersonalRecordViewModel : ViewModelBase
         RecordValue =  value.Value;
         RecordDate =  value.Date;
     }
-
 }
