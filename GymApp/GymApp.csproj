@@ -55,5 +55,8 @@
       <Compile Update="Views\SupplementIntakeView.axaml.cs">
         <DependentUpon>SupplementIntakeView.axaml</DependentUpon>
       </Compile>
+      <Compile Update="Views\WorkoutProgramView.axaml.cs">
+        <DependentUpon>WorkoutProgramView.axaml</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>

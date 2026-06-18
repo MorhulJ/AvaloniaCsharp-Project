@@ -9,12 +9,13 @@
     <DockPanel>
 
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="10">
+            <Button Content="Workout Program" Command="{Binding ShowWorkoutProgramCommand}" />
             <Button Content="Exercises" Command="{Binding ShowExercisesCommand}" />
             <Button Content="Goals" Command="{Binding ShowGoalsCommand}" />
-            <Button Content="Supplements" Command="{Binding ShowSupplementsCommand}" />
-            <Button Content="Nutrition calculator" Command="{Binding ShowNutritionCommand}" />
             <Button Content="Personal Records" Command="{Binding ShowPersonalRecordCommand}" />
+            <Button Content="Supplements" Command="{Binding ShowSupplementsCommand}" />
             <Button Content="Supplement Intake" Command="{Binding ShowSupplementIntakeCommand}" />
+            <Button Content="Nutrition calculator" Command="{Binding ShowNutritionCommand}" />
         </StackPanel>
 
         <ContentControl Content="{Binding CurrentView}" />

@@ -14,6 +14,7 @@ public partial class GoalView : UserControl
             if (DataContext is GoalViewModel vm)
             {
                 await vm.LoadGoalsAsync();
+                await  vm.LoadExercisesAsync();
             }   
         };
     }

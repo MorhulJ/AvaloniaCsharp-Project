@@ -1,5 +1,5 @@
 ﻿using System;
-using GymApp.Models;
+namespace GymApp.Models;
 
 public class ProgramExercise
 {

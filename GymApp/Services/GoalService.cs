@@ -40,19 +40,6 @@ public class GoalService
         _db.Goals.Remove(goal);
         await _db.SaveChangesAsync();
     }
-
-    public async Task UpdateProgressAsync(int goalId, double currentValue)
-    {
-        Goal? goal = await GetGoalByIdAsync(goalId);
-        
-        if (goal == null)
-            throw new KeyNotFoundException($"Goal with Id={goalId} is not found");
-        
-        if (currentValue > goal.CurrentValue) 
-            goal.CurrentValue = currentValue;
-        
-        await _db.SaveChangesAsync();
-    }
     
     public async Task UpdateGoalAsync(Goal goal)
     {

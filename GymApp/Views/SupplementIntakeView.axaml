@@ -45,6 +45,7 @@
                             <Run Text="{Binding Time}" />
                             <Run Text=" — " />
                             <Run Text="{Binding Dosage}" />
+                            <Run Text="g" />
                         </TextBlock>
                     </StackPanel>
                 </DataTemplate>
