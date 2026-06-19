@@ -17,9 +17,9 @@ public partial class WorkoutProgramViewModel : ViewModelBase
     public ObservableCollection<Exercise> Exercises { get; } = new();
 
     [ObservableProperty] 
-    private string programName;
+    private string programName = "";
     [ObservableProperty] 
-    private string programDescription;
+    private string programDescription = "";
     [ObservableProperty] 
     private WorkoutProgram? selectedProgram;
 
@@ -79,6 +79,9 @@ public partial class WorkoutProgramViewModel : ViewModelBase
     [RelayCommand]
     public async Task AddExerciseToProgramAsync()
     {
+        if (SelectedProgram == null || SelectedExercise == null)
+            return;
+        
         var programExercise = new ProgramExercise
         {
             ProgramId = SelectedProgram.Id,
@@ -174,6 +177,6 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         
         _editingProgramId = value.Id;
 
-        LoadProgramExercisesAsync();
+        _ = LoadProgramExercisesAsync();
     }
 }
