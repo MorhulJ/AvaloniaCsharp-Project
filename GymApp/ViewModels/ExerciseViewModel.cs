@@ -32,14 +32,13 @@ public partial class ExerciseViewModel : ViewModelBase
     [RelayCommand]
     private async Task SaveExerciseAsync()
     {
-
         if (_editingExerciseId == null)
         {
-            var exercise = new Exercise()
+            var exercise = new Exercise
             {
-                Name = exerciseName,
-                MuscleGroup = muscleGroup,
-                Description = description
+                Name = ExerciseName,
+                MuscleGroup = MuscleGroup,
+                Description = Description
             };
         
             await _exerciseService.AddExerciseAsync(exercise);
@@ -49,9 +48,9 @@ public partial class ExerciseViewModel : ViewModelBase
             var exercise = new Exercise()
             {
                 Id = _editingExerciseId.Value,
-                Name = exerciseName,
-                MuscleGroup = muscleGroup,
-                Description = description
+                Name = ExerciseName,
+                MuscleGroup = MuscleGroup,
+                Description = Description
             };
             
             await _exerciseService.UpdateExerciseAsync(exercise);

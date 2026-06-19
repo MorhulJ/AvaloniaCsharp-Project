@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GymApp.Models;
 
 namespace GymApp.ViewModels;
 
@@ -12,11 +13,12 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly PersonalRecordViewModel _personalRecordViewModel;
     private readonly SupplementIntakeViewModel _supplementIntakeViewModel;
     private readonly WorkoutProgramViewModel _workoutProgramViewModel;
+    private readonly UserViewModel _userViewModel;
     
     [ObservableProperty]
     private ViewModelBase currentView;
     
-    public MainWindowViewModel(ExerciseViewModel exerciseViewModel, GoalViewModel goalViewModel,  SupplementViewModel supplementViewModel, NutritionViewModel nutritionViewModel, PersonalRecordViewModel personalRecordViewModel, SupplementIntakeViewModel supplementIntakeViewModel, WorkoutProgramViewModel workoutProgramViewModel)
+    public MainWindowViewModel(ExerciseViewModel exerciseViewModel, GoalViewModel goalViewModel,  SupplementViewModel supplementViewModel, NutritionViewModel nutritionViewModel, PersonalRecordViewModel personalRecordViewModel, SupplementIntakeViewModel supplementIntakeViewModel, WorkoutProgramViewModel workoutProgramViewModel, UserViewModel userViewModel)
     {
         _exerciseViewModel = exerciseViewModel;
         _goalViewModel = goalViewModel;
@@ -25,6 +27,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _personalRecordViewModel = personalRecordViewModel;
         _supplementIntakeViewModel = supplementIntakeViewModel;
         _workoutProgramViewModel = workoutProgramViewModel;
+        _userViewModel = userViewModel;
 
         currentView = _workoutProgramViewModel;
     }
@@ -70,4 +73,11 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         CurrentView =  _workoutProgramViewModel;
     }
+    
+    [RelayCommand]
+    private void ShowUser()
+    {
+        CurrentView =  _userViewModel;
+    }
+    
 }

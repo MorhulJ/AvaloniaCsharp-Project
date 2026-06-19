@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GymApp.ViewModels"
+             x:Class="GymApp.Views.UserView"
+             x:DataType="vm:UserViewModel">
+
+    <StackPanel Margin="20" Spacing="10">
+
+        <TextBlock Text="Name" />
+        <TextBox Text="{Binding UserName}" />
+
+        <TextBlock Text="Gender" />
+        <ComboBox ItemsSource="{Binding GenderOptions}"
+                  SelectedItem="{Binding UserGender}" />
+
+        <TextBlock Text="Date of birth" />
+        <DatePicker SelectedDate="{Binding UserDateOfBirth}" />
+
+        <TextBlock Text="Weight (kg)" />
+        <TextBox Text="{Binding UserWeight}" />
+
+        <TextBlock Text="Height (cm)" />
+        <TextBox Text="{Binding UserHeight}" />
+
+        <Button Content="Save" Command="{Binding SaveUserCommand}" />
+
+    </StackPanel>
+
+</UserControl>

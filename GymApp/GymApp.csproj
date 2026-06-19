@@ -58,5 +58,8 @@
       <Compile Update="Views\WorkoutProgramView.axaml.cs">
         <DependentUpon>WorkoutProgramView.axaml</DependentUpon>
       </Compile>
+      <Compile Update="Views\UserView.axaml.cs">
+        <DependentUpon>UserView.axaml</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>

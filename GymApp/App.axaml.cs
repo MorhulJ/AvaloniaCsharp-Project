@@ -49,6 +49,7 @@ public partial class App : Application
             var personalRecordService = new PersonalRecordService(new AppDbContext());
             var supplementIntakeService = new SupplementIntakeService(new AppDbContext());
             var workoutProgramSerivce = new WorkoutProgramService(new AppDbContext());
+            var userService = new UserService(new AppDbContext());
 
             var exerciseViewModel = new ExerciseViewModel(exerciseService);
             var goalViewModel = new GoalViewModel(goalService, exerciseService);
@@ -57,6 +58,7 @@ public partial class App : Application
             var personalRecordViewModel = new PersonalRecordViewModel(personalRecordService, exerciseService);
             var supplementIntakeViewModel = new SupplementIntakeViewModel(supplementIntakeService, supplementService);
             var workoutProgramViewModel = new WorkoutProgramViewModel(workoutProgramSerivce, exerciseService);
+            var userViewModel = new UserViewModel(userService);
 
             exerciseViewModel.LoadExercisesAsync().GetAwaiter().GetResult();
             goalViewModel.LoadGoalsAsync().GetAwaiter().GetResult();
@@ -64,8 +66,9 @@ public partial class App : Application
             supplementViewModel.LoadSupplementAsync().GetAwaiter().GetResult();
             supplementIntakeViewModel.LoadSupplementIntakesAsync().GetAwaiter().GetResult();
             workoutProgramViewModel.LoadProgramsAsync().GetAwaiter().GetResult();
+            userViewModel.LoadUserAsync().GetAwaiter().GetResult();
 
-            var mainWindowViewModel = new MainWindowViewModel(exerciseViewModel, goalViewModel, supplementViewModel, nutritionViewModel, personalRecordViewModel, supplementIntakeViewModel,  workoutProgramViewModel);
+            var mainWindowViewModel = new MainWindowViewModel(exerciseViewModel, goalViewModel, supplementViewModel, nutritionViewModel, personalRecordViewModel, supplementIntakeViewModel,  workoutProgramViewModel, userViewModel);
 
             desktop.MainWindow = new MainWindow
             {

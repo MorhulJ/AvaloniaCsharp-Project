@@ -16,6 +16,8 @@
             <Button Content="Supplements" Command="{Binding ShowSupplementsCommand}" />
             <Button Content="Supplement Intake" Command="{Binding ShowSupplementIntakeCommand}" />
             <Button Content="Nutrition calculator" Command="{Binding ShowNutritionCommand}" />
+            <Button Content="User" Command="{Binding ShowUserCommand}" />
+
         </StackPanel>
 
         <ContentControl Content="{Binding CurrentView}" />
