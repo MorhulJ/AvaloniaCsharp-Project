@@ -117,7 +117,5 @@ public partial class GoalViewModel : ViewModelBase
         CurrentValue = value.CurrentValue;
 
         _editingGoalId = value.Id;
-
-        LoadExercisesAsync();
     }
 }

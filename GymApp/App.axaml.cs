@@ -1,8 +1,6 @@
 using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
-using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
 using GymApp.ViewModels;
@@ -67,6 +65,10 @@ public partial class App : Application
             supplementIntakeViewModel.LoadSupplementIntakesAsync().GetAwaiter().GetResult();
             workoutProgramViewModel.LoadProgramsAsync().GetAwaiter().GetResult();
             userViewModel.LoadUserAsync().GetAwaiter().GetResult();
+            personalRecordViewModel.LoadRecordsAsync().GetAwaiter().GetResult();
+            personalRecordViewModel.LoadExercisesAsync().GetAwaiter().GetResult();
+            supplementIntakeViewModel.LoadSupplementsAsync().GetAwaiter().GetResult();
+            workoutProgramViewModel.LoadExercisesAsync().GetAwaiter().GetResult();
 
             var mainWindowViewModel = new MainWindowViewModel(exerciseViewModel, goalViewModel, supplementViewModel, nutritionViewModel, personalRecordViewModel, supplementIntakeViewModel,  workoutProgramViewModel, userViewModel);
 

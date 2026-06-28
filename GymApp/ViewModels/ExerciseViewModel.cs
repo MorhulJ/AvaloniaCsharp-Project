@@ -24,6 +24,8 @@ public partial class ExerciseViewModel : ViewModelBase
     
     private int? _editingExerciseId;
     
+    public event Action? ExerciseSaved;
+    
     public ExerciseViewModel(ExerciseService exerciseService)
     {
         _exerciseService = exerciseService;
@@ -36,32 +38,34 @@ public partial class ExerciseViewModel : ViewModelBase
         {
             var exercise = new Exercise
             {
-                Name = ExerciseName,
-                MuscleGroup = MuscleGroup,
-                Description = Description
+                Name = exerciseName,
+                MuscleGroup = muscleGroup,
+                Description = description
             };
-        
+
             await _exerciseService.AddExerciseAsync(exercise);
-        } 
+        }
         else
         {
-            var exercise = new Exercise()
+            var exercise = new Exercise
             {
                 Id = _editingExerciseId.Value,
-                Name = ExerciseName,
-                MuscleGroup = MuscleGroup,
-                Description = Description
+                Name = exerciseName,
+                MuscleGroup = muscleGroup,
+                Description = description
             };
-            
+
             await _exerciseService.UpdateExerciseAsync(exercise);
-            
             _editingExerciseId = null;
         }
+
         ExerciseName = "";
         MuscleGroup = "";
         Description = "";
 
         await LoadExercisesAsync();
+
+        ExerciseSaved?.Invoke();
     }
 
     public async Task LoadExercisesAsync()

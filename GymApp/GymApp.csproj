@@ -61,5 +61,11 @@
       <Compile Update="Views\UserView.axaml.cs">
         <DependentUpon>UserView.axaml</DependentUpon>
       </Compile>
+      <Compile Update="Views\AddExerciseWindow.cs">
+        <DependentUpon>AddExerciseWindow.axaml</DependentUpon>
+      </Compile>
+      <Compile Update="Views\AddExerciseWindow.axaml.cs">
+        <DependentUpon>AddExerciseWindow.axaml</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>
