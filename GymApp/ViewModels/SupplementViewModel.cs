@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -23,6 +24,8 @@ public partial class SupplementViewModel : ViewModelBase
     private Supplement? selectedSupplement;
 
     private int? _editingSupplementId;
+    
+    public event Action? SupplementSaved;
 
     public SupplementViewModel(SupplementService supplementService)
     {
@@ -54,7 +57,6 @@ public partial class SupplementViewModel : ViewModelBase
             };
             
             await _supplementService.UpdateSupplementAsync(supplement);
-            
             _editingSupplementId = null;
         }
 
@@ -63,6 +65,8 @@ public partial class SupplementViewModel : ViewModelBase
         Description = "";
         
         await LoadSupplementAsync();
+        
+        SupplementSaved?.Invoke();
     }
 
     public async Task LoadSupplementAsync()

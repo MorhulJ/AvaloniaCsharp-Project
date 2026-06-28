@@ -67,5 +67,8 @@
       <Compile Update="Views\AddExerciseWindow.axaml.cs">
         <DependentUpon>AddExerciseWindow.axaml</DependentUpon>
       </Compile>
+      <Compile Update="Views\AddSupplementWindow.axaml.cs">
+        <DependentUpon>AddSupplementWindow.axaml</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>

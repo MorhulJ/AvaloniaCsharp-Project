@@ -3,9 +3,9 @@ using GymApp.ViewModels;
 
 namespace GymApp.Views;
 
-public partial class AddExerciseWindow : Window
+public partial class AddSupplementWindow : Window
 {
-    public AddExerciseWindow(ExerciseViewModel vm)
+    public AddSupplementWindow(SupplementViewModel vm)
     {
         InitializeComponent();
         DataContext = vm;
@@ -13,9 +13,9 @@ public partial class AddExerciseWindow : Window
         void OnSaved()
         {
             Close();
-            vm.ExerciseSaved -= OnSaved;
+            vm.SupplementSaved -= OnSaved;
         }
 
-        vm.ExerciseSaved += OnSaved;
+        vm.SupplementSaved += OnSaved;
     }
 }
