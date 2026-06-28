@@ -28,7 +28,7 @@
 
         <StackPanel Orientation="Horizontal" Spacing="10">
             <Button Content="Save" Command="{Binding SaveSupplementIntakeCommand}" />
-            <Button Content="Delete" Command="{Binding DeleteSupplementCommand}" />
+            <Button Content="Delete" Click="OnDeleteSupplementIntake" />
         </StackPanel>
 
         <TextBlock Text="Schedule:" Margin="0,10,0,0" />

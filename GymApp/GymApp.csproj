@@ -70,5 +70,8 @@
       <Compile Update="Views\AddSupplementWindow.axaml.cs">
         <DependentUpon>AddSupplementWindow.axaml</DependentUpon>
       </Compile>
+      <Compile Update="Views\ConfirmDialog.axaml.cs">
+        <DependentUpon>ConfirmDialog.axaml</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>

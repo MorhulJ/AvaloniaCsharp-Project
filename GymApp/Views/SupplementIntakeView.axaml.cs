@@ -18,4 +18,18 @@ public partial class SupplementIntakeView : UserControl
             }
         };
     }
+    
+    private async void OnDeleteSupplementIntake(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not SupplementIntakeViewModel vm) return;
+        if (vm.SelectedSupplementIntake == null) return;
+
+        var dialog = new ConfirmDialog();
+        await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Window);
+
+        if (dialog.Result)
+        {
+            await vm.DeleteSupplementIntakeCommand.ExecuteAsync(null);
+        }
+    }
 }

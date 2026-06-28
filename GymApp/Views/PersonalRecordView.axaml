@@ -24,7 +24,7 @@
 
         <StackPanel Orientation="Horizontal" Spacing="10">
             <Button Content="Save" Command="{Binding SaveRecordCommand}" />
-            <Button Content="Delete" Command="{Binding DeleteRecordCommand}" />
+            <Button Content="Delete" Click="OnDeleteRecord" />
         </StackPanel>
 
         <TextBlock Text="Records list:" Margin="0,10,0,0" />

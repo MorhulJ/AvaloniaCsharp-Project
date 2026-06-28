@@ -14,7 +14,7 @@
 
         <StackPanel Orientation="Horizontal" Spacing="10">
             <Button Content="Save" Command="{Binding SaveProgramCommand}" />
-            <Button Content="Delete" Command="{Binding DeleteProgramCommand}" />
+            <Button Content="Delete" Click="OnDeleteWorkoutProgram" />
         </StackPanel>
 
         <TextBlock Text="Select program"
@@ -49,7 +49,7 @@
         
         <StackPanel Orientation="Horizontal" Spacing="10">
             <Button Content="Add exercise" Command="{Binding AddExerciseToProgramCommand}" />
-            <Button Content="Delete exercise" Command="{Binding DeleteExerciseFromProgramCommand}" />
+            <Button Content="Delete exercise" Click="OnDeleteExerciseFromProgram" />
         </StackPanel
         >
         <TextBlock Text="Program exercises:"

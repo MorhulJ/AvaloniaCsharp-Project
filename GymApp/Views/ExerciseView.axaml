@@ -28,7 +28,7 @@
 
         <StackPanel Orientation="Horizontal" Spacing="10">
             <Button Content="Edit" Click="OpenEditExerciseWindow" />
-            <Button Content="Delete" Command="{Binding DeleteExerciseCommand}" />
+            <Button Content="Delete" Click="OnDeleteExercise" />
         </StackPanel>
 
     </StackPanel>

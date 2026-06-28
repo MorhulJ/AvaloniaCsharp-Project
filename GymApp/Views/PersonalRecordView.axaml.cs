@@ -18,4 +18,18 @@ public partial class PersonalRecordView : UserControl
             }
         };
     }
+    
+    private async void OnDeleteRecord(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not PersonalRecordViewModel vm) return;
+        if (vm.SelectedRecord == null) return;
+
+        var dialog = new ConfirmDialog();
+        await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Window);
+
+        if (dialog.Result)
+        {
+            await vm.DeleteRecordCommand.ExecuteAsync(null);
+        }
+    }
 }

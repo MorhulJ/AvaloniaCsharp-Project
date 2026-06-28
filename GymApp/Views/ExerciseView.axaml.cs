@@ -38,4 +38,18 @@ public partial class ExerciseView : UserControl
         var window = new AddExerciseWindow(vm);
         window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
     }
+    
+    private async void OnDeleteExercise(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not ExerciseViewModel vm) return;
+        if (vm.SelectedExercise == null) return;
+
+        var dialog = new ConfirmDialog();
+        await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Window);
+
+        if (dialog.Result)
+        {
+            await vm.DeleteExerciseCommand.ExecuteAsync(null);
+        }
+    }
 }

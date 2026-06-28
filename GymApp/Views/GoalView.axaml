@@ -27,7 +27,7 @@
 
         <StackPanel Orientation="Horizontal" Spacing="10">
             <Button Content="Save" Command="{Binding SaveGoalCommand}" />
-            <Button Content="Delete" Command="{Binding DeleteGoalCommand}" />
+            <Button Content="Delete" Click="OnDeleteGoal" />
         </StackPanel>
 
         <TextBlock Text="Goal list:" Margin="0,10,0,0" />
@@ -38,7 +38,7 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-
+    
     </StackPanel>
 
 </UserControl>

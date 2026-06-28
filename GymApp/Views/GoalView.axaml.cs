@@ -18,4 +18,18 @@ public partial class GoalView : UserControl
             }   
         };
     }
+    
+    private async void OnDeleteGoal(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not GoalViewModel vm) return;
+        if (vm.SelectedGoal == null) return;
+
+        var dialog = new ConfirmDialog();
+        await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Window);
+
+        if (dialog.Result)
+        {
+            await vm.DeleteGoalCommand.ExecuteAsync(null);
+        }
+    }
 }

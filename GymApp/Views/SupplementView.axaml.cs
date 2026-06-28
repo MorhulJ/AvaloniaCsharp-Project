@@ -38,4 +38,18 @@ public partial class SupplementView : UserControl
         var window = new AddSupplementWindow(vm);
         window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
     }
+    
+    private async void OnDeleteSupplement(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not SupplementViewModel vm) return;
+        if (vm.SelectedSupplement == null) return;
+
+        var dialog = new ConfirmDialog();
+        await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Window);
+
+        if (dialog.Result)
+        {
+            await vm.DeleteSupplementCommand.ExecuteAsync(null);
+        }
+    }
 }

@@ -94,7 +94,7 @@ public partial class SupplementIntakeViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task DeleteSupplementAsync()
+    private async Task DeleteSupplementIntakeAsync()
     {
         if (selectedSupplementIntake == null) 
             return;

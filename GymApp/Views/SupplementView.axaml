@@ -28,7 +28,7 @@
 
         <StackPanel Orientation="Horizontal" Spacing="10">
             <Button Content="Edit" Click="OpenEditSupplementWindow" />
-            <Button Content="Delete" Command="{Binding DeleteSupplementCommand}" />
+            <Button Content="Delete" Click="OnDeleteSupplement" />
         </StackPanel>
 
     </StackPanel>
