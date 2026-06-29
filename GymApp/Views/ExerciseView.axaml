@@ -9,9 +9,7 @@
         <Button Content="Add Exercise" Click="OpenAddExerciseWindow" />
 
         <TextBlock Text="Exercise list:" Margin="0,10,0,0" />
-        <ListBox ItemsSource="{Binding Exercises}"
-                 SelectedItem="{Binding SelectedExercise}"
-                 Height="400">
+        <ListBox ItemsSource="{Binding Exercises}" SelectedItem="{Binding SelectedExercise}" Height="400">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Margin="0,4">

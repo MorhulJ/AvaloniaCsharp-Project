@@ -5,30 +5,8 @@
              x:DataType="vm:GoalViewModel">
 
     <StackPanel Margin="20" Spacing="10">
-
-        <TextBlock Text="Goal title" />
-        <TextBox Text="{Binding GoalTitle}" />
-
-        <TextBlock Text="Goal exercise" />
-        <ComboBox ItemsSource="{Binding Exercises}"
-                  SelectedItem="{Binding GoalExercise}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-
-        <TextBlock Text="Goal value" />
-        <TextBox Text="{Binding GoalValue}" />
-
-        <TextBlock Text="Current value" />
-        <TextBox Text="{Binding CurrentValue}" />
-
-        <StackPanel Orientation="Horizontal" Spacing="10">
-            <Button Content="Save" Command="{Binding SaveGoalCommand}" />
-            <Button Content="Delete" Click="OnDeleteGoal" />
-        </StackPanel>
+        
+        <Button Content="Add Goal" Click="OpenAddGoalWindow" />
 
         <TextBlock Text="Goal list:" Margin="0,10,0,0" />
         <ListBox ItemsSource="{Binding Goals}" SelectedItem="{Binding SelectedGoal}" Height="200">
@@ -38,6 +16,11 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        
+        <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Content="Edit" Click="OpenEditGoalWindow" />
+            <Button Content="Delete" Click="OnDeleteGoal" />
+        </StackPanel>
     
     </StackPanel>
 

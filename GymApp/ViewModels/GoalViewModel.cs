@@ -18,13 +18,20 @@ public partial class GoalViewModel : ViewModelBase
 
     public ObservableCollection<Exercise> Exercises { get; } = new();
 
-    [ObservableProperty] private string goalTitle = "";
-    [ObservableProperty] private Exercise? goalExercise;
-    [ObservableProperty] private double goalValue;
-    [ObservableProperty] private double currentValue;
-    [ObservableProperty] private Goal? selectedGoal;
+    [ObservableProperty] 
+    private string goalTitle = "";
+    [ObservableProperty] 
+    private Exercise? goalExercise;
+    [ObservableProperty] 
+    private double goalValue;
+    [ObservableProperty] 
+    private double currentValue;
+    [ObservableProperty] 
+    private Goal? selectedGoal;
 
     private int? _editingGoalId;
+    
+    public event Action? GoalSaved;
 
     public GoalViewModel(GoalService goalService, ExerciseService exerciseService)
     {
@@ -70,6 +77,8 @@ public partial class GoalViewModel : ViewModelBase
         CurrentValue = 0;
 
         await LoadGoalsAsync();
+        
+        GoalSaved?.Invoke();
     }
 
     public async Task LoadGoalsAsync()
