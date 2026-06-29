@@ -1,3 +1,4 @@
+using System;
 using Avalonia.Controls;
 using GymApp.ViewModels;
 
@@ -17,6 +18,18 @@ public partial class PersonalRecordView : UserControl
                 await vm.LoadExercisesAsync();
             }
         };
+    }
+    
+    private void OpenAddRecordWindow(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not PersonalRecordViewModel vm) return;
+
+        vm.RecordExercise = null;
+        vm.RecordValue = 0;
+        vm.RecordDate = DateTime.Today;
+
+        var window = new AddRecordWindow(vm);
+        window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
     }
     
     private async void OnDeleteRecord(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

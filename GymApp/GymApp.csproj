@@ -76,5 +76,8 @@
       <Compile Update="Views\AddGoalWindow.axaml.cs">
         <DependentUpon>AddGoalWindow.axaml</DependentUpon>
       </Compile>
+      <Compile Update="Views\AddRecordWindow.axaml.cs">
+        <DependentUpon>AddRecordWindow.axaml</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>

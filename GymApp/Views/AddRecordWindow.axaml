@@ -1,0 +1,32 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GymApp.ViewModels"
+        x:Class="GymApp.Views.AddRecordWindow"
+        x:DataType="vm:PersonalRecordViewModel"
+        Title="Add Exercise"
+        Width="400" Height="300"
+        WindowStartupLocation="CenterOwner">
+
+    <StackPanel Margin="20" Spacing="10">
+
+        <TextBlock Text="Exercise" />
+        <ComboBox ItemsSource="{Binding Exercises}"
+                  SelectedItem="{Binding RecordExercise}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <TextBlock Text="Value (kg)" />
+        <TextBox Text="{Binding RecordValue}" />
+
+        <TextBlock Text="Date" />
+        <DatePicker SelectedDate="{Binding RecordDate}" />
+
+        <Button Content="Save" Command="{Binding SaveRecordCommand}" />
+
+    </StackPanel>
+
+</Window>

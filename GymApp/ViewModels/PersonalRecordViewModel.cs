@@ -27,6 +27,8 @@ public partial class PersonalRecordViewModel : ViewModelBase
     [ObservableProperty]
     private PersonalRecord? selectedRecord;
 
+    public event Action? RecordSaved;
+
     public PersonalRecordViewModel(PersonalRecordService personalRecordService, ExerciseService exerciseService)
     {
         _personalRecordService = personalRecordService;
@@ -51,6 +53,8 @@ public partial class PersonalRecordViewModel : ViewModelBase
         RecordDate = DateTime.Today;
         
         await LoadRecordsAsync();
+        
+        RecordSaved?.Invoke();
     }
 
     public async Task LoadRecordsAsync()
