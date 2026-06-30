@@ -32,6 +32,17 @@ public partial class MainWindowViewModel : ViewModelBase
         currentView = _workoutProgramViewModel;
     }
     
+    [ObservableProperty]
+    private bool isDarkTheme = true;
+    
+    [RelayCommand]
+    private void ToggleTheme()
+    {
+        var app = (App)Avalonia.Application.Current!;
+        app.SetTheme(IsDarkTheme ? "Warm" : "Dark");
+        IsDarkTheme = !IsDarkTheme;
+    }
+    
     [RelayCommand]
     private void ShowExercises()
     {

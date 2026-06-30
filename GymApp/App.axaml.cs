@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using System.Linq;
 using Avalonia.Markup.Xaml;
+using Avalonia.Markup.Xaml.Styling;
 using GymApp.ViewModels;
 using GymApp.Views;
 using GymApp.Data;
@@ -23,6 +24,8 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            SetTheme("Dark");
+            
             using (var db = new AppDbContext())
             {
                 db.Database.Migrate();
@@ -79,5 +82,22 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+    
+    public void SetTheme(string themeName)
+    {
+        var styles = Application.Current!.Styles;
+
+        if (styles.Count > 1)
+            styles.RemoveAt(styles.Count - 1);
+
+        var uri = themeName == "Dark" ? "avares://GymApp/Styles/StylesDark.axaml" : "avares://GymApp/Styles/StylesLight.axaml";
+
+        var newStyle = new StyleInclude(new Uri("avares://GymApp/"))
+        {
+            Source = new Uri(uri)
+        };
+
+        styles.Add(newStyle);
     }
 }

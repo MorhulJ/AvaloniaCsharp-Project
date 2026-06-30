@@ -86,4 +86,8 @@
         <DependentUpon>AddExerciseToProgramWindow.axaml</DependentUpon>
       </Compile>
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Styles\" />
+    </ItemGroup>
 </Project>
