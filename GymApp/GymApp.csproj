@@ -79,5 +79,8 @@
       <Compile Update="Views\AddRecordWindow.axaml.cs">
         <DependentUpon>AddRecordWindow.axaml</DependentUpon>
       </Compile>
+      <Compile Update="Views\AddIntakeWindow.axaml.cs">
+        <DependentUpon>AddIntakeWindow.axaml</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>

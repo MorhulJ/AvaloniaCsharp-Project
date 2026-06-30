@@ -5,36 +5,11 @@
              x:DataType="vm:SupplementIntakeViewModel">
 
     <StackPanel Margin="20" Spacing="10">
-
-        <TextBlock Text="Supplement" />
-        <ComboBox ItemsSource="{Binding Supplements}"
-                  SelectedItem="{Binding Supplement}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-
-        <TextBlock Text="Dosage" />
-        <TextBox Text="{Binding SupplementDosage}" />
-
-        <TextBlock Text="Day" />
-        <ComboBox ItemsSource="{Binding DayOptions}"
-                  SelectedItem="{Binding SupplementDay}" />
-
-        <TextBlock Text="Time (hh:mm)" />
-        <TextBox Text="{Binding SupplementTime}" />
-
-        <StackPanel Orientation="Horizontal" Spacing="10">
-            <Button Content="Save" Command="{Binding SaveSupplementIntakeCommand}" />
-            <Button Content="Delete" Click="OnDeleteSupplementIntake" />
-        </StackPanel>
+        
+        <Button Content="Add Intake" Click="OpenAddIntakeWindow" />
 
         <TextBlock Text="Schedule:" Margin="0,10,0,0" />
-        <ListBox ItemsSource="{Binding SupplementIntakes}"
-                 SelectedItem="{Binding SelectedSupplementIntake}"
-                 Height="200">
+        <ListBox ItemsSource="{Binding SupplementIntakes}" SelectedItem="{Binding SelectedSupplementIntake}" Height="400">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Margin="0,4">
@@ -51,6 +26,8 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        
+        <Button Content="Delete" Click="OnDeleteSupplementIntake" />
 
     </StackPanel>
 

@@ -9,9 +9,7 @@
         <Button Content="Add Record" Click="OpenAddRecordWindow" />
         
         <TextBlock Text="Records list:" Margin="0,10,0,0" />
-        <ListBox ItemsSource="{Binding Records}"
-                 SelectedItem="{Binding SelectedRecord}"
-                 Height="200">
+        <ListBox ItemsSource="{Binding Records}" SelectedItem="{Binding SelectedRecord}" Height="400">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Margin="0,4">

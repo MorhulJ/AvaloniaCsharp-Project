@@ -40,6 +40,8 @@ public partial class SupplementIntakeViewModel : ViewModelBase
     private TimeSpan supplementTime;
     [ObservableProperty]
     private SupplementIntake? selectedSupplementIntake;
+    
+    public event Action? IntakeSaved;
 
     public SupplementIntakeViewModel(SupplementIntakeService supplementIntakeService, SupplementService supplementService)
     {
@@ -67,6 +69,8 @@ public partial class SupplementIntakeViewModel : ViewModelBase
         SupplementTime = TimeSpan.Zero;
 
         await LoadSupplementIntakesAsync();
+        
+        IntakeSaved?.Invoke();
     }
     
     public async Task LoadSupplementIntakesAsync()

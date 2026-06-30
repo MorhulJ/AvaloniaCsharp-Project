@@ -9,9 +9,7 @@
         <Button Content="Add Supplement" Click="OpenAddSupplementWindow" />
 
         <TextBlock Text="Supplements list:" Margin="0,10,0,0" />
-        <ListBox ItemsSource="{Binding Suplements}"
-                 SelectedItem="{Binding SelectedSupplement}"
-                 Height="400">
+        <ListBox ItemsSource="{Binding Suplements}" SelectedItem="{Binding SelectedSupplement}" Height="400">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Margin="0,4">

@@ -1,3 +1,4 @@
+using System;
 using Avalonia.Controls;
 using GymApp.ViewModels;
 
@@ -17,6 +18,19 @@ public partial class SupplementIntakeView : UserControl
                 await vm.LoadSupplementsAsync();
             }
         };
+    }
+    
+    private void OpenAddIntakeWindow(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not SupplementIntakeViewModel vm) return;
+
+        vm.Supplement = null;
+        vm.SupplementDosage = 0;
+        vm.SupplementDay = DayOfWeek.Monday;
+        vm.SupplementTime = TimeSpan.Zero;
+
+        var window = new AddIntakeWindow(vm);
+        window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
     }
     
     private async void OnDeleteSupplementIntake(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

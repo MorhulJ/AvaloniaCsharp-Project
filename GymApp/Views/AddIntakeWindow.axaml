@@ -1,0 +1,36 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GymApp.ViewModels"
+        x:Class="GymApp.Views.AddIntakeWindow"
+        x:DataType="vm:SupplementIntakeViewModel"
+        Title="Add Exercise"
+        Width="400" Height="350"
+        WindowStartupLocation="CenterOwner">
+
+    <StackPanel Margin="20" Spacing="10">
+        
+        <TextBlock Text="Supplement" />
+        <ComboBox ItemsSource="{Binding Supplements}"
+                  SelectedItem="{Binding Supplement}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <TextBlock Text="Dosage" />
+        <TextBox Text="{Binding SupplementDosage}" />
+
+        <TextBlock Text="Day" />
+        <ComboBox ItemsSource="{Binding DayOptions}"
+                  SelectedItem="{Binding SupplementDay}" />
+
+        <TextBlock Text="Time (hh:mm)" />
+        <TextBox Text="{Binding SupplementTime}" />
+
+        <Button Content="Save" Command="{Binding SaveSupplementIntakeCommand}" />
+
+    </StackPanel>
+
+</Window>

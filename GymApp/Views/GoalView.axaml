@@ -5,23 +5,23 @@
              x:DataType="vm:GoalViewModel">
 
     <StackPanel Margin="20" Spacing="10">
-        
+
         <Button Content="Add Goal" Click="OpenAddGoalWindow" />
 
         <TextBlock Text="Goal list:" Margin="0,10,0,0" />
-        <ListBox ItemsSource="{Binding Goals}" SelectedItem="{Binding SelectedGoal}" Height="200">
+        <ListBox ItemsSource="{Binding Goals}" SelectedItem="{Binding SelectedGoal}" Height="400">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Title}" />
+                    <TextBlock Text="{Binding Title}" FontWeight="Bold" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        
+
         <StackPanel Orientation="Horizontal" Spacing="10">
             <Button Content="Edit" Click="OpenEditGoalWindow" />
             <Button Content="Delete" Click="OnDeleteGoal" />
         </StackPanel>
-    
+
     </StackPanel>
 
 </UserControl>
