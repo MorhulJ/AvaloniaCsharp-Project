@@ -21,7 +21,8 @@ public partial class ExerciseView : UserControl
     private void OpenAddExerciseWindow(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (DataContext is not ExerciseViewModel vm) return;
-
+        
+        vm.ResetEditingState();
         vm.ExerciseName = "";
         vm.MuscleGroup = "";
         vm.Description = "";

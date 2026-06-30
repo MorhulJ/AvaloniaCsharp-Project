@@ -107,4 +107,9 @@ public partial class SupplementViewModel : ViewModelBase
         
         _editingSupplementId = value.Id;
     }
+    
+    public void ResetEditingState()
+    {
+        _editingSupplementId = null;
+    }
 }

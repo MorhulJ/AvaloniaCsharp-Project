@@ -21,7 +21,8 @@ public partial class SupplementView : UserControl
     private void OpenAddSupplementWindow(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (DataContext is not SupplementViewModel vm) return;
-
+        
+        vm.ResetEditingState();
         vm.SupplementName = "";
         vm.DosageUnit = "";
         vm.Description = "";

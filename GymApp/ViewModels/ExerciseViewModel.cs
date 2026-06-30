@@ -106,4 +106,9 @@ public partial class ExerciseViewModel : ViewModelBase
         
         _editingExerciseId = value.Id;
     }
+    
+    public void ResetEditingState()
+    {
+        _editingExerciseId = null;
+    }
 }

@@ -19,6 +19,41 @@ public partial class WorkoutProgramView : UserControl
         };
     }
     
+    private void OpenAddProgramWindow(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not WorkoutProgramViewModel vm) return;
+
+        vm.ResetEditingState();
+        vm.ProgramName = "";
+        vm.ProgramDescription = "";
+
+        var window = new AddProgramWindow(vm);
+        window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
+    }
+
+    private void OpenEditProgramWindow(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not WorkoutProgramViewModel vm) return;
+        if (vm.SelectedProgram == null) return;
+
+        var window = new AddProgramWindow(vm);
+        window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
+    }
+    
+    private void OpenAddExerciseToProgramWindow(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not WorkoutProgramViewModel vm) return;
+        if (vm.SelectedProgram == null) return;
+
+        vm.SelectedExercise = null;
+        vm.ExerciseSets = 0;
+        vm.ExerciseReps = 0;
+        vm.ExerciseRestTime = 0;
+
+        var window = new AddExerciseToProgramWindow(vm);
+        window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
+    }
+    
     private async void OnDeleteWorkoutProgram(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (DataContext is not WorkoutProgramViewModel vm) return;

@@ -1,0 +1,35 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GymApp.ViewModels"
+        x:Class="GymApp.Views.AddExerciseToProgramWindow"
+        x:DataType="vm:WorkoutProgramViewModel"
+        Title="Add Exercise To Program"
+        Width="400" Height="400"
+        WindowStartupLocation="CenterOwner">
+
+    <StackPanel Margin="20" Spacing="10">
+
+        <TextBlock Text="Exercise"
+                   Margin="0,10,0,0" />
+
+        <ComboBox ItemsSource="{Binding Exercises}" SelectedItem="{Binding SelectedExercise}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <TextBlock Text="Sets" />
+        <TextBox Text="{Binding ExerciseSets}" />
+        
+        <TextBlock Text="Reps" />
+        <TextBox Text="{Binding ExerciseReps}" />
+        
+        <TextBlock Text="Rest time (seconds)" />
+        <TextBox Text="{Binding ExerciseRestTime}" />
+
+        <Button Content="Add exercise" Command="{Binding AddExerciseToProgramCommand}" />
+    </StackPanel>
+
+</Window>

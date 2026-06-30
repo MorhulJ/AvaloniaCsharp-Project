@@ -127,4 +127,9 @@ public partial class GoalViewModel : ViewModelBase
 
         _editingGoalId = value.Id;
     }
+    
+    public void ResetEditingState()
+    {
+        _editingGoalId = null;
+    }
 }

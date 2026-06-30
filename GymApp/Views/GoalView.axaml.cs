@@ -23,7 +23,8 @@ public partial class GoalView : UserControl
     private void OpenAddGoalWindow(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (DataContext is not GoalViewModel vm) return;
-
+        
+        vm.ResetEditingState();
         vm.GoalTitle = "";
         vm.GoalExercise = null;
         vm.GoalValue = 0;

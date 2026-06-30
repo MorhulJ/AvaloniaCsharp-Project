@@ -1,0 +1,22 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GymApp.ViewModels"
+        x:Class="GymApp.Views.AddProgramWindow"
+        x:DataType="vm:WorkoutProgramViewModel"
+        Title="Add Workout Program"
+        Width="400" Height="250"
+        WindowStartupLocation="CenterOwner">
+
+    <StackPanel Margin="20" Spacing="10">
+
+        <TextBlock Text="Program name" />
+        <TextBox Text="{Binding ProgramName}" />
+
+        <TextBlock Text="Description" />
+        <TextBox Text="{Binding ProgramDescription}" />
+
+        <Button Content="Save" Command="{Binding SaveProgramCommand}" />
+
+    </StackPanel>
+
+</Window>

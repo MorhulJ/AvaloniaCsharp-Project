@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -24,6 +25,8 @@ public partial class WorkoutProgramViewModel : ViewModelBase
     private WorkoutProgram? selectedProgram;
 
     private int? _editingProgramId;
+    
+    public event Action? ProgramSaved;
 
     [ObservableProperty] 
     private int exerciseSets;
@@ -35,6 +38,8 @@ public partial class WorkoutProgramViewModel : ViewModelBase
     private Exercise? selectedExercise;
     [ObservableProperty] 
     private ProgramExercise? selectedProgramExercise;
+    
+    public event Action? ProgramExerciseSaved;
 
     public WorkoutProgramViewModel(WorkoutProgramService programService, ExerciseService exerciseService)
     {
@@ -74,6 +79,8 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         ProgramDescription = "";
 
         await LoadProgramsAsync();
+        
+        ProgramSaved?.Invoke();
     }
     
     [RelayCommand]
@@ -99,6 +106,8 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         ExerciseSets = 0;
         ExerciseReps = 0;
         ExerciseRestTime = 0;
+        
+        ProgramExerciseSaved?.Invoke();
     }
 
     public async Task LoadProgramsAsync()
@@ -178,5 +187,10 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         _editingProgramId = value.Id;
 
         _ = LoadProgramExercisesAsync();
+    }
+    
+    public void ResetEditingState()
+    {
+        _editingProgramId = null;
     }
 }
