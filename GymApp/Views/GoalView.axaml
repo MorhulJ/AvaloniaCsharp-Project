@@ -4,22 +4,36 @@
              x:Class="GymApp.Views.GoalView"
              x:DataType="vm:GoalViewModel">
 
-    <StackPanel Margin="20" Spacing="10">
+    <StackPanel Margin="30" Spacing="16">
 
-        <Button Content="Add Goal" Click="OpenAddGoalWindow" />
+        <TextBlock Text="Goals" Classes="title" />
 
-        <TextBlock Text="Goal list:" Margin="0,10,0,0" />
+        <Button Content="+ Add goal" Click="OpenAddGoalWindow" HorizontalAlignment="Left" HorizontalContentAlignment="Center" />
+
+        <TextBlock Text="Goal list" Classes="label" Margin="0,10,0,0" />
         <ListBox ItemsSource="{Binding Goals}" SelectedItem="{Binding SelectedGoal}" Height="400">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Title}" FontWeight="Bold" />
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="Bold" />
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock Classes="label">
+                                <Run Text="Target: " />
+                                <Run Text="{Binding TargetValue}" />
+                            </TextBlock>
+                            <TextBlock Classes="label">
+                                <Run Text="Current: " />
+                                <Run Text="{Binding CurrentValue}" />
+                            </TextBlock>
+                        </StackPanel>
+                    </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <StackPanel Orientation="Horizontal" Spacing="10">
-            <Button Content="Edit" Click="OpenEditGoalWindow" />
-            <Button Content="Delete" Click="OnDeleteGoal" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Edit" Click="OpenEditGoalWindow" HorizontalContentAlignment="Center" Width="80"/>
+            <Button Content="Delete" Classes="danger" Click="OnDeleteGoal" HorizontalContentAlignment="Center" Width="80"/>
         </StackPanel>
 
     </StackPanel>

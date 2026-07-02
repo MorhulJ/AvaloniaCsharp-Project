@@ -3,33 +3,48 @@
         xmlns:vm="using:GymApp.ViewModels"
         x:Class="GymApp.Views.AddIntakeWindow"
         x:DataType="vm:SupplementIntakeViewModel"
-        Title="Add Exercise"
-        Width="400" Height="350"
+        Title="Add Intake"
+        Width="420" Height="420"
         WindowStartupLocation="CenterOwner">
 
-    <StackPanel Margin="20" Spacing="10">
-        
-        <TextBlock Text="Supplement" />
-        <ComboBox ItemsSource="{Binding Supplements}"
-                  SelectedItem="{Binding Supplement}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
+    <StackPanel Margin="24" Spacing="14">
 
-        <TextBlock Text="Dosage" />
-        <TextBox Text="{Binding SupplementDosage}" />
+        <TextBlock Text="Supplement intake" Classes="title" FontSize="20" />
 
-        <TextBlock Text="Day" />
-        <ComboBox ItemsSource="{Binding DayOptions}"
-                  SelectedItem="{Binding SupplementDay}" />
+        <StackPanel Spacing="6">
+            <TextBlock Text="Supplement" Classes="label" />
+            <ComboBox ItemsSource="{Binding Supplements}"
+                      SelectedItem="{Binding Supplement}"
+                      HorizontalAlignment="Stretch">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
 
-        <TextBlock Text="Time (hh:mm)" />
-        <TextBox Text="{Binding SupplementTime}" />
+        <StackPanel Spacing="6">
+            <TextBlock Text="Dosage" Classes="label" />
+            <TextBox Text="{Binding SupplementDosage}" />
+        </StackPanel>
 
-        <Button Content="Save" Command="{Binding SaveSupplementIntakeCommand}" />
+        <StackPanel Spacing="6">
+            <TextBlock Text="Day" Classes="label" />
+            <ComboBox ItemsSource="{Binding DayOptions}"
+                      SelectedItem="{Binding SupplementDay}"
+                      HorizontalAlignment="Stretch" />
+        </StackPanel>
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Time (hh:mm)" Classes="label" />
+            <TextBox Text="{Binding SupplementTime}" />
+        </StackPanel>
+
+        <Button Content="Save" Command="{Binding SaveSupplementIntakeCommand}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                Margin="0,10,0,0" />
 
     </StackPanel>
 

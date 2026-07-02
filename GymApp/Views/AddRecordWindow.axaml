@@ -3,29 +3,41 @@
         xmlns:vm="using:GymApp.ViewModels"
         x:Class="GymApp.Views.AddRecordWindow"
         x:DataType="vm:PersonalRecordViewModel"
-        Title="Add Exercise"
-        Width="400" Height="300"
+        Title="Add Record"
+        Width="420" Height="340"
         WindowStartupLocation="CenterOwner">
 
-    <StackPanel Margin="20" Spacing="10">
+    <StackPanel Margin="24" Spacing="14">
 
-        <TextBlock Text="Exercise" />
-        <ComboBox ItemsSource="{Binding Exercises}"
-                  SelectedItem="{Binding RecordExercise}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
+        <TextBlock Text="Record" Classes="title" FontSize="20" />
 
-        <TextBlock Text="Value (kg)" />
-        <TextBox Text="{Binding RecordValue}" />
+        <StackPanel Spacing="6">
+            <TextBlock Text="Exercise" Classes="label" />
+            <ComboBox ItemsSource="{Binding Exercises}"
+                      SelectedItem="{Binding RecordExercise}"
+                      HorizontalAlignment="Stretch">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
 
-        <TextBlock Text="Date" />
-        <DatePicker SelectedDate="{Binding RecordDate}" />
+        <StackPanel Spacing="6">
+            <TextBlock Text="Value (kg)" Classes="label" />
+            <TextBox Text="{Binding RecordValue}" />
+        </StackPanel>
 
-        <Button Content="Save" Command="{Binding SaveRecordCommand}" />
+        <StackPanel Spacing="6">
+            <TextBlock Text="Date" Classes="label" />
+            <DatePicker SelectedDate="{Binding RecordDate}"/>
+        </StackPanel>
+
+        <Button Content="Save" Command="{Binding SaveRecordCommand}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                Margin="0,10,0,0" />
 
     </StackPanel>
 

@@ -3,19 +3,25 @@
         xmlns:vm="using:GymApp.ViewModels"
         x:Class="GymApp.Views.AddProgramWindow"
         x:DataType="vm:WorkoutProgramViewModel"
-        Title="Add Workout Program"
-        Width="400" Height="250"
+        Title="Add Program"
+        Width="420" Height="290"
         WindowStartupLocation="CenterOwner">
 
-    <StackPanel Margin="20" Spacing="10">
+    <StackPanel Margin="24" Spacing="14">
 
-        <TextBlock Text="Program name" />
-        <TextBox Text="{Binding ProgramName}" />
+        <TextBlock Text="Program" Classes="title" FontSize="20" />
 
-        <TextBlock Text="Description" />
-        <TextBox Text="{Binding ProgramDescription}" />
+        <StackPanel Spacing="6">
+            <TextBlock Text="Program name" Classes="label" />
+            <TextBox Text="{Binding ProgramName}" />
+        </StackPanel>
 
-        <Button Content="Save" Command="{Binding SaveProgramCommand}" />
+        <StackPanel Spacing="6">
+            <TextBlock Text="Description" Classes="label" />
+            <TextBox Text="{Binding ProgramDescription}" />
+        </StackPanel>
+
+        <Button Content="Save" Command="{Binding SaveProgramCommand}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" Margin="0,10,0,0" />
 
     </StackPanel>
 

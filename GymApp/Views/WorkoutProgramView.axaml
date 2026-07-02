@@ -4,53 +4,65 @@
              x:Class="GymApp.Views.WorkoutProgramView"
              x:DataType="vm:WorkoutProgramViewModel">
 
-    <StackPanel Margin="20" Spacing="10">
-        
-        <Button Content="Add Program" Click="OpenAddProgramWindow" />
+    <StackPanel Margin="30" Spacing="16">
 
-        <TextBlock Text="Select program"
-                   Margin="0,10,0,0" />
-        <ComboBox ItemsSource="{Binding WorkoutPrograms}" SelectedItem="{Binding SelectedProgram}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-        
+        <TextBlock Text="Workout programs" Classes="title" />
+
         <StackPanel Orientation="Horizontal" Spacing="10">
-            <Button Content="Edit Program" Click="OpenEditProgramWindow" />
-            <Button Content="Delete Program" Click="OnDeleteWorkoutProgram" />
+            <Button Content="+ Add program" Click="OpenAddProgramWindow" />
         </StackPanel>
-        
-        <TextBlock Text="Program exercises:"
-                   Margin="0,10,0,0" />
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Select program" Classes="label" />
+            <ComboBox ItemsSource="{Binding WorkoutPrograms}"
+                      SelectedItem="{Binding SelectedProgram}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Edit" Click="OpenEditProgramWindow" HorizontalContentAlignment="Center" Width="80"/>
+            <Button Content="Delete" Classes="danger" Click="OnDeleteWorkoutProgram" HorizontalContentAlignment="Center" Width="80"/>
+        </StackPanel>
+
+        <TextBlock Text="Exercises in program" Classes="label" Margin="0,10,0,0" />
 
         <ListBox ItemsSource="{Binding ProgramExercises}"
                  SelectedItem="{Binding SelectedProgramExercise}"
-                 Height="400">
+                 Height="350">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Margin="0,4">
-                        <TextBlock Text="{Binding Exercise.Name}" FontWeight="Bold" />
-                        <TextBlock>
-                            <Run Text="Sets: " />
-                            <Run Text="{Binding Sets}" />
-                            <Run Text="  Reps: " />
-                            <Run Text="{Binding Reps}" />
-                            <Run Text="  Rest: " />
-                            <Run Text="{Binding RestTime}" />
-                        </TextBlock>
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{Binding Exercise.Name}" FontSize="15" FontWeight="Bold" />
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock Classes="label">
+                                <Run Text="Sets: " />
+                                <Run Text="{Binding Sets}" />
+                            </TextBlock>
+                            <TextBlock Classes="label">
+                                <Run Text="Reps: " />
+                                <Run Text="{Binding Reps}" />
+                            </TextBlock>
+                            <TextBlock Classes="label">
+                                <Run Text="Rest: " />
+                                <Run Text="{Binding RestTime}" />
+                                <Run Text="s" />
+                            </TextBlock>
+                        </StackPanel>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        
-        <StackPanel Orientation="Horizontal" Spacing="10">
-            <Button Content="Add Exercise" Click="OpenAddExerciseToProgramWindow" />
-            <Button Content="Delete Exercise" Click="OnDeleteExerciseFromProgram" />
+
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="+ Add exercise" Click="OpenAddExerciseToProgramWindow" />
+            <Button Content="Delete exercise" Classes="danger" Click="OnDeleteExerciseFromProgram" />
         </StackPanel>
-        
+
     </StackPanel>
-    
+
 </UserControl>

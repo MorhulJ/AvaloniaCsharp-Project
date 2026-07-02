@@ -4,21 +4,32 @@
         x:Class="GymApp.Views.AddSupplementWindow"
         x:DataType="vm:SupplementViewModel"
         Title="Add Supplement"
-        Width="400" Height="300"
+        Width="420" Height="350"
         WindowStartupLocation="CenterOwner">
 
-    <StackPanel Margin="20" Spacing="10">
+    <StackPanel Margin="24" Spacing="14">
 
-        <TextBlock Text="Supplement name" />
-        <TextBox Text="{Binding SupplementName}" />
+        <TextBlock Text="Supplement" Classes="title" FontSize="20" />
 
-        <TextBlock Text="Dosage Unit" />
-        <TextBox Text="{Binding DosageUnit}" />
+        <StackPanel Spacing="6">
+            <TextBlock Text="Supplement name" Classes="label" />
+            <TextBox Text="{Binding SupplementName}" />
+        </StackPanel>
 
-        <TextBlock Text="Description" />
-        <TextBox Text="{Binding Description}" />
+        <StackPanel Spacing="6">
+            <TextBlock Text="Dosage unit" Classes="label" />
+            <TextBox Text="{Binding DosageUnit}" />
+        </StackPanel>
 
-        <Button Content="Save" Command="{Binding SaveSupplementCommand}" />
+        <StackPanel Spacing="6">
+            <TextBlock Text="Description" Classes="label" />
+            <TextBox Text="{Binding Description}" />
+        </StackPanel>
+
+        <Button Content="Save" Command="{Binding SaveSupplementCommand}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                Margin="0,10,0,0" />
 
     </StackPanel>
 

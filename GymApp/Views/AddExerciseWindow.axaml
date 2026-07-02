@@ -4,12 +4,12 @@
         x:Class="GymApp.Views.AddExerciseWindow"
         x:DataType="vm:ExerciseViewModel"
         Title="Add Exercise"
-        Width="420" Height="340"
+        Width="420" Height="360"
         WindowStartupLocation="CenterOwner">
 
     <StackPanel Margin="24" Spacing="14">
 
-        <TextBlock Text="Add exercise" Classes="title" FontSize="20" />
+        <TextBlock Text="Exercise" Classes="title" FontSize="20" />
 
         <StackPanel Spacing="6">
             <TextBlock Text="Exercise name" Classes="label" />

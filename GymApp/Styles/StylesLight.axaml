@@ -103,5 +103,59 @@
         <Setter Property="BorderBrush" Value="{StaticResource TerracottaBrush}" />
         <Setter Property="BorderThickness" Value="1.5" />
     </Style>
+    
+    <Style Selector="ComboBoxItem">
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="Background" Value="{StaticResource CardBrush}" />
+    </Style>
+
+    <Style Selector="ComboBoxItem:selected /template/ ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource TerracottaBrush}" />
+    </Style>
+
+    <Style Selector="ComboBoxItem:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource TerracottaLightBrush}" />
+    </Style>
+    
+    <Style Selector="DatePicker">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+    </Style>
+    
+    <Style Selector="DatePicker /template/ TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI, Arial, sans-serif" />
+        <Setter Property="FontSize" Value="14" />
+    </Style>
+
+    <Style Selector="DatePickerPresenter TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI, Arial, sans-serif" />
+        <Setter Property="FontSize" Value="14" />
+    </Style>
+
+    <Style Selector="DateTimePickerPanel TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI, Arial, sans-serif" />
+        <Setter Property="FontSize" Value="14" />
+    </Style>
+    
+    <Style Selector="DateTimePickerPanel ListBoxItem:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="#E8D5C4" />
+    </Style>
+    
+    <Style Selector="DateTimePickerPanel ListBoxItem">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    
+    <Style Selector="StackPanel.result-card">
+        <Setter Property="Background" Value="{StaticResource CardBrush}" />
+        <Setter Property="Margin" Value="0,0,0,0" />
+    </Style>
+    
+    <Style Selector="StackPanel.result-card">
+        <Setter Property="Background" Value="{StaticResource CardBrush}" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
 
 </Styles>

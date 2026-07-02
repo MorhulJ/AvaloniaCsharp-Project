@@ -4,30 +4,34 @@
              x:Class="GymApp.Views.SupplementIntakeView"
              x:DataType="vm:SupplementIntakeViewModel">
 
-    <StackPanel Margin="20" Spacing="10">
-        
-        <Button Content="Add Intake" Click="OpenAddIntakeWindow" />
+    <StackPanel Margin="30" Spacing="16">
 
-        <TextBlock Text="Schedule:" Margin="0,10,0,0" />
+        <TextBlock Text="Supplement schedule" Classes="title" />
+
+        <Button Content="+ Add intake" Click="OpenAddIntakeWindow" HorizontalAlignment="Left" HorizontalContentAlignment="Center" />
+
+        <TextBlock Text="Schedule" Classes="label" Margin="0,10,0,0" />
         <ListBox ItemsSource="{Binding SupplementIntakes}" SelectedItem="{Binding SelectedSupplementIntake}" Height="400">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Margin="0,4">
-                        <TextBlock Text="{Binding Supplement.Name}" FontWeight="Bold" />
-                        <TextBlock>
-                            <Run Text="{Binding Date}" />
-                            <Run Text=" — " />
-                            <Run Text="{Binding Time}" />
-                            <Run Text=" — " />
-                            <Run Text="{Binding Dosage}" />
-                            <Run Text="g" />
-                        </TextBlock>
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{Binding Supplement.Name}" FontSize="15" FontWeight="Bold" />
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock Classes="label" Text="{Binding Date}" />
+                            <TextBlock Classes="label" Text="·" />
+                            <TextBlock Classes="label" Text="{Binding Time}" />
+                            <TextBlock Classes="label" Text="·" />
+                            <TextBlock Classes="label">
+                                <Run Text="{Binding Dosage}" />
+                                <Run Text=" g" />
+                            </TextBlock>
+                        </StackPanel>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        
-        <Button Content="Delete" Click="OnDeleteSupplementIntake" />
+
+        <Button Content="Delete" Classes="danger" Click="OnDeleteSupplementIntake" HorizontalContentAlignment="Center" Width="80" />
 
     </StackPanel>
 

@@ -4,25 +4,46 @@
              x:Class="GymApp.Views.UserView"
              x:DataType="vm:UserViewModel">
 
-    <StackPanel Margin="20" Spacing="10">
+    <StackPanel Margin="30" Spacing="16">
 
-        <TextBlock Text="Name" />
-        <TextBox Text="{Binding UserName}" />
+        <TextBlock Text="Profile" Classes="title" />
 
-        <TextBlock Text="Gender" />
-        <ComboBox ItemsSource="{Binding GenderOptions}"
-                  SelectedItem="{Binding UserGender}" />
+        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto">
 
-        <TextBlock Text="Date of birth" />
-        <DatePicker SelectedDate="{Binding UserDateOfBirth}" />
+            <StackPanel Grid.Column="0" Grid.Row="0" Spacing="6" Margin="0,0,40,10">
+                <TextBlock Text="Name" Classes="label" />
+                <TextBox Text="{Binding UserName}" />
+            </StackPanel>
 
-        <TextBlock Text="Weight (kg)" />
-        <TextBox Text="{Binding UserWeight}" />
+            <StackPanel Grid.Column="1" Grid.Row="0" Spacing="6" Margin="0,0,0,10">
+                <TextBlock Text="Gender" Classes="label" />
+                <ComboBox ItemsSource="{Binding GenderOptions}"
+                          SelectedItem="{Binding UserGender}"
+                          HorizontalAlignment="Stretch" />
+            </StackPanel>
 
-        <TextBlock Text="Height (cm)" />
-        <TextBox Text="{Binding UserHeight}" />
+            <StackPanel Grid.Column="0" Grid.Row="1" Spacing="6" Margin="0,0,40,10">
+                <TextBlock Text="Weight (kg)" Classes="label" />
+                <TextBox Text="{Binding UserWeight}" />
+            </StackPanel>
 
-        <Button Content="Save" Command="{Binding SaveUserCommand}" />
+            <StackPanel Grid.Column="1" Grid.Row="1" Spacing="6" Margin="0,0,0,10">
+                <TextBlock Text="Height (cm)" Classes="label" />
+                <TextBox Text="{Binding UserHeight}" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="0" Grid.Row="2" Spacing="6" Margin="0,0,10,0">
+                <TextBlock Text="Date of birth" Classes="label" />
+                <DatePicker SelectedDate="{Binding UserDateOfBirth}"/>
+            </StackPanel>
+
+        </Grid>
+
+        <Button Content="Save" Command="{Binding SaveUserCommand}"
+                HorizontalAlignment="Left"
+                HorizontalContentAlignment="Center"
+                Width="150"
+                Margin="0,10,0,0" />
 
     </StackPanel>
 

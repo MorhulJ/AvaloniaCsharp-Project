@@ -26,8 +26,8 @@
         </ListBox>
 
         <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Content="Edit" Click="OpenEditExerciseWindow" />
-            <Button Content="Delete" Classes="danger" Click="OnDeleteExercise" />
+            <Button Content="Edit" Click="OpenEditExerciseWindow" HorizontalContentAlignment="Center" Width="80"/>
+            <Button Content="Delete" Classes="danger" Click="OnDeleteExercise" HorizontalContentAlignment="Center" Width="80"/>
         </StackPanel>
 
     </StackPanel>

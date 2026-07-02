@@ -4,27 +4,31 @@
              x:Class="GymApp.Views.PersonalRecordView"
              x:DataType="vm:PersonalRecordViewModel">
 
-    <StackPanel Margin="20" Spacing="10">
-        
-        <Button Content="Add Record" Click="OpenAddRecordWindow" />
-        
-        <TextBlock Text="Records list:" Margin="0,10,0,0" />
+    <StackPanel Margin="30" Spacing="16">
+
+        <TextBlock Text="Personal records" Classes="title" />
+
+        <Button Content="+ Add record" Click="OpenAddRecordWindow" HorizontalAlignment="Left" HorizontalContentAlignment="Center" />
+
+        <TextBlock Text="Records list" Classes="label" Margin="0,10,0,0" />
         <ListBox ItemsSource="{Binding Records}" SelectedItem="{Binding SelectedRecord}" Height="400">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Margin="0,4">
-                        <TextBlock Text="{Binding Exercise.Name}" FontWeight="Bold" />
-                        <TextBlock>
-                            <Run Text="{Binding Value}" />
-                            <Run Text="kg — " />
-                            <Run Text="{Binding Date, StringFormat='{}{0:dd.MM.yyyy}'}" />
-                        </TextBlock>
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{Binding Exercise.Name}" FontSize="15" FontWeight="Bold" />
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock Classes="label">
+                                <Run Text="{Binding Value}" />
+                                <Run Text=" kg" />
+                            </TextBlock>
+                            <TextBlock Classes="label" Text="{Binding Date, StringFormat='{}{0:dd.MM.yyyy}'}" />
+                        </StackPanel>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        
-        <Button Content="Delete" Click="OnDeleteRecord" />
+
+        <Button Content="Delete" Classes="danger" Click="OnDeleteRecord" HorizontalContentAlignment="Center" Width="80"/>
 
     </StackPanel>
 

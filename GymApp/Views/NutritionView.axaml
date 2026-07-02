@@ -4,39 +4,151 @@
              x:Class="GymApp.Views.NutritionView"
              x:DataType="vm:NutritionViewModel">
 
-    <StackPanel Margin="20" Spacing="10">
+    <ScrollViewer>
+        <StackPanel Margin="30" Spacing="16">
 
-        <TextBlock Text="Weight (kg)" />
-        <TextBox Text="{Binding Weight}" />
+            <TextBlock Text="Nutrition calculator" Classes="title" />
 
-        <TextBlock Text="Height (cm)" />
-        <TextBox Text="{Binding Height}" />
+            <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto">
 
-        <TextBlock Text="Age" />
-        <TextBox Text="{Binding Age}" />
+                <StackPanel Grid.Column="0" Grid.Row="0" Spacing="6" Margin="0,0,40,10">
+                    <TextBlock Text="Weight (kg)" Classes="label" />
+                    <TextBox Text="{Binding Weight}" />
+                </StackPanel>
 
-        <TextBlock Text="Gender" />
-        <ComboBox ItemsSource="{Binding GenderOptions}"
-                  SelectedItem="{Binding Gender}" />
+                <StackPanel Grid.Column="1" Grid.Row="0" Spacing="6" Margin="0,0,40,10">
+                    <TextBlock Text="Height (cm)" Classes="label" />
+                    <TextBox Text="{Binding Height}" />
+                </StackPanel>
 
-        <TextBlock Text="Activity level" />
-        <ComboBox ItemsSource="{Binding ActivityLevelOptions}"
-                  SelectedItem="{Binding ActivityLevel}" />
+                <StackPanel Grid.Column="2" Grid.Row="0" Spacing="6" Margin="0,0,0,10">
+                    <TextBlock Text="Age" Classes="label" />
+                    <TextBox Text="{Binding Age}" />
+                </StackPanel>
 
-        <TextBlock Text="Goal" />
-        <ComboBox ItemsSource="{Binding GoalOptions}"
-                  SelectedItem="{Binding Goal}" />
+                <StackPanel Grid.Column="0" Grid.Row="1" Spacing="6" Margin="0,0,40,10">
+                    <TextBlock Text="Gender" Classes="label" />
+                    <ComboBox ItemsSource="{Binding GenderOptions}"
+                              SelectedItem="{Binding Gender}"
+                              HorizontalAlignment="Stretch" />
+                </StackPanel>
 
-        <Button Content="Calculate" Command="{Binding CalculateCommand}" />
+                <StackPanel Grid.Column="1" Grid.Row="1" Spacing="6" Margin="0,0,40,10">
+                    <TextBlock Text="Activity level" Classes="label" />
+                    <ComboBox ItemsSource="{Binding ActivityLevelOptions}"
+                              SelectedItem="{Binding ActivityLevel}"
+                              HorizontalAlignment="Stretch" />
+                </StackPanel>
 
-        <TextBlock Text="Results:" Margin="0,10,0,0" FontWeight="Bold" />
-        <TextBlock Text="{Binding Bmr, StringFormat='BMR (base metabolism): {0} kcal'}" />
-        <TextBlock Text="{Binding Tdee, StringFormat='TDEE (calorie expenditure): {0} kcal'}" />
-        <TextBlock Text="{Binding Calories, StringFormat='Calories: {0} kcal'}" />
-        <TextBlock Text="{Binding Protein, StringFormat='Protein: {0} g'}" />
-        <TextBlock Text="{Binding Fat, StringFormat='Fat: {0} g'}" />
-        <TextBlock Text="{Binding Carbs, StringFormat='Carbs: {0} g'}" />
+                <StackPanel Grid.Column="2" Grid.Row="1" Spacing="6" Margin="0,0,0,10">
+                    <TextBlock Text="Goal" Classes="label" />
+                    <ComboBox ItemsSource="{Binding GoalOptions}"
+                              SelectedItem="{Binding Goal}"
+                              HorizontalAlignment="Stretch" />
+                </StackPanel>
 
-    </StackPanel>
+            </Grid>
+
+            <Button Content="Calculate" Command="{Binding CalculateCommand}"
+                    HorizontalAlignment="Left"
+                    HorizontalContentAlignment="Center"
+                    Width="150" />
+
+            <TextBlock Text="Results" Classes="title" FontSize="18" Margin="0,10,0,0" />
+
+            <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto">
+
+                <Border Grid.Column="0" Grid.Row="0"
+                        Background="{StaticResource CardBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        Padding="16,12"
+                        Margin="0,0,40,20">
+                    <StackPanel Spacing="4" HorizontalAlignment="Center">
+                        <TextBlock Text="BMR" Classes="label" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding Bmr, StringFormat='{}{0} kcal'}" FontFamily="Segoe UI, Arial"
+                                   FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" />
+                        <TextBlock Text="Base metabolism" Classes="label" FontSize="10" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Grid.Row="0"
+                        Background="{StaticResource CardBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        Padding="16,12"
+                        Margin="0,0,40,20">
+                    <StackPanel Spacing="4" HorizontalAlignment="Center">
+                        <TextBlock Text="TDEE" Classes="label" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding Tdee, StringFormat='{}{0} kcal'}" FontFamily="Segoe UI, Arial"
+                                   FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" />
+                        <TextBlock Text="Total expenditure" Classes="label" FontSize="10" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Grid.Row="0"
+                        Background="{StaticResource CardBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        Padding="16,12"
+                        Margin="0,0,0,20">
+                    <StackPanel Spacing="4" HorizontalAlignment="Center">
+                        <TextBlock Text="Calories" Classes="label" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding Calories, StringFormat='{}{0} kcal'}" FontFamily="Segoe UI, Arial"
+                                   FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" />
+                        <TextBlock Text="Daily target" Classes="label" FontSize="10" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="0" Grid.Row="1"
+                        Background="{StaticResource CardBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        Padding="16,12"
+                        Margin="0,0,40,0">
+                    <StackPanel Spacing="4" HorizontalAlignment="Center">
+                        <TextBlock Text="Protein" Classes="label" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding Protein, StringFormat='{}{0} g'}" FontFamily="Segoe UI, Arial"
+                                   FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Grid.Row="1"
+                        Background="{StaticResource CardBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        Padding="16,12"
+                        Margin="0,0,40,0">
+                    <StackPanel Spacing="4" HorizontalAlignment="Center">
+                        <TextBlock Text="Fat" Classes="label" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding Fat, StringFormat='{}{0} g'}" FontFamily="Segoe UI, Arial"
+                                   FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Grid.Row="1"
+                        Background="{StaticResource CardBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        Padding="16,12"
+                        Margin="0,0,0,0">
+                    <StackPanel Spacing="4" HorizontalAlignment="Center">
+                        <TextBlock Text="Carbs" Classes="label" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding Carbs, StringFormat='{}{0} g'}" FontFamily="Segoe UI, Arial"
+                                   FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
+            </Grid>
+
+        </StackPanel>
+        
+    </ScrollViewer>
 
 </UserControl>
