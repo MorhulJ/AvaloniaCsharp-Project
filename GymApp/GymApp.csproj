@@ -88,6 +88,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Repositories\Interfaces\" />
       <Folder Include="Styles\" />
     </ItemGroup>
 </Project>
