@@ -10,4 +10,6 @@ public class User
     public DateTime DateOfBirth { get; set; }
     public int weight { get; set; }
     public int height { get; set; }
+    public string Login { get; set; } = "";
+    public string PasswordHash { get; set; } = "";
 }

@@ -102,6 +102,39 @@ namespace GymApp.Migrations
                     b.ToTable("PersonalRecords");
                 });
 
+            modelBuilder.Entity("GymApp.Models.ProgramExercise", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ExerciseId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ProgramId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Reps")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RestTime")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Sets")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExerciseId");
+
+                    b.HasIndex("ProgramId");
+
+                    b.ToTable("WorkoutExercises");
+                });
+
             modelBuilder.Entity("GymApp.Models.Supplement", b =>
                 {
                     b.Property<int>("Id")
@@ -168,7 +201,15 @@ namespace GymApp.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Login")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -210,39 +251,6 @@ namespace GymApp.Migrations
                     b.ToTable("WorkoutPrograms");
                 });
 
-            modelBuilder.Entity("ProgramExercise", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ExerciseId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("OrderIndex")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ProgramId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Reps")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("RestTime")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Sets")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ExerciseId");
-
-                    b.HasIndex("ProgramId");
-
-                    b.ToTable("WorkoutExercises");
-                });
-
             modelBuilder.Entity("GymApp.Models.Goal", b =>
                 {
                     b.HasOne("GymApp.Models.Exercise", "Exercise")
@@ -279,6 +287,25 @@ namespace GymApp.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("GymApp.Models.ProgramExercise", b =>
+                {
+                    b.HasOne("GymApp.Models.Exercise", "Exercise")
+                        .WithMany()
+                        .HasForeignKey("ExerciseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GymApp.Models.WorkoutProgram", "Program")
+                        .WithMany("ProgramExercises")
+                        .HasForeignKey("ProgramId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Exercise");
+
+                    b.Navigation("Program");
+                });
+
             modelBuilder.Entity("GymApp.Models.SupplementIntake", b =>
                 {
                     b.HasOne("GymApp.Models.Supplement", "Supplement")
@@ -307,25 +334,6 @@ namespace GymApp.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ProgramExercise", b =>
-                {
-                    b.HasOne("GymApp.Models.Exercise", "Exercise")
-                        .WithMany()
-                        .HasForeignKey("ExerciseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GymApp.Models.WorkoutProgram", "Program")
-                        .WithMany("ProgramExercises")
-                        .HasForeignKey("ProgramId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Exercise");
-
-                    b.Navigation("Program");
                 });
 
             modelBuilder.Entity("GymApp.Models.WorkoutProgram", b =>
