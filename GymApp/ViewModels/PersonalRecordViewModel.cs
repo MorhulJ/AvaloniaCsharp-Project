@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GymApp.Models;
 using GymApp.Services;
+using GymApp.Validators;
 
 namespace GymApp.ViewModels;
 
@@ -17,6 +18,9 @@ public partial class PersonalRecordViewModel : ViewModelBase
     public ObservableCollection<PersonalRecord> Records { get; } = new();
 
     public ObservableCollection<Exercise> Exercises { get; } = new();
+
+    [ObservableProperty] 
+    private string validationMessage = "";
     
     [ObservableProperty]
     private Exercise? recordExercise;
@@ -35,6 +39,8 @@ public partial class PersonalRecordViewModel : ViewModelBase
         _exerciseService = exerciseService;
     }
 
+    private readonly RecordValidator _validator = new();
+
     [RelayCommand]
     private async Task SaveRecordAsync()
     {
@@ -46,6 +52,16 @@ public partial class PersonalRecordViewModel : ViewModelBase
             Date = recordDate,
         };
         
+        var result = _validator.Validate(record);
+
+        if (!result.IsValid)
+        {
+            ValidationMessage = result.Errors[0].ErrorMessage;
+            return;
+        }
+
+        ValidationMessage = "";
+
         await _personalRecordService.AddRecordAsync(record);
         
         RecordExercise = null;
@@ -99,5 +115,10 @@ public partial class PersonalRecordViewModel : ViewModelBase
         RecordExercise =  Exercises.FirstOrDefault(e => e.Id == value.ExerciseId);
         RecordValue =  value.Value;
         RecordDate =  value.Date;
+    }
+
+    public void ResetValidation()
+    {
+        validationMessage = "";
     }
 }

@@ -5,12 +5,16 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GymApp.Models;
 using GymApp.Services;
+using GymApp.Validators;
 
 namespace GymApp.ViewModels;
 
 public partial class UserViewModel : ViewModelBase
 {
     private readonly UserService _userService;
+    
+    [ObservableProperty]
+    private string validationMessage = "";
     
     [ObservableProperty]
     private int userId;
@@ -31,6 +35,8 @@ public partial class UserViewModel : ViewModelBase
     {
         _userService = userService;
     }
+    
+    private readonly UserValidator _validator = new UserValidator();
 
     [RelayCommand]
     private async Task SaveUserAsync()
@@ -45,6 +51,16 @@ public partial class UserViewModel : ViewModelBase
             height =  UserHeight
         };
         
+        var result = _validator.Validate(user);
+
+        if (!result.IsValid)
+        {
+            ValidationMessage =  result.Errors[0].ErrorMessage;
+            return;
+        }
+
+        ValidationMessage = "";
+
         await _userService.UpdateUserAsync(user);
     }
 

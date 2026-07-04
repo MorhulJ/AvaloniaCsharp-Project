@@ -23,7 +23,8 @@ public partial class SupplementIntakeView : UserControl
     private void OpenAddIntakeWindow(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (DataContext is not SupplementIntakeViewModel vm) return;
-
+        
+        vm.ResetValidation();
         vm.Supplement = null;
         vm.SupplementDosage = 0;
         vm.SupplementDay = DayOfWeek.Monday;

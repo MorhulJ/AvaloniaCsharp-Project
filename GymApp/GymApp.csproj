@@ -21,6 +21,7 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1" />
+        <PackageReference Include="FluentValidation" Version="12.1.1" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -88,7 +89,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Repositories\Interfaces\" />
       <Folder Include="Styles\" />
     </ItemGroup>
 </Project>

@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GymApp.Models;
 using GymApp.Services;
+using GymApp.Validators;
 
 namespace GymApp.ViewModels;
 
@@ -18,6 +19,9 @@ public partial class WorkoutProgramViewModel : ViewModelBase
     public ObservableCollection<Exercise> Exercises { get; } = new();
 
     [ObservableProperty] 
+    private string programValidationMessage = "";
+
+    [ObservableProperty] 
     private string programName = "";
     [ObservableProperty] 
     private string programDescription = "";
@@ -27,6 +31,9 @@ public partial class WorkoutProgramViewModel : ViewModelBase
     private int? _editingProgramId;
     
     public event Action? ProgramSaved;
+    
+    [ObservableProperty]
+    private string programExerciseValidationMessage = "";
 
     [ObservableProperty] 
     private int exerciseSets;
@@ -47,6 +54,9 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         _exerciseService = exerciseService;
     }
 
+    private readonly ProgramValidator _programValidator = new();
+    private readonly ProgramExerciseValidator _programExerciseValidator = new();
+
     [RelayCommand]
     private async Task SaveProgramAsync()
     {
@@ -58,7 +68,16 @@ public partial class WorkoutProgramViewModel : ViewModelBase
                 Name = ProgramName,
                 Description = ProgramDescription,
             };
+            
+            var programResult = _programValidator.Validate(program);
+            
+            if (!programResult.IsValid)
+            {
+                ProgramValidationMessage = programResult.Errors[0].ErrorMessage;
+                return;
+            }
 
+            ProgramValidationMessage = "";
             await _programService.AddProgramAsync(program);
         }
         else
@@ -86,8 +105,14 @@ public partial class WorkoutProgramViewModel : ViewModelBase
     [RelayCommand]
     public async Task AddExerciseToProgramAsync()
     {
-        if (SelectedProgram == null || SelectedExercise == null)
+        if (SelectedProgram == null)
             return;
+        
+        if (SelectedExercise == null)
+        {
+            ProgramExerciseValidationMessage = "Exercise is required";
+            return;
+        }
         
         var programExercise = new ProgramExercise
         {
@@ -98,6 +123,16 @@ public partial class WorkoutProgramViewModel : ViewModelBase
             RestTime = ExerciseRestTime,
             OrderIndex = ProgramExercises.Count + 1
         };
+        
+        var programExerciseResult = _programExerciseValidator.Validate(programExercise);
+            
+        if (!programExerciseResult.IsValid)
+        {
+            ProgramExerciseValidationMessage = programExerciseResult.Errors[0].ErrorMessage;
+            return;
+        }
+
+        ProgramExerciseValidationMessage = "";
         
         await _programService.AddExerciseToProgramAsync(programExercise);
         await LoadProgramExercisesAsync();
@@ -192,5 +227,15 @@ public partial class WorkoutProgramViewModel : ViewModelBase
     public void ResetEditingState()
     {
         _editingProgramId = null;
+    }
+    
+    public void ResetProgramValidation()
+    {
+        ProgramValidationMessage = "";
+    }
+    
+    public void ResetProgramExerciseValidation()
+    {
+        ProgramExerciseValidationMessage = "";
     }
 }

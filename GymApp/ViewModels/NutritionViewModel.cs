@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GymApp.Services;
+using GymApp.Validators;
 
 namespace GymApp.ViewModels;
 
@@ -11,6 +12,9 @@ public partial class NutritionViewModel : ViewModelBase
     public List<string> GenderOptions { get; } = new() { "Male", "Female" };
     public List<string> ActivityLevelOptions { get; } = new() { "Sedentary", "Light", "Moderate", "Active", "VeryActive" };
     public List<string> GoalOptions { get; } = new() { "Lose", "Maintain", "Gain" };
+    
+    [ObservableProperty]
+    private string validationMessage = "";
     
     [ObservableProperty] 
     private int weight;
@@ -38,9 +42,21 @@ public partial class NutritionViewModel : ViewModelBase
     [ObservableProperty] 
     private double carbs;
     
+    private readonly NutritionValidator _validator = new();
+    
     [RelayCommand]
     private void Calculate()
     {
+        var result = _validator.Validate(this);
+    
+        if (!result.IsValid)
+        {
+            ValidationMessage = result.Errors[0].ErrorMessage;
+            return;
+        }
+    
+        ValidationMessage = "";
+        
         double calculatedBmr = NutritionCalculator.CalculateBmr(weight, height, age, gender);
         double calculatedTdee = NutritionCalculator.CalculateTdee(calculatedBmr, activityLevel);
         double calculatedCalories = NutritionCalculator.AdjustCaloriesForGoal(calculatedTdee, goal);

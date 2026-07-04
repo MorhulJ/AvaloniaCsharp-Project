@@ -23,7 +23,8 @@ public partial class PersonalRecordView : UserControl
     private void OpenAddRecordWindow(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (DataContext is not PersonalRecordViewModel vm) return;
-
+        
+        vm.ResetValidation();
         vm.RecordExercise = null;
         vm.RecordValue = 0;
         vm.RecordDate = DateTime.Today;

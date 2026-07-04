@@ -25,6 +25,7 @@ public partial class GoalView : UserControl
         if (DataContext is not GoalViewModel vm) return;
         
         vm.ResetEditingState();
+        vm.ResetValidation();
         vm.GoalTitle = "";
         vm.GoalExercise = null;
         vm.GoalValue = 0;

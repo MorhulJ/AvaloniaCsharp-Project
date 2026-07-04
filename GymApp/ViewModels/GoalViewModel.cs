@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using GymApp.Models;
 using GymApp.Services;
 using System.Threading.Tasks;
+using GymApp.Validators;
 
 namespace GymApp.ViewModels;
 
@@ -17,6 +18,9 @@ public partial class GoalViewModel : ViewModelBase
     public ObservableCollection<Goal> Goals { get; } = new();
 
     public ObservableCollection<Exercise> Exercises { get; } = new();
+
+    [ObservableProperty] 
+    private string validationMessage = "";
 
     [ObservableProperty] 
     private string goalTitle = "";
@@ -39,6 +43,8 @@ public partial class GoalViewModel : ViewModelBase
         _exerciseService = exerciseService;
     }
 
+    private readonly GoalValidator _validator = new();
+
     [RelayCommand]
     private async Task SaveGoalAsync()
     {
@@ -52,6 +58,16 @@ public partial class GoalViewModel : ViewModelBase
                 TargetValue = goalValue,
                 CurrentValue = currentValue
             };
+            
+            var result = _validator.Validate(goal);
+
+            if (!result.IsValid)
+            {
+                ValidationMessage = result.Errors[0].ErrorMessage;
+                return;
+            }
+
+            ValidationMessage = "";
 
             await _goalService.AddGoalAsync(goal);
         }
@@ -131,5 +147,10 @@ public partial class GoalViewModel : ViewModelBase
     public void ResetEditingState()
     {
         _editingGoalId = null;
+    }
+
+    public void ResetValidation()
+    {
+        validationMessage = "";
     }
 }

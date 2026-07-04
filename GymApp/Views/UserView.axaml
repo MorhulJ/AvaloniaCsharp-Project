@@ -44,6 +44,10 @@
                 HorizontalContentAlignment="Center"
                 Width="150"
                 Margin="0,10,0,0" />
+        
+        <TextBlock Text="{Binding ValidationMessage}" 
+                   Foreground="Red"
+                   IsVisible="{Binding ValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
 
     </StackPanel>
 

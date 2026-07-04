@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GymApp.Models;
 using GymApp.Services;
+using GymApp.Validators;
 
 namespace GymApp.ViewModels;
 
@@ -13,6 +14,9 @@ public partial class SupplementViewModel : ViewModelBase
     private readonly SupplementService _supplementService;
 
     public ObservableCollection<Supplement> Suplements { get; } = new();
+
+    [ObservableProperty] 
+    private string validationMessage = "";
 
     [ObservableProperty] 
     private string supplementName = "";
@@ -32,6 +36,8 @@ public partial class SupplementViewModel : ViewModelBase
         _supplementService = supplementService;
     }
 
+    private readonly SupplementValidator _validator = new();
+
     [RelayCommand]
     private async Task SaveSupplementAsync()
     {
@@ -44,6 +50,16 @@ public partial class SupplementViewModel : ViewModelBase
                 Description = description
             };
             
+            var result = _validator.Validate(supplement);
+
+            if (!result.IsValid)
+            {
+                ValidationMessage = result.Errors[0].ErrorMessage;
+                return;
+            }
+
+            ValidationMessage = "";
+
             await _supplementService.AddSupplementAsync(supplement);
         }
         else
@@ -111,5 +127,10 @@ public partial class SupplementViewModel : ViewModelBase
     public void ResetEditingState()
     {
         _editingSupplementId = null;
+    }
+
+    public void ResetValidation()
+    {
+        validationMessage = "";
     }
 }

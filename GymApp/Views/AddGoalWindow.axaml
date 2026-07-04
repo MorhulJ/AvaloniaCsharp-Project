@@ -4,7 +4,7 @@
         x:Class="GymApp.Views.AddGoalWindow"
         x:DataType="vm:GoalViewModel"
         Title="Add Goal"
-        Width="420" Height="420"
+        Width="420" Height="440"
         WindowStartupLocation="CenterOwner">
 
     <StackPanel Margin="24" Spacing="14">
@@ -40,7 +40,11 @@
         </StackPanel>
 
         <Button Content="Save" Command="{Binding SaveGoalCommand}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" Margin="0,10,0,0" />
-
+        
+        <TextBlock Text="{Binding ValidationMessage}" 
+                   Foreground="Red"
+                   IsVisible="{Binding ValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        
     </StackPanel>
 
 </Window>

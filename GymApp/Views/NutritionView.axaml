@@ -48,12 +48,16 @@
                 </StackPanel>
 
             </Grid>
-
-            <Button Content="Calculate" Command="{Binding CalculateCommand}"
-                    HorizontalAlignment="Left"
-                    HorizontalContentAlignment="Center"
-                    Width="150" />
-
+            
+            
+            <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Calculate" Command="{Binding CalculateCommand}" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Width="150" />
+            <TextBlock Text="{Binding ValidationMessage}" 
+                       VerticalAlignment="Center" 
+                       Foreground="Red"
+                       IsVisible="{Binding ValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" /> 
+            </StackPanel>
+            
             <TextBlock Text="Results" Classes="title" FontSize="18" Margin="0,10,0,0" />
 
             <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto">

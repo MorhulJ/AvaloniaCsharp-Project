@@ -4,7 +4,7 @@
         x:Class="GymApp.Views.AddProgramWindow"
         x:DataType="vm:WorkoutProgramViewModel"
         Title="Add Program"
-        Width="420" Height="290"
+        Width="420" Height="300"
         WindowStartupLocation="CenterOwner">
 
     <StackPanel Margin="24" Spacing="14">
@@ -22,7 +22,11 @@
         </StackPanel>
 
         <Button Content="Save" Command="{Binding SaveProgramCommand}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" Margin="0,10,0,0" />
-
+        
+        <TextBlock Text="{Binding ProgramValidationMessage}" 
+                   Foreground="Red"
+                   IsVisible="{Binding ProgramValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        
     </StackPanel>
 
 </Window>

@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GymApp.Models;
 using GymApp.Services;
+using GymApp.Validators;
 
 namespace GymApp.ViewModels;
 
@@ -29,6 +30,9 @@ public partial class SupplementIntakeViewModel : ViewModelBase
     public ObservableCollection<SupplementIntake> SupplementIntakes { get; } = new();
 
     public ObservableCollection<Supplement> Supplements { get; } = new();
+
+    [ObservableProperty] 
+    private string validationMessage = "";
     
     [ObservableProperty]
     private Supplement? supplement;
@@ -48,6 +52,8 @@ public partial class SupplementIntakeViewModel : ViewModelBase
         _supplementIntakeService = supplementIntakeService;
         _supplementService = supplementService;
     }
+    
+    private readonly SupplementIntakeValidator _validator = new();
 
     [RelayCommand]
     private async Task SaveSupplementIntakeAsync()
@@ -61,6 +67,16 @@ public partial class SupplementIntakeViewModel : ViewModelBase
             Time = supplementTime,
         };
         
+        var result = _validator.Validate(supplementIntake);
+
+        if (!result.IsValid)
+        {
+            ValidationMessage =  result.Errors[0].ErrorMessage;
+            return;
+        }
+
+        ValidationMessage = "";
+
         await _supplementIntakeService.AddSupplementAsync(supplementIntake);
         
         Supplement = null;
@@ -116,5 +132,10 @@ public partial class SupplementIntakeViewModel : ViewModelBase
         SupplementDosage = value.Dosage;
         SupplementDay = value.Date;
         SupplementTime =  value.Time;
+    }
+
+    public void ResetValidation()
+    {
+        validationMessage = "";
     }
 }

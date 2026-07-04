@@ -23,6 +23,7 @@ public partial class SupplementView : UserControl
         if (DataContext is not SupplementViewModel vm) return;
         
         vm.ResetEditingState();
+        vm.ResetValidation();
         vm.SupplementName = "";
         vm.DosageUnit = "";
         vm.Description = "";

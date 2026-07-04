@@ -24,6 +24,7 @@ public partial class WorkoutProgramView : UserControl
         if (DataContext is not WorkoutProgramViewModel vm) return;
 
         vm.ResetEditingState();
+        vm.ResetProgramValidation();
         vm.ProgramName = "";
         vm.ProgramDescription = "";
 
@@ -46,6 +47,7 @@ public partial class WorkoutProgramView : UserControl
         if (vm.SelectedProgram == null) return;
 
         vm.SelectedExercise = null;
+        vm.ResetProgramExerciseValidation();
         vm.ExerciseSets = 0;
         vm.ExerciseReps = 0;
         vm.ExerciseRestTime = 0;

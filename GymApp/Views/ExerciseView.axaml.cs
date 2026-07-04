@@ -23,6 +23,7 @@ public partial class ExerciseView : UserControl
         if (DataContext is not ExerciseViewModel vm) return;
         
         vm.ResetEditingState();
+        vm.ResetValidation();
         vm.ExerciseName = "";
         vm.MuscleGroup = "";
         vm.Description = "";

@@ -5,6 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 using GymApp.Models;
 using GymApp.Services;
 using System.Threading.Tasks;
+using GymApp.Validators;
+
 namespace GymApp.ViewModels;
 
 public partial class ExerciseViewModel : ViewModelBase
@@ -12,6 +14,9 @@ public partial class ExerciseViewModel : ViewModelBase
     private readonly  ExerciseService _exerciseService;
     
     public ObservableCollection<Exercise> Exercises { get; } = new();
+    
+    [ObservableProperty]
+    private string validationMessage = "";
     
     [ObservableProperty]
     private string exerciseName = "";
@@ -30,6 +35,8 @@ public partial class ExerciseViewModel : ViewModelBase
     {
         _exerciseService = exerciseService;
     }
+    
+    private readonly ExerciseValidator _validator = new();
 
     [RelayCommand]
     private async Task SaveExerciseAsync()
@@ -42,6 +49,16 @@ public partial class ExerciseViewModel : ViewModelBase
                 MuscleGroup = muscleGroup,
                 Description = description
             };
+            
+            var result = _validator.Validate(exercise);
+
+            if (!result.IsValid)
+            {
+                ValidationMessage = result.Errors[0].ErrorMessage;
+                return;
+            }
+
+            ValidationMessage = "";
 
             await _exerciseService.AddExerciseAsync(exercise);
         }
@@ -110,5 +127,10 @@ public partial class ExerciseViewModel : ViewModelBase
     public void ResetEditingState()
     {
         _editingExerciseId = null;
+    }
+    
+    public void ResetValidation()
+    {
+        ValidationMessage = "";
     }
 }
