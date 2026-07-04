@@ -21,7 +21,10 @@
                 <Button Content="User" Command="{Binding ShowUserCommand}" />
             </StackPanel>
 
-            <Button Grid.Column="1" Content="Theme" Command="{Binding ToggleThemeCommand}" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                <Button Content="Generate Report" Command="{Binding GenerateReportCommand}" />
+                <Button Content="Theme" Command="{Binding ToggleThemeCommand}" />
+            </StackPanel>
 
         </Grid>
 

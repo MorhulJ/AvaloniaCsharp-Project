@@ -1,6 +1,9 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System;
+using System.IO;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GymApp.Models;
+using GymApp.Reports;
 
 namespace GymApp.ViewModels;
 
@@ -14,6 +17,29 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly SupplementIntakeViewModel _supplementIntakeViewModel;
     private readonly WorkoutProgramViewModel _workoutProgramViewModel;
     private readonly UserViewModel _userViewModel;
+    private readonly WorkoutReportService _reportService = new();
+
+    [RelayCommand]
+    private void GenerateReport()
+    {
+        var filePath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+            $"GymReport_{DateTime.Now:yyyyMMdd_HHmmss}.pdf"
+        );
+
+        _reportService.GenerateFullReport(
+            new User { Name = _userViewModel.UserName },
+            _goalViewModel.Goals,
+            _personalRecordViewModel.Records,
+            filePath
+        );
+        
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = filePath,
+            UseShellExecute = true
+        });
+    }
     
     [ObservableProperty]
     private ViewModelBase currentView;
