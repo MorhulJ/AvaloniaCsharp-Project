@@ -14,6 +14,7 @@ public partial class UserView : UserControl
             if (DataContext is UserViewModel vm)
             {
                 await vm.LoadUserAsync();
+                vm.ValidationMessage = "";
             }
         };
     }
