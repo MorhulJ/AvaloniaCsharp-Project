@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GymApp.Models;
 using GymApp.Reports;
+using GymApp.Services;
 
 namespace GymApp.ViewModels;
 
@@ -18,6 +19,9 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly WorkoutProgramViewModel _workoutProgramViewModel;
     private readonly UserViewModel _userViewModel;
     private readonly WorkoutReportService _reportService = new();
+    private readonly AuthService _authService;
+    
+    public event Action? LoggedOut;
 
     [RelayCommand]
     private void GenerateReport()
@@ -44,7 +48,10 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private ViewModelBase currentView;
     
-    public MainWindowViewModel(ExerciseViewModel exerciseViewModel, GoalViewModel goalViewModel,  SupplementViewModel supplementViewModel, NutritionViewModel nutritionViewModel, PersonalRecordViewModel personalRecordViewModel, SupplementIntakeViewModel supplementIntakeViewModel, WorkoutProgramViewModel workoutProgramViewModel, UserViewModel userViewModel)
+    public MainWindowViewModel(ExerciseViewModel exerciseViewModel, GoalViewModel goalViewModel,
+        SupplementViewModel supplementViewModel, NutritionViewModel nutritionViewModel,
+        PersonalRecordViewModel personalRecordViewModel, SupplementIntakeViewModel supplementIntakeViewModel,
+        WorkoutProgramViewModel workoutProgramViewModel, UserViewModel userViewModel, AuthService authService)
     {
         _exerciseViewModel = exerciseViewModel;
         _goalViewModel = goalViewModel;
@@ -54,6 +61,10 @@ public partial class MainWindowViewModel : ViewModelBase
         _supplementIntakeViewModel = supplementIntakeViewModel;
         _workoutProgramViewModel = workoutProgramViewModel;
         _userViewModel = userViewModel;
+        _authService = authService;
+        
+        _userViewModel.LoggedOut += () => LoggedOut?.Invoke();
+        _userViewModel.AccountDeleted += () => LoggedOut?.Invoke();
 
         currentView = _workoutProgramViewModel;
     }
@@ -115,6 +126,16 @@ public partial class MainWindowViewModel : ViewModelBase
     private void ShowUser()
     {
         CurrentView =  _userViewModel;
+    }
+    
+    [RelayCommand]
+    private void Exit()
+    {
+        if (Avalonia.Application.Current?.ApplicationLifetime is 
+            Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.Shutdown();
+        }
     }
     
 }

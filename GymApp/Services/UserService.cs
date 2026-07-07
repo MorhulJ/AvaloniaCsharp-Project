@@ -19,9 +19,11 @@ public class UserService
         return await _db.Users.FindAsync(id);
     }
 
-    public async Task AddUserAsync(User user)
+    public async Task DeleteUserAsync(int id)
     {
-        _db.Users.Add(user);
+        var user = await _db.Users.FindAsync(id);
+        if (user == null) return;
+        _db.Users.Remove(user);
         await _db.SaveChangesAsync();
     }
 

@@ -24,6 +24,7 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
                 <Button Content="Generate Report" Command="{Binding GenerateReportCommand}" />
                 <Button Content="Theme" Command="{Binding ToggleThemeCommand}" />
+                <Button Content="Exit" Command="{Binding ExitCommand}" Classes="danger" />
             </StackPanel>
 
         </Grid>

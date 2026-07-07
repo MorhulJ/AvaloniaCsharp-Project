@@ -13,7 +13,7 @@ public partial class WorkoutProgramView : UserControl
         {
             if (DataContext is WorkoutProgramViewModel vm)
             {
-                await vm.LoadProgramsAsync();
+                await vm.LoadProgramsAsync(vm.CurrentUserId);
                 await vm.LoadExercisesAsync();
             }   
         };

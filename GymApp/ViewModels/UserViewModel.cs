@@ -12,6 +12,7 @@ namespace GymApp.ViewModels;
 public partial class UserViewModel : ViewModelBase
 {
     private readonly UserService _userService;
+    private readonly int _userId;
     
     [ObservableProperty]
     private string validationMessage = "";
@@ -23,7 +24,7 @@ public partial class UserViewModel : ViewModelBase
     [ObservableProperty]
     private string userGender = "Male";
     [ObservableProperty]
-    private DateTimeOffset? userDateOfBirth = new DateTimeOffset( new DateTime(1990, 1, 1));
+    private DateTimeOffset? userDateOfBirth = new DateTimeOffset(new DateTime(1990, 1, 1));
     [ObservableProperty]
     private int userWeight;
     [ObservableProperty]
@@ -31,9 +32,14 @@ public partial class UserViewModel : ViewModelBase
     
     public List<string> GenderOptions { get; } = new() { "Male", "Female" };
     
-    public UserViewModel(UserService userService)
+    private readonly AuthService _authService;
+    public event Action? LoggedOut;
+    
+    public UserViewModel(UserService userService, int userId, AuthService authService)
     {
         _userService = userService;
+        _userId = userId;
+        _authService = authService;
     }
     
     private readonly UserValidator _validator = new UserValidator();
@@ -43,7 +49,7 @@ public partial class UserViewModel : ViewModelBase
     {
         var user = new User
         {
-            Id = UserId,
+            Id = _userId,
             Name = UserName,
             Gender = UserGender,
             DateOfBirth = UserDateOfBirth?.DateTime ?? DateTime.MinValue,
@@ -66,7 +72,7 @@ public partial class UserViewModel : ViewModelBase
 
     public async Task LoadUserAsync()
     {
-        var user = await _userService.GetUserByIdAsync(1);
+        var user = await _userService.GetUserByIdAsync(_userId);
         
         if (user == null)
             return;
@@ -77,5 +83,22 @@ public partial class UserViewModel : ViewModelBase
         UserDateOfBirth = new DateTimeOffset(user.DateOfBirth);
         UserWeight = user.weight;
         UserHeight = user.height;
+    }
+    
+    [RelayCommand]
+    private void Logout()
+    {
+        _authService.Logout();
+        LoggedOut?.Invoke();
+    }
+    
+    public event Action? AccountDeleted;
+
+    [RelayCommand]
+    private async Task DeleteAccountAsync()
+    {
+        await _userService.DeleteUserAsync(_userId);
+        _authService.Logout();
+        AccountDeleted?.Invoke();
     }
 }

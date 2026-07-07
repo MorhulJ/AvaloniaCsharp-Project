@@ -35,6 +35,8 @@ public partial class GoalViewModel : ViewModelBase
 
     private int? _editingGoalId;
     
+    public int CurrentUserId { get; set; }
+    
     public event Action? GoalSaved;
 
     public GoalViewModel(GoalService goalService, ExerciseService exerciseService)
@@ -52,7 +54,7 @@ public partial class GoalViewModel : ViewModelBase
         {
             var goal = new Goal
             {
-                UserId = 1,
+                UserId = CurrentUserId,
                 ExerciseId = goalExercise?.Id,
                 Title = goalTitle,
                 TargetValue = goalValue,
@@ -92,14 +94,14 @@ public partial class GoalViewModel : ViewModelBase
         GoalValue = 0;
         CurrentValue = 0;
 
-        await LoadGoalsAsync();
+        await LoadGoalsAsync(CurrentUserId);
         
         GoalSaved?.Invoke();
     }
 
-    public async Task LoadGoalsAsync()
+    public async Task LoadGoalsAsync(int userId)
     {
-        var goalList = await _goalService.GetAllGoalsByUserAsync(1);
+        var goalList = await _goalService.GetAllGoalsByUserAsync(userId);
 
         Goals.Clear();
 
@@ -128,7 +130,7 @@ public partial class GoalViewModel : ViewModelBase
             return;
 
         await _goalService.DeleteGoalAsync(SelectedGoal);
-        await LoadGoalsAsync();
+        await LoadGoalsAsync(CurrentUserId);
     }
 
     partial void OnSelectedGoalChanged(Goal? value)

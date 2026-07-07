@@ -14,7 +14,7 @@ public partial class PersonalRecordView : UserControl
         {
             if (DataContext is PersonalRecordViewModel vm)
             {
-                await vm.LoadRecordsAsync();
+                await vm.LoadRecordsAsync(vm.CurrentUserId);
                 await vm.LoadExercisesAsync();
             }
         };

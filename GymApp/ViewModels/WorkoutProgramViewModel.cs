@@ -30,6 +30,8 @@ public partial class WorkoutProgramViewModel : ViewModelBase
 
     private int? _editingProgramId;
     
+    public int CurrentUserId { get; set; }
+    
     public event Action? ProgramSaved;
     
     [ObservableProperty]
@@ -64,7 +66,7 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         {
             var program = new WorkoutProgram
             {
-                UserId = 1,
+                UserId = CurrentUserId,
                 Name = ProgramName,
                 Description = ProgramDescription,
             };
@@ -97,7 +99,7 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         ProgramName = "";
         ProgramDescription = "";
 
-        await LoadProgramsAsync();
+        await LoadProgramsAsync(CurrentUserId);
         
         ProgramSaved?.Invoke();
     }
@@ -145,9 +147,9 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         ProgramExerciseSaved?.Invoke();
     }
 
-    public async Task LoadProgramsAsync()
+    public async Task LoadProgramsAsync(int userId)
     {
-        var programList = await _programService.GetAllProgramsAByUserAsync(1);
+        var programList = await _programService.GetAllProgramsAByUserAsync(userId);
 
         WorkoutPrograms.Clear();
         foreach (var program in programList)
@@ -198,7 +200,7 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         ProgramDescription = "";
         _editingProgramId = null;
         
-        await LoadProgramsAsync();
+        await LoadProgramsAsync(CurrentUserId);
     }
 
     [RelayCommand]

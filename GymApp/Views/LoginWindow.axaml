@@ -1,0 +1,57 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GymApp.ViewModels"
+        x:Class="GymApp.Views.LoginWindow"
+        x:DataType="vm:LoginViewModel"
+        Title="GymApp — Login"
+        Width="400" Height="480"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False">
+
+    <StackPanel Margin="30" Spacing="14">
+
+        <TextBlock Text="GymApp" Classes="title" FontSize="28" HorizontalAlignment="Center" />
+
+        <TextBlock Text="{Binding ModeTitle}"
+                   Classes="label" HorizontalAlignment="Center" FontSize="14" />
+
+        <StackPanel Spacing="6" IsVisible="{Binding IsRegistering}">
+            <TextBlock Text="Name" Classes="label" />
+            <TextBox Text="{Binding Name}" />
+        </StackPanel>
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Login" Classes="label" />
+            <TextBox Text="{Binding Login}" />
+        </StackPanel>
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Password" Classes="label" />
+            <TextBox Text="{Binding Password}" PasswordChar="*" />
+        </StackPanel>
+
+        <CheckBox Content="Remember me" IsChecked="{Binding RememberMe}" />
+
+        <TextBlock Text="{Binding ValidationMessage}"
+                   Foreground="Red"
+                   IsVisible="{Binding ValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+        <Button Content="Login"
+                Command="{Binding LoginCommand}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                IsVisible="{Binding !IsRegistering}" />
+
+        <Button Content="Create account"
+                Command="{Binding RegisterCommand}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                IsVisible="{Binding IsRegistering}" />
+
+        <Button Content="{Binding ToggleModeText}"
+                Command="{Binding ToggleModeCommand}"
+                HorizontalAlignment="Center" />
+
+    </StackPanel>
+
+</Window>

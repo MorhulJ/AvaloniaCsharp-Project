@@ -31,6 +31,8 @@ public partial class PersonalRecordViewModel : ViewModelBase
     [ObservableProperty]
     private PersonalRecord? selectedRecord;
 
+    public int CurrentUserId { get; set; }
+
     public event Action? RecordSaved;
 
     public PersonalRecordViewModel(PersonalRecordService personalRecordService, ExerciseService exerciseService)
@@ -46,7 +48,7 @@ public partial class PersonalRecordViewModel : ViewModelBase
     {
         var record = new PersonalRecord
         {
-            UserId = 1,
+            UserId = CurrentUserId,
             ExerciseId = recordExercise?.Id ?? 0,
             Value =  recordValue,
             Date = recordDate,
@@ -68,14 +70,14 @@ public partial class PersonalRecordViewModel : ViewModelBase
         RecordValue = 0;
         RecordDate = DateTime.Today;
         
-        await LoadRecordsAsync();
+        await LoadRecordsAsync(CurrentUserId);
         
         RecordSaved?.Invoke();
     }
 
-    public async Task LoadRecordsAsync()
+    public async Task LoadRecordsAsync(int userId)
     {
-        var recordList = await _personalRecordService.GetAllRecordsByUserAsync(1);
+        var recordList = await _personalRecordService.GetAllRecordsByUserAsync(userId);
         
         Records.Clear();
 
@@ -104,7 +106,7 @@ public partial class PersonalRecordViewModel : ViewModelBase
             return;
         
         await _personalRecordService.DeleteRecordAsync(selectedRecord);
-        await LoadRecordsAsync();
+        await LoadRecordsAsync(CurrentUserId);
     }
 
     partial void OnSelectedRecordChanged(PersonalRecord? value)

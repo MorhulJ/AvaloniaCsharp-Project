@@ -14,7 +14,7 @@ public partial class SupplementIntakeView : UserControl
         {
             if (DataContext is SupplementIntakeViewModel vm)
             {
-                await vm.LoadSupplementIntakesAsync();
+                await vm.LoadSupplementIntakesAsync(vm.CurrentUserId);
                 await vm.LoadSupplementsAsync();
             }
         };

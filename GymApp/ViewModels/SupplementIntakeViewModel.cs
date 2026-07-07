@@ -44,6 +44,8 @@ public partial class SupplementIntakeViewModel : ViewModelBase
     private TimeSpan supplementTime;
     [ObservableProperty]
     private SupplementIntake? selectedSupplementIntake;
+
+    public int CurrentUserId { get; set; }
     
     public event Action? IntakeSaved;
 
@@ -60,7 +62,7 @@ public partial class SupplementIntakeViewModel : ViewModelBase
     {
         var supplementIntake = new SupplementIntake
         {
-            UserId = 1,
+            UserId = CurrentUserId,
             SupplementId = supplement?.Id ?? 0,
             Dosage = supplementDosage,
             Date = supplementDay,
@@ -84,14 +86,14 @@ public partial class SupplementIntakeViewModel : ViewModelBase
         SupplementDay = DayOfWeek.Monday;
         SupplementTime = TimeSpan.Zero;
 
-        await LoadSupplementIntakesAsync();
+        await LoadSupplementIntakesAsync(CurrentUserId);
         
         IntakeSaved?.Invoke();
     }
     
-    public async Task LoadSupplementIntakesAsync()
+    public async Task LoadSupplementIntakesAsync(int userId)
     {
-        var supplementIntakesList = await _supplementIntakeService.GetAllSupplementsByUserAsync(1);
+        var supplementIntakesList = await _supplementIntakeService.GetAllSupplementsByUserAsync(userId);
         
         SupplementIntakes.Clear();
 
@@ -120,7 +122,7 @@ public partial class SupplementIntakeViewModel : ViewModelBase
             return;
         
         await _supplementIntakeService.DeleteSupplementAsync(selectedSupplementIntake);
-        await LoadSupplementIntakesAsync();
+        await LoadSupplementIntakesAsync(CurrentUserId);
     }
 
     partial void OnSelectedSupplementIntakeChanged(SupplementIntake? value)
