@@ -4,6 +4,7 @@
         x:Class="GymApp.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="GymApp"
+        Icon="avares://GymApp/Assets/gymapp_icon.png"
         WindowState="Maximized">
 
     <DockPanel>

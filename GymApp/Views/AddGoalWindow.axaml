@@ -4,6 +4,7 @@
         x:Class="GymApp.Views.AddGoalWindow"
         x:DataType="vm:GoalViewModel"
         Title="Add Goal"
+        Icon="avares://GymApp/Assets/gymapp_icon.png"
         Width="420" Height="440"
         WindowStartupLocation="CenterOwner">
 

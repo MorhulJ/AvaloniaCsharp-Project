@@ -4,6 +4,7 @@
         x:Class="GymApp.Views.AddIntakeWindow"
         x:DataType="vm:SupplementIntakeViewModel"
         Title="Add Intake"
+        Icon="avares://GymApp/Assets/gymapp_icon.png"
         Width="420" Height="430"
         WindowStartupLocation="CenterOwner">
 

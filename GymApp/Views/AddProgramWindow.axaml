@@ -4,6 +4,7 @@
         x:Class="GymApp.Views.AddProgramWindow"
         x:DataType="vm:WorkoutProgramViewModel"
         Title="Add Program"
+        Icon="avares://GymApp/Assets/gymapp_icon.png"
         Width="420" Height="300"
         WindowStartupLocation="CenterOwner">
 

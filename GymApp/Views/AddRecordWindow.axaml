@@ -4,6 +4,7 @@
         x:Class="GymApp.Views.AddRecordWindow"
         x:DataType="vm:PersonalRecordViewModel"
         Title="Add Record"
+        Icon="avares://GymApp/Assets/gymapp_icon.png"
         Width="420" Height="360"
         WindowStartupLocation="CenterOwner">
 

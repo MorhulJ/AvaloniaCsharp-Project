@@ -4,6 +4,7 @@
         x:Class="GymApp.Views.AddSupplementWindow"
         x:DataType="vm:SupplementViewModel"
         Title="Add Supplement"
+        Icon="avares://GymApp/Assets/gymapp_icon.png"
         Width="420" Height="370"
         WindowStartupLocation="CenterOwner">
 
