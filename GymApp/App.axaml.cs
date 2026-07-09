@@ -25,7 +25,7 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
 
             SetTheme("Dark");
 
