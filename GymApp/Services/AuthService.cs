@@ -133,6 +133,11 @@ private async Task SeedUserDataAsync(int userId)
     public void SaveRememberMe(int userId)
     {
         var path = GetRememberMePath();
+        var directory = Path.GetDirectoryName(path)!;
+    
+        if (!Directory.Exists(directory))
+            Directory.CreateDirectory(directory);
+    
         File.WriteAllText(path, userId.ToString());
     }
 
