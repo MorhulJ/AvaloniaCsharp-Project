@@ -51,7 +51,7 @@
         
         <StackPanel Orientation="Horizontal" Spacing="10">
             <Button Content="Logout" Command="{Binding LogoutCommand}" Classes="danger" HorizontalContentAlignment="Center" Width="150" />
-            <Button Content="Delete account" Command="{Binding DeleteAccountCommand}" Classes="danger" HorizontalContentAlignment="Center" Width="150" />
+            <Button Content="Delete account" Click="OnDeleteAccount" Classes="danger" HorizontalContentAlignment="Center" Width="150" />
         </StackPanel>
 
     </StackPanel>

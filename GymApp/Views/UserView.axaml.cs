@@ -18,4 +18,17 @@ public partial class UserView : UserControl
             }
         };
     }
+    
+    private async void OnDeleteAccount(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not UserViewModel vm) return;
+
+        var dialog = new ConfirmDialog();
+        await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Window);
+
+        if (dialog.Result)
+        {
+            await vm.DeleteAccountCommand.ExecuteAsync(null);
+        }
+    }
 }
