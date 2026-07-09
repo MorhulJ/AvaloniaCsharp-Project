@@ -9,6 +9,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Content Include="Assets\gymapp_icon.ico" />
+    </ItemGroup>
+
+    <ItemGroup>
         <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
 
