@@ -26,6 +26,8 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            
+            FirebaseService.Initialize();
 
             SetTheme("Dark");
 
