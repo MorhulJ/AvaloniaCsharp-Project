@@ -11,13 +11,12 @@ namespace GymApp.ViewModels;
 
 public partial class ExerciseViewModel : ViewModelBase
 {
-    private readonly  ExerciseService _exerciseService;
+    private readonly ExerciseService _exerciseService;
     
     public ObservableCollection<Exercise> Exercises { get; } = new();
     
     [ObservableProperty]
     private string validationMessage = "";
-    
     [ObservableProperty]
     private string exerciseName = "";
     [ObservableProperty]
@@ -27,8 +26,9 @@ public partial class ExerciseViewModel : ViewModelBase
     [ObservableProperty]
     private Exercise? selectedExercise;
     
-    private int? _editingExerciseId;
+    private string? _editingExerciseFirebaseId;
     
+    public string CurrentUserId { get; set; } = "";
     public event Action? ExerciseSaved;
     
     public ExerciseViewModel(ExerciseService exerciseService)
@@ -41,7 +41,7 @@ public partial class ExerciseViewModel : ViewModelBase
     [RelayCommand]
     private async Task SaveExerciseAsync()
     {
-        if (_editingExerciseId == null)
+        if (_editingExerciseFirebaseId == null)
         {
             var exercise = new Exercise
             {
@@ -59,42 +59,37 @@ public partial class ExerciseViewModel : ViewModelBase
             }
 
             ValidationMessage = "";
-
-            await _exerciseService.AddExerciseAsync(exercise);
+            await _exerciseService.AddExerciseAsync(exercise, CurrentUserId);
         }
         else
         {
             var exercise = new Exercise
             {
-                Id = _editingExerciseId.Value,
+                FirebaseId = _editingExerciseFirebaseId,
                 Name = exerciseName,
                 MuscleGroup = muscleGroup,
                 Description = description
             };
 
-            await _exerciseService.UpdateExerciseAsync(exercise);
-            _editingExerciseId = null;
+            await _exerciseService.UpdateExerciseAsync(exercise, CurrentUserId);
+            _editingExerciseFirebaseId = null;
         }
 
         ExerciseName = "";
         MuscleGroup = "";
         Description = "";
 
-        await LoadExercisesAsync();
-
+        await LoadExercisesAsync(CurrentUserId);
         ExerciseSaved?.Invoke();
     }
 
-    public async Task LoadExercisesAsync()
+    public async Task LoadExercisesAsync(string userId)
     {
-        var exercisesList = await _exerciseService.GetAllExercisesAsync();
+        var exercisesList = await _exerciseService.GetAllExercisesAsync(userId);
         
         Exercises.Clear();
-
         foreach (var exercise in exercisesList)
-        {
             Exercises.Add(exercise);
-        }
     }
     
     [RelayCommand]
@@ -103,14 +98,14 @@ public partial class ExerciseViewModel : ViewModelBase
         if (SelectedExercise == null)
             return;
 
-        await _exerciseService.DeleteExerciseAsync(SelectedExercise);
+        await _exerciseService.DeleteExerciseAsync(SelectedExercise, CurrentUserId);
         
         ExerciseName = "";
         MuscleGroup = "";
         Description = "";
-        _editingExerciseId = null;
+        _editingExerciseFirebaseId = null;
         
-        await LoadExercisesAsync();
+        await LoadExercisesAsync(CurrentUserId);
     }
     
     partial void OnSelectedExerciseChanged(Exercise? value)
@@ -120,13 +115,12 @@ public partial class ExerciseViewModel : ViewModelBase
         ExerciseName = value.Name;
         MuscleGroup = value.MuscleGroup;
         Description = value.Description;
-        
-        _editingExerciseId = value.Id;
+        _editingExerciseFirebaseId = value.FirebaseId;
     }
     
     public void ResetEditingState()
     {
-        _editingExerciseId = null;
+        _editingExerciseFirebaseId = null;
     }
     
     public void ResetValidation()

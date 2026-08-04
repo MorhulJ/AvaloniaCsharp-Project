@@ -1,38 +1,56 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using GymApp.Data;
+using Google.Cloud.Firestore;
 using GymApp.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace GymApp.Services;
 
 public class SupplementIntakeService
 {
-    private readonly AppDbContext _db;
-    
-    public SupplementIntakeService(AppDbContext db)
+    private readonly FirestoreDb _db;
+
+    public SupplementIntakeService()
     {
-        _db = db;
-    }
-    
-    public async Task<List<SupplementIntake>> GetAllSupplementsByUserAsync(int userId)
-    {
-        return await _db.SupplementIntakes
-            .Include(si => si.Supplement)
-            .Where(si => si.UserId == userId)
-            .ToListAsync();
+        _db = FirebaseService.GetDb();
     }
 
-    public async Task AddSupplementAsync(SupplementIntake supplement)
+    public async Task<List<SupplementIntake>> GetAllSupplementsByUserAsync(string userId)
     {
-        _db.SupplementIntakes.Add(supplement);
-        await _db.SaveChangesAsync();
+        var snapshot = await _db.Collection("users").Document(userId)
+            .Collection("supplementIntakes").GetSnapshotAsync();
+
+        var intakes = new List<SupplementIntake>();
+        foreach (var doc in snapshot.Documents)
+        {
+            intakes.Add(new SupplementIntake
+            {
+                FirebaseId = doc.Id,
+                UserId = userId,
+                SupplementFirebaseId = doc.GetValue<string>("supplementId"),
+                Dosage = doc.GetValue<double>("dosage"),
+                Date = (DayOfWeek)doc.GetValue<int>("day"),
+                Time = TimeSpan.Parse(doc.GetValue<string>("time"))
+            });
+        }
+        return intakes;
     }
 
-    public async Task DeleteSupplementAsync(SupplementIntake supplement)
+    public async Task AddSupplementAsync(SupplementIntake intake)
     {
-        _db.SupplementIntakes.Remove(supplement);
-        await _db.SaveChangesAsync();
+        await _db.Collection("users").Document(intake.UserId)
+            .Collection("supplementIntakes").AddAsync(new
+            {
+                supplementId = intake.SupplementFirebaseId,
+                dosage = intake.Dosage,
+                day = (int)intake.Date,
+                time = intake.Time.ToString()
+            });
+    }
+
+    public async Task DeleteSupplementAsync(SupplementIntake intake)
+    {
+        await _db.Collection("users").Document(intake.UserId)
+            .Collection("supplementIntakes").Document(intake.FirebaseId).DeleteAsync();
     }
 }

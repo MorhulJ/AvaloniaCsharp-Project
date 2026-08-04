@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -20,7 +21,6 @@ public partial class WorkoutProgramViewModel : ViewModelBase
 
     [ObservableProperty] 
     private string programValidationMessage = "";
-
     [ObservableProperty] 
     private string programName = "";
     [ObservableProperty] 
@@ -28,15 +28,13 @@ public partial class WorkoutProgramViewModel : ViewModelBase
     [ObservableProperty] 
     private WorkoutProgram? selectedProgram;
 
-    private int? _editingProgramId;
+    private string? _editingProgramFirebaseId;
     
-    public int CurrentUserId { get; set; }
-    
+    public string CurrentUserId { get; set; } = "";
     public event Action? ProgramSaved;
     
     [ObservableProperty]
     private string programExerciseValidationMessage = "";
-
     [ObservableProperty] 
     private int exerciseSets;
     [ObservableProperty] 
@@ -62,7 +60,7 @@ public partial class WorkoutProgramViewModel : ViewModelBase
     [RelayCommand]
     private async Task SaveProgramAsync()
     {
-        if (_editingProgramId == null)
+        if (_editingProgramFirebaseId == null)
         {
             var program = new WorkoutProgram
             {
@@ -86,21 +84,20 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         {
             var program = new WorkoutProgram
             {
-                Id = _editingProgramId.Value,
+                FirebaseId = _editingProgramFirebaseId,
+                UserId = CurrentUserId,
                 Name = ProgramName,
                 Description = ProgramDescription,
             };
 
             await _programService.UpdateProgramAsync(program);
-
-            _editingProgramId = null;
+            _editingProgramFirebaseId = null;
         }
 
         ProgramName = "";
         ProgramDescription = "";
 
         await LoadProgramsAsync(CurrentUserId);
-        
         ProgramSaved?.Invoke();
     }
     
@@ -118,8 +115,8 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         
         var programExercise = new ProgramExercise
         {
-            ProgramId = SelectedProgram.Id,
-            ExerciseId = SelectedExercise.Id,
+            ProgramFirebaseId = SelectedProgram.FirebaseId,
+            ExerciseFirebaseId = SelectedExercise.FirebaseId,
             Sets = ExerciseSets,
             Reps = ExerciseReps,
             RestTime = ExerciseRestTime,
@@ -136,7 +133,7 @@ public partial class WorkoutProgramViewModel : ViewModelBase
 
         ProgramExerciseValidationMessage = "";
         
-        await _programService.AddExerciseToProgramAsync(programExercise);
+        await _programService.AddExerciseToProgramAsync(programExercise, CurrentUserId);
         await LoadProgramExercisesAsync();
         
         SelectedExercise = null;
@@ -147,27 +144,28 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         ProgramExerciseSaved?.Invoke();
     }
 
-    public async Task LoadProgramsAsync(int userId)
+    public async Task LoadProgramsAsync(string userId)
     {
         var programList = await _programService.GetAllProgramsAByUserAsync(userId);
 
         WorkoutPrograms.Clear();
         foreach (var program in programList)
         {
+            foreach (var pe in program.ProgramExercises)
+            {
+                pe.Exercise = Exercises.FirstOrDefault(e => e.FirebaseId == pe.ExerciseFirebaseId);
+            }
             WorkoutPrograms.Add(program);
         }
     }
     
     public async Task LoadExercisesAsync()
     {
-        var exercisesList = await _exerciseService.GetAllExercisesAsync();
+        var exercisesList = await _exerciseService.GetAllExercisesAsync(CurrentUserId);
 
         Exercises.Clear();
-
         foreach (var exercise in exercisesList)
-        {
             Exercises.Add(exercise);
-        }
     }
     
     public async Task LoadProgramExercisesAsync()
@@ -175,12 +173,12 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         if (SelectedProgram == null)
             return;
 
-        var exercises = await _programService.GetExercisesByProgramAsync(SelectedProgram.Id);
+        var exercises = await _programService.GetExercisesByProgramAsync(SelectedProgram.FirebaseId, CurrentUserId);
 
         ProgramExercises.Clear();
-
         foreach (var exercise in exercises)
         {
+            exercise.Exercise = Exercises.FirstOrDefault(e => e.FirebaseId == exercise.ExerciseFirebaseId);
             ProgramExercises.Add(exercise);
         }
     }
@@ -194,11 +192,10 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         await _programService.DeleteProgramAsync(SelectedProgram);
         
         ProgramExercises.Clear();
-        
         SelectedProgram = null;
         ProgramName = "";
         ProgramDescription = "";
-        _editingProgramId = null;
+        _editingProgramFirebaseId = null;
         
         await LoadProgramsAsync(CurrentUserId);
     }
@@ -209,7 +206,7 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         if (SelectedProgramExercise == null)
             return;
 
-        await _programService.DeleteExerciseFromProgramAsync(SelectedProgramExercise);
+        await _programService.DeleteExerciseFromProgramAsync(SelectedProgramExercise, CurrentUserId);
         ProgramExercises.Remove(SelectedProgramExercise);
     }
 
@@ -218,17 +215,16 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         if (value == null)
             return;
         
-        ProgramName =  value.Name;
-        ProgramDescription =  value.Description;
-        
-        _editingProgramId = value.Id;
+        ProgramName = value.Name;
+        ProgramDescription = value.Description;
+        _editingProgramFirebaseId = value.FirebaseId;
 
         _ = LoadProgramExercisesAsync();
     }
     
     public void ResetEditingState()
     {
-        _editingProgramId = null;
+        _editingProgramFirebaseId = null;
     }
     
     public void ResetProgramValidation()

@@ -38,20 +38,20 @@ public partial class LoginViewModel : ViewModelBase
     {
         if (string.IsNullOrWhiteSpace(Login) || string.IsNullOrWhiteSpace(Password))
         {
-            ValidationMessage = "Login and password are required";
+            ValidationMessage = "Email and password are required";
             return;
         }
 
-        var user = await _authService.LoginAsync(Login, Password);
+        var success = await _authService.LoginAsync(Login, Password);
 
-        if (user == null)
+        if (!success)
         {
             ValidationMessage = "Invalid login or password";
             return;
         }
 
         if (RememberMe)
-            _authService.SaveRememberMe(user.Id);
+            _authService.SaveRememberMe(_authService.CurrentUserId!);
 
         LoginSuccessful?.Invoke();
     }
@@ -69,12 +69,12 @@ public partial class LoginViewModel : ViewModelBase
 
         if (!success)
         {
-            ValidationMessage = "Login already exists";
+            ValidationMessage = "Email already exists";
             return;
         }
 
         if (RememberMe)
-            _authService.SaveRememberMe(_authService.CurrentUser!.Id);
+            _authService.SaveRememberMe(_authService.CurrentUserId!);
 
         LoginSuccessful?.Invoke();
     }

@@ -8,9 +8,7 @@ using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Threading;
 using GymApp.ViewModels;
 using GymApp.Views;
-using GymApp.Data;
 using GymApp.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace GymApp;
 
@@ -26,22 +24,15 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-            
-            FirebaseService.Initialize();
 
             SetTheme("Dark");
 
-            using (var db = new AppDbContext())
-            {
-                db.Database.Migrate();
-            }
+            FirebaseService.Initialize();
 
-            var authDb = new AppDbContext();
-            var authService = new AuthService(authDb);
+            var authService = new AuthService();
+            var autoLoggedIn = await authService.TryAutoLoginAsync();
 
-            var autoUser = await authService.TryAutoLoginAsync();
-
-            if (autoUser == null)
+            if (!autoLoggedIn)
             {
                 ShowLoginWindow(desktop, authService);
             }
@@ -72,15 +63,15 @@ public partial class App : Application
 
     private async Task ShowMainWindowAsync(IClassicDesktopStyleApplicationLifetime desktop, AuthService authService)
     {
-        var exerciseService = new ExerciseService(new AppDbContext());
-        var goalService = new GoalService(new AppDbContext());
-        var supplementService = new SupplementService(new AppDbContext());
-        var personalRecordService = new PersonalRecordService(new AppDbContext());
-        var supplementIntakeService = new SupplementIntakeService(new AppDbContext());
-        var workoutProgramService = new WorkoutProgramService(new AppDbContext());
-        var userService = new UserService(new AppDbContext());
+        var exerciseService = new ExerciseService();
+        var goalService = new GoalService();
+        var supplementService = new SupplementService();
+        var personalRecordService = new PersonalRecordService();
+        var supplementIntakeService = new SupplementIntakeService();
+        var workoutProgramService = new WorkoutProgramService();
+        var userService = new UserService();
 
-        var userId = authService.CurrentUser!.Id;
+        var userId = authService.CurrentUserId!;
 
         var exerciseViewModel = new ExerciseViewModel(exerciseService);
         var goalViewModel = new GoalViewModel(goalService, exerciseService);
@@ -91,22 +82,24 @@ public partial class App : Application
         var workoutProgramViewModel = new WorkoutProgramViewModel(workoutProgramService, exerciseService);
         var userViewModel = new UserViewModel(userService, userId, authService);
 
+        exerciseViewModel.CurrentUserId = userId;
         goalViewModel.CurrentUserId = userId;
+        supplementViewModel.CurrentUserId = userId;
         personalRecordViewModel.CurrentUserId = userId;
         supplementIntakeViewModel.CurrentUserId = userId;
         workoutProgramViewModel.CurrentUserId = userId;
 
-        await exerciseViewModel.LoadExercisesAsync();
+        await exerciseViewModel.LoadExercisesAsync(userId);
         await goalViewModel.LoadGoalsAsync(userId);
         await goalViewModel.LoadExercisesAsync();
-        await supplementViewModel.LoadSupplementAsync();
+        await supplementViewModel.LoadSupplementAsync(userId);
         await supplementIntakeViewModel.LoadSupplementIntakesAsync(userId);
+        await supplementIntakeViewModel.LoadSupplementsAsync(userId);
         await workoutProgramViewModel.LoadProgramsAsync(userId);
+        await workoutProgramViewModel.LoadExercisesAsync();
         await userViewModel.LoadUserAsync();
         await personalRecordViewModel.LoadRecordsAsync(userId);
         await personalRecordViewModel.LoadExercisesAsync();
-        await supplementIntakeViewModel.LoadSupplementsAsync();
-        await workoutProgramViewModel.LoadExercisesAsync();
 
         var mainWindowViewModel = new MainWindowViewModel(
             exerciseViewModel, goalViewModel, supplementViewModel,
@@ -118,7 +111,7 @@ public partial class App : Application
 
         mainWindowViewModel.LoggedOut += () =>
         {
-            Dispatcher.UIThread.Post(async () =>
+            Dispatcher.UIThread.Post(() =>
             {
                 mainWindow.Hide();
                 ShowLoginWindow(desktop, authService);

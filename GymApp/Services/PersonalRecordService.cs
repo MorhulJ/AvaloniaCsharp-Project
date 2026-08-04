@@ -1,38 +1,54 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using GymApp.Data;
+using Google.Cloud.Firestore;
 using GymApp.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace GymApp.Services;
 
 public class PersonalRecordService
 {
-    private readonly AppDbContext _db;
+    private readonly FirestoreDb _db;
 
-    public PersonalRecordService(AppDbContext db)
+    public PersonalRecordService()
     {
-        _db = db;
+        _db = FirebaseService.GetDb();
     }
 
-    public async Task<List<PersonalRecord>> GetAllRecordsByUserAsync(int userId)
+    public async Task<List<PersonalRecord>> GetAllRecordsByUserAsync(string userId)
     {
-        return await _db.PersonalRecords
-            .Include(pr => pr.Exercise)
-            .Where(pr => pr.UserId == userId)
-            .ToListAsync();
+        var snapshot = await _db.Collection("users").Document(userId)
+            .Collection("personalRecords").GetSnapshotAsync();
+
+        var records = new List<PersonalRecord>();
+        foreach (var doc in snapshot.Documents)
+        {
+            records.Add(new PersonalRecord
+            {
+                FirebaseId = doc.Id,
+                UserId = userId,
+                ExerciseFirebaseId = doc.GetValue<string>("exerciseId"),
+                Value = doc.GetValue<double>("value"),
+                Date = DateTimeOffset.Parse(doc.GetValue<string>("date"))
+            });
+        }
+        return records;
     }
 
     public async Task AddRecordAsync(PersonalRecord record)
     {
-        _db.PersonalRecords.Add(record);
-        await _db.SaveChangesAsync();
+        await _db.Collection("users").Document(record.UserId)
+            .Collection("personalRecords").AddAsync(new
+            {
+                exerciseId = record.ExerciseFirebaseId,
+                value = record.Value,
+                date = record.Date.ToString("O")
+            });
     }
 
     public async Task DeleteRecordAsync(PersonalRecord record)
     {
-        _db.PersonalRecords.Remove(record);
-        await _db.SaveChangesAsync();
+        await _db.Collection("users").Document(record.UserId)
+            .Collection("personalRecords").Document(record.FirebaseId).DeleteAsync();
     }
 }

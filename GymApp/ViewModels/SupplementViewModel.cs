@@ -17,7 +17,6 @@ public partial class SupplementViewModel : ViewModelBase
 
     [ObservableProperty] 
     private string validationMessage = "";
-
     [ObservableProperty] 
     private string supplementName = "";
     [ObservableProperty] 
@@ -27,8 +26,9 @@ public partial class SupplementViewModel : ViewModelBase
     [ObservableProperty]
     private Supplement? selectedSupplement;
 
-    private int? _editingSupplementId;
+    private string? _editingSupplementFirebaseId;
     
+    public string CurrentUserId { get; set; } = "";
     public event Action? SupplementSaved;
 
     public SupplementViewModel(SupplementService supplementService)
@@ -41,10 +41,11 @@ public partial class SupplementViewModel : ViewModelBase
     [RelayCommand]
     private async Task SaveSupplementAsync()
     {
-        if (_editingSupplementId == null)
+        if (_editingSupplementFirebaseId == null)
         {
-            var supplement = new Supplement()
+            var supplement = new Supplement
             {
+                UserId = CurrentUserId,
                 Name = supplementName,
                 DosageUnit = dosageUnit,
                 Description = description
@@ -59,42 +60,38 @@ public partial class SupplementViewModel : ViewModelBase
             }
 
             ValidationMessage = "";
-
             await _supplementService.AddSupplementAsync(supplement);
         }
         else
         {
-            var supplement = new Supplement()
+            var supplement = new Supplement
             {
-                Id = _editingSupplementId.Value,
+                FirebaseId = _editingSupplementFirebaseId,
+                UserId = CurrentUserId,
                 Name = supplementName,
                 DosageUnit = dosageUnit,
                 Description = description
             };
             
             await _supplementService.UpdateSupplementAsync(supplement);
-            _editingSupplementId = null;
+            _editingSupplementFirebaseId = null;
         }
 
         SupplementName = "";
         DosageUnit = "";
         Description = "";
         
-        await LoadSupplementAsync();
-        
+        await LoadSupplementAsync(CurrentUserId);
         SupplementSaved?.Invoke();
     }
 
-    public async Task LoadSupplementAsync()
+    public async Task LoadSupplementAsync(string userId)
     {
-        var supplementList = await _supplementService.GetAllSupplementsAsync();
+        var supplementList = await _supplementService.GetAllSupplementsAsync(userId);
         
         Suplements.Clear();
-        
         foreach (var supplement in supplementList)
-        {
             Suplements.Add(supplement);
-        }
     }
 
     [RelayCommand]
@@ -108,9 +105,9 @@ public partial class SupplementViewModel : ViewModelBase
         SupplementName = "";
         DosageUnit = "";
         Description = "";
-        _editingSupplementId = null;
+        _editingSupplementFirebaseId = null;
         
-        await LoadSupplementAsync();
+        await LoadSupplementAsync(CurrentUserId);
     }
 
     partial void OnSelectedSupplementChanged(Supplement? value)
@@ -120,13 +117,12 @@ public partial class SupplementViewModel : ViewModelBase
         SupplementName = value.Name;
         DosageUnit = value.DosageUnit;
         Description = value.Description;
-        
-        _editingSupplementId = value.Id;
+        _editingSupplementFirebaseId = value.FirebaseId;
     }
     
     public void ResetEditingState()
     {
-        _editingSupplementId = null;
+        _editingSupplementFirebaseId = null;
     }
 
     public void ResetValidation()

@@ -1,54 +1,64 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using GymApp.Data;
+using Google.Cloud.Firestore;
 using GymApp.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace GymApp.Services;
 
 public class ExerciseService
 {
-    private readonly AppDbContext _db;
-    
-    public ExerciseService(AppDbContext db)
+    private readonly FirestoreDb _db;
+
+    public ExerciseService()
     {
-        _db = db;
+        _db = FirebaseService.GetDb();
     }
 
-    public async Task<Exercise?> GetExerciseByIdAsync(int id)
+    public async Task<List<Exercise>> GetAllExercisesAsync(string userId)
     {
-        return await _db.Exercises.FindAsync(id);
-    }
+        var snapshot = await _db.Collection("users").Document(userId)
+            .Collection("exercises").GetSnapshotAsync();
     
-    public async Task<List<Exercise>> GetAllExercisesAsync()
-    {
-        return await _db.Exercises.ToListAsync();
-    }
-
-    public async Task AddExerciseAsync(Exercise exercise)
-    {
-        _db.Exercises.Add(exercise);
-        await _db.SaveChangesAsync();
-    }
-
-    public async Task DeleteExerciseAsync(Exercise exercise)
-    {
-        _db.Exercises.Remove(exercise);
-        await _db.SaveChangesAsync();
+        var exercises = new List<Exercise>();
+        foreach (var doc in snapshot.Documents)
+        {
+            exercises.Add(new Exercise
+            {
+                FirebaseId = doc.Id,
+                Name = doc.GetValue<string>("name"),
+                MuscleGroup = doc.GetValue<string>("muscleGroup"),
+                Description = doc.GetValue<string>("description")
+            });
+        }
+        return exercises;
     }
 
-    public async Task UpdateExerciseAsync(Exercise exercise)
+    public async Task AddExerciseAsync(Exercise exercise, string userId)
     {
-        var existing = await _db.Exercises.FindAsync(exercise.Id);
-    
-        if (existing == null) 
-            throw new KeyNotFoundException($"Exercise with Id={exercise.Id} is not found");
-    
-        existing.Name = exercise.Name;
-        existing.MuscleGroup = exercise.MuscleGroup;
-        existing.Description = exercise.Description;
-    
-        await _db.SaveChangesAsync();
+        await _db.Collection("users").Document(userId)
+            .Collection("exercises").AddAsync(new
+            {
+                name = exercise.Name,
+                muscleGroup = exercise.MuscleGroup,
+                description = exercise.Description
+            });
+    }
+
+    public async Task UpdateExerciseAsync(Exercise exercise, string userId)
+    {
+        await _db.Collection("users").Document(userId)
+            .Collection("exercises").Document(exercise.FirebaseId)
+            .UpdateAsync(new Dictionary<string, object>
+            {
+                { "name", exercise.Name },
+                { "muscleGroup", exercise.MuscleGroup },
+                { "description", exercise.Description }
+            });
+    }
+
+    public async Task DeleteExerciseAsync(Exercise exercise, string userId)
+    {
+        await _db.Collection("users").Document(userId)
+            .Collection("exercises").Document(exercise.FirebaseId).DeleteAsync();
     }
 }

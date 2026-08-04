@@ -33,9 +33,9 @@ public partial class GoalViewModel : ViewModelBase
     [ObservableProperty] 
     private Goal? selectedGoal;
 
-    private int? _editingGoalId;
+    private string? _editingGoalFirebaseId;
     
-    public int CurrentUserId { get; set; }
+    public string CurrentUserId { get; set; }
     
     public event Action? GoalSaved;
 
@@ -50,12 +50,12 @@ public partial class GoalViewModel : ViewModelBase
     [RelayCommand]
     private async Task SaveGoalAsync()
     {
-        if (_editingGoalId == null)
+        if (_editingGoalFirebaseId == null)
         {
             var goal = new Goal
             {
                 UserId = CurrentUserId,
-                ExerciseId = goalExercise?.Id,
+                ExerciseFirebaseId = goalExercise?.FirebaseId,
                 Title = goalTitle,
                 TargetValue = goalValue,
                 CurrentValue = currentValue
@@ -77,16 +77,16 @@ public partial class GoalViewModel : ViewModelBase
         {
             var goal = new Goal
             {
-                Id = _editingGoalId.Value,
+                FirebaseId = _editingGoalFirebaseId,
                 Title = goalTitle,
-                ExerciseId = goalExercise?.Id,
+                ExerciseFirebaseId = goalExercise?.FirebaseId,
                 TargetValue = goalValue,
                 CurrentValue = currentValue
             };
 
             await _goalService.UpdateGoalAsync(goal);
 
-            _editingGoalId = null;
+            _editingGoalFirebaseId = null;
         }
 
         GoalTitle = "";
@@ -99,7 +99,7 @@ public partial class GoalViewModel : ViewModelBase
         GoalSaved?.Invoke();
     }
 
-    public async Task LoadGoalsAsync(int userId)
+    public async Task LoadGoalsAsync(string userId)
     {
         var goalList = await _goalService.GetAllGoalsByUserAsync(userId);
 
@@ -113,7 +113,7 @@ public partial class GoalViewModel : ViewModelBase
 
     public async Task LoadExercisesAsync()
     {
-        var exercisesList = await _exerciseService.GetAllExercisesAsync();
+        var exercisesList = await _exerciseService.GetAllExercisesAsync(CurrentUserId);
 
         Exercises.Clear();
 
@@ -139,16 +139,16 @@ public partial class GoalViewModel : ViewModelBase
             return;
 
         GoalTitle = value.Title;
-        GoalExercise = Exercises.FirstOrDefault(e => e.Id == value.ExerciseId);
+        GoalExercise = Exercises.FirstOrDefault(e => e.FirebaseId == value.ExerciseFirebaseId);
         GoalValue = value.TargetValue;
         CurrentValue = value.CurrentValue;
 
-        _editingGoalId = value.Id;
+        _editingGoalFirebaseId = value.FirebaseId;
     }
     
     public void ResetEditingState()
     {
-        _editingGoalId = null;
+        _editingGoalFirebaseId = null;
     }
 
     public void ResetValidation()

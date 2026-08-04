@@ -1,53 +1,65 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using GymApp.Data;
+using Google.Cloud.Firestore;
 using GymApp.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace GymApp.Services;
 
 public class SupplementService
 {
-    private readonly AppDbContext _db;
-    
-    public SupplementService(AppDbContext db)
+    private readonly FirestoreDb _db;
+
+    public SupplementService()
     {
-        _db = db;
-    }
-    
-    public async Task<Supplement?> GetSupplementByIdAsync(int id)
-    {
-        return await _db.Supplements.FindAsync(id);
+        _db = FirebaseService.GetDb();
     }
 
-    public async Task<List<Supplement>> GetAllSupplementsAsync()
+    public async Task<List<Supplement>> GetAllSupplementsAsync(string userId)
     {
-        return await _db.Supplements.ToListAsync();
+        var snapshot = await _db.Collection("users").Document(userId)
+            .Collection("supplements").GetSnapshotAsync();
+
+        var supplements = new List<Supplement>();
+        foreach (var doc in snapshot.Documents)
+        {
+            supplements.Add(new Supplement
+            {
+                FirebaseId = doc.Id,
+                UserId = userId,
+                Name = doc.GetValue<string>("name"),
+                DosageUnit = doc.GetValue<string>("dosageUnit"),
+                Description = doc.GetValue<string>("description")
+            });
+        }
+        return supplements;
     }
 
-    public async Task AddSupplementAsync(Supplement suplement)
+    public async Task AddSupplementAsync(Supplement supplement)
     {
-        _db.Supplements.Add(suplement);
-        await _db.SaveChangesAsync();
+        await _db.Collection("users").Document(supplement.UserId)
+            .Collection("supplements").AddAsync(new
+            {
+                name = supplement.Name,
+                dosageUnit = supplement.DosageUnit,
+                description = supplement.Description
+            });
     }
 
-    public async Task DeleteSupplementAsync(Supplement suplement)
+    public async Task UpdateSupplementAsync(Supplement supplement)
     {
-        _db.Supplements.Remove(suplement);
-        await _db.SaveChangesAsync();
+        await _db.Collection("users").Document(supplement.UserId)
+            .Collection("supplements").Document(supplement.FirebaseId)
+            .UpdateAsync(new Dictionary<string, object>
+            {
+                { "name", supplement.Name },
+                { "dosageUnit", supplement.DosageUnit },
+                { "description", supplement.Description }
+            });
     }
 
-    public async Task UpdateSupplementAsync(Supplement suplement)
+    public async Task DeleteSupplementAsync(Supplement supplement)
     {
-        var existing =  await _db.Supplements.FindAsync(suplement.Id);
-        
-        if (existing == null)
-            throw new KeyNotFoundException($"Supplement with Id={suplement.Id} is not found");
-        
-        existing.Name = suplement.Name;
-        existing.DosageUnit = suplement.DosageUnit;
-        existing.Description = suplement.Description;
-        
-        await _db.SaveChangesAsync();
+        await _db.Collection("users").Document(supplement.UserId)
+            .Collection("supplements").Document(supplement.FirebaseId).DeleteAsync();
     }
 }

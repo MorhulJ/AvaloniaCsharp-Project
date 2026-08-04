@@ -5,12 +5,11 @@ namespace GymApp.Models;
 
 public class WorkoutProgram
 {
-    public int Id { get; set; }
-    public int UserId { get; set; }
+    public string FirebaseId { get; set; } = "";
+    public string UserId { get; set; } = "";
     public string Name { get; set; } = "";
     public string Description { get; set; } = "";
-    public DateTime CreatedDate { get; set; } =  DateTime.Now;
     
-    public User User { get; set; }
+    public User? User { get; set; }
     public List<ProgramExercise> ProgramExercises { get; set; } = new();
 }

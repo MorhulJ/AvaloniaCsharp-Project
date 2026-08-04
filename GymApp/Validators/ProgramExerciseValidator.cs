@@ -8,8 +8,8 @@ public class ProgramExerciseValidator : AbstractValidator<ProgramExercise>
 {
     public ProgramExerciseValidator()
     {
-        RuleFor(pe => pe.ExerciseId)
-            .GreaterThan(0).WithMessage("Program exercise is required");
+        RuleFor(pe => pe.ExerciseFirebaseId)
+            .NotEmpty().WithMessage("Program exercise is required");
 
         RuleFor(pe => pe.Sets)
             .GreaterThan(0).WithMessage("Sets must be greater than 0");

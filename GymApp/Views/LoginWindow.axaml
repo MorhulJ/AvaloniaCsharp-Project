@@ -22,7 +22,7 @@
         </StackPanel>
 
         <StackPanel Spacing="6">
-            <TextBlock Text="Login" Classes="label" />
+            <TextBlock Text="Email" Classes="label" />
             <TextBox Text="{Binding Login}" />
         </StackPanel>
 

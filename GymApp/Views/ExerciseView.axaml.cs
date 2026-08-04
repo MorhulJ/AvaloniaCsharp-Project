@@ -13,7 +13,7 @@ public partial class ExerciseView : UserControl
         {
             if (DataContext is ExerciseViewModel vm)
             {
-                await vm.LoadExercisesAsync();
+                await vm.LoadExercisesAsync(vm.CurrentUserId);
             }
         };
     }

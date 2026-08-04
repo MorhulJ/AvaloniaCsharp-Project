@@ -13,7 +13,7 @@ public partial class SupplementView : UserControl
         {
             if (DataContext is SupplementViewModel vm)
             {
-                await vm.LoadSupplementAsync();
+                await vm.LoadSupplementAsync(vm.CurrentUserId);
             }   
         };
     }

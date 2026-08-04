@@ -28,12 +28,10 @@ public partial class SupplementIntakeViewModel : ViewModelBase
     private readonly SupplementService _supplementService;
 
     public ObservableCollection<SupplementIntake> SupplementIntakes { get; } = new();
-
     public ObservableCollection<Supplement> Supplements { get; } = new();
 
     [ObservableProperty] 
     private string validationMessage = "";
-    
     [ObservableProperty]
     private Supplement? supplement;
     [ObservableProperty]
@@ -45,8 +43,7 @@ public partial class SupplementIntakeViewModel : ViewModelBase
     [ObservableProperty]
     private SupplementIntake? selectedSupplementIntake;
 
-    public int CurrentUserId { get; set; }
-    
+    public string CurrentUserId { get; set; } = "";
     public event Action? IntakeSaved;
 
     public SupplementIntakeViewModel(SupplementIntakeService supplementIntakeService, SupplementService supplementService)
@@ -63,7 +60,7 @@ public partial class SupplementIntakeViewModel : ViewModelBase
         var supplementIntake = new SupplementIntake
         {
             UserId = CurrentUserId,
-            SupplementId = supplement?.Id ?? 0,
+            SupplementFirebaseId = supplement?.FirebaseId ?? "",
             Dosage = supplementDosage,
             Date = supplementDay,
             Time = supplementTime,
@@ -73,12 +70,11 @@ public partial class SupplementIntakeViewModel : ViewModelBase
 
         if (!result.IsValid)
         {
-            ValidationMessage =  result.Errors[0].ErrorMessage;
+            ValidationMessage = result.Errors[0].ErrorMessage;
             return;
         }
 
         ValidationMessage = "";
-
         await _supplementIntakeService.AddSupplementAsync(supplementIntake);
         
         Supplement = null;
@@ -87,32 +83,28 @@ public partial class SupplementIntakeViewModel : ViewModelBase
         SupplementTime = TimeSpan.Zero;
 
         await LoadSupplementIntakesAsync(CurrentUserId);
-        
         IntakeSaved?.Invoke();
     }
     
-    public async Task LoadSupplementIntakesAsync(int userId)
+    public async Task LoadSupplementIntakesAsync(string userId)
     {
-        var supplementIntakesList = await _supplementIntakeService.GetAllSupplementsByUserAsync(userId);
+        var list = await _supplementIntakeService.GetAllSupplementsByUserAsync(userId);
         
         SupplementIntakes.Clear();
-
-        foreach (var supplementIntake in supplementIntakesList)
+        foreach (var intake in list)
         {
-            SupplementIntakes.Add(supplementIntake);
+            intake.Supplement = Supplements.FirstOrDefault(s => s.FirebaseId == intake.SupplementFirebaseId);
+            SupplementIntakes.Add(intake);
         }
     }
     
-    public async Task LoadSupplementsAsync()
+    public async Task LoadSupplementsAsync(string userId)
     {
-        var supplementsList = await _supplementService.GetAllSupplementsAsync();
+        var list = await _supplementService.GetAllSupplementsAsync(userId);
         
         Supplements.Clear();
-
-        foreach (var supplement in supplementsList)
-        {
+        foreach (var supplement in list)
             Supplements.Add(supplement);
-        }
     }
 
     [RelayCommand]
@@ -130,10 +122,10 @@ public partial class SupplementIntakeViewModel : ViewModelBase
         if (value == null)
             return;
         
-        Supplement = Supplements.FirstOrDefault(e => e.Id == value.SupplementId);
+        Supplement = Supplements.FirstOrDefault(e => e.FirebaseId == value.SupplementFirebaseId);
         SupplementDosage = value.Dosage;
         SupplementDay = value.Date;
-        SupplementTime =  value.Time;
+        SupplementTime = value.Time;
     }
 
     public void ResetValidation()

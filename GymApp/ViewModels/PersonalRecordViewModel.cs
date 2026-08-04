@@ -13,26 +13,23 @@ namespace GymApp.ViewModels;
 public partial class PersonalRecordViewModel : ViewModelBase
 {
     private readonly PersonalRecordService _personalRecordService;
-    private readonly  ExerciseService _exerciseService;
+    private readonly ExerciseService _exerciseService;
 
     public ObservableCollection<PersonalRecord> Records { get; } = new();
-
     public ObservableCollection<Exercise> Exercises { get; } = new();
 
     [ObservableProperty] 
     private string validationMessage = "";
-    
     [ObservableProperty]
     private Exercise? recordExercise;
     [ObservableProperty]
     private double recordValue;
     [ObservableProperty]
-    private DateTimeOffset recordDate =  DateTime.Today;
+    private DateTimeOffset recordDate = DateTime.Today;
     [ObservableProperty]
     private PersonalRecord? selectedRecord;
 
-    public int CurrentUserId { get; set; }
-
+    public string CurrentUserId { get; set; } = "";
     public event Action? RecordSaved;
 
     public PersonalRecordViewModel(PersonalRecordService personalRecordService, ExerciseService exerciseService)
@@ -49,8 +46,8 @@ public partial class PersonalRecordViewModel : ViewModelBase
         var record = new PersonalRecord
         {
             UserId = CurrentUserId,
-            ExerciseId = recordExercise?.Id ?? 0,
-            Value =  recordValue,
+            ExerciseFirebaseId = recordExercise?.FirebaseId ?? "",
+            Value = recordValue,
             Date = recordDate,
         };
         
@@ -71,32 +68,27 @@ public partial class PersonalRecordViewModel : ViewModelBase
         RecordDate = DateTime.Today;
         
         await LoadRecordsAsync(CurrentUserId);
-        
         RecordSaved?.Invoke();
     }
 
-    public async Task LoadRecordsAsync(int userId)
+    public async Task LoadRecordsAsync(string userId)
     {
         var recordList = await _personalRecordService.GetAllRecordsByUserAsync(userId);
         
         Records.Clear();
-
         foreach (var record in recordList)
         {
+            record.Exercise = Exercises.FirstOrDefault(e => e.FirebaseId == record.ExerciseFirebaseId);
             Records.Add(record);
         }
     }
     
     public async Task LoadExercisesAsync()
     {
-        var exercisesList = await _exerciseService.GetAllExercisesAsync();
-            
+        var exercisesList = await _exerciseService.GetAllExercisesAsync(CurrentUserId);
         Exercises.Clear();
-
         foreach (var exercise in exercisesList)
-        {
             Exercises.Add(exercise);
-        }
     }
 
     [RelayCommand]
@@ -111,12 +103,11 @@ public partial class PersonalRecordViewModel : ViewModelBase
 
     partial void OnSelectedRecordChanged(PersonalRecord? value)
     {
-        if (value == null) 
-            return;
+        if (value == null) return;
         
-        RecordExercise =  Exercises.FirstOrDefault(e => e.Id == value.ExerciseId);
-        RecordValue =  value.Value;
-        RecordDate =  value.Date;
+        RecordExercise = Exercises.FirstOrDefault(e => e.FirebaseId == value.ExerciseFirebaseId);
+        RecordValue = value.Value;
+        RecordDate = value.Date;
     }
 
     public void ResetValidation()

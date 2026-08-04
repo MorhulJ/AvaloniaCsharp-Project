@@ -1,78 +1,128 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using GymApp.Data;
+using Google.Cloud.Firestore;
 using GymApp.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace GymApp.Services;
 
 public class WorkoutProgramService
 {
-    private readonly AppDbContext _db;
-    
-    public  WorkoutProgramService(AppDbContext db)
+    private readonly FirestoreDb _db;
+
+    public WorkoutProgramService()
     {
-        _db = db;
+        _db = FirebaseService.GetDb();
     }
 
-    public async Task<WorkoutProgram?> GetProgramByIdAsync(int Id)
+    public async Task<List<WorkoutProgram>> GetAllProgramsAByUserAsync(string userId)
     {
-        return await _db.WorkoutPrograms.FindAsync(Id);
+        var snapshot = await _db.Collection("users").Document(userId)
+            .Collection("workoutPrograms").GetSnapshotAsync();
+
+        var programs = new List<WorkoutProgram>();
+        foreach (var doc in snapshot.Documents)
+        {
+            var program = new WorkoutProgram
+            {
+                FirebaseId = doc.Id,
+                UserId = userId,
+                Name = doc.GetValue<string>("name"),
+                Description = doc.GetValue<string>("description")
+            };
+
+            var exercisesSnapshot = await _db.Collection("users").Document(userId)
+                .Collection("workoutPrograms").Document(doc.Id)
+                .Collection("exercises").GetSnapshotAsync();
+
+            foreach (var exDoc in exercisesSnapshot.Documents)
+            {
+                program.ProgramExercises.Add(new ProgramExercise
+                {
+                    FirebaseId = exDoc.Id,
+                    ProgramFirebaseId = doc.Id,
+                    ExerciseFirebaseId = exDoc.GetValue<string>("exerciseId"),
+                    Sets = exDoc.GetValue<int>("sets"),
+                    Reps = exDoc.GetValue<int>("reps"),
+                    RestTime = exDoc.GetValue<int>("restTime"),
+                    OrderIndex = exDoc.GetValue<int>("orderIndex")
+                });
+            }
+
+            programs.Add(program);
+        }
+        return programs;
     }
 
-    public async Task<List<WorkoutProgram>> GetAllProgramsAByUserAsync(int userId)
+    public async Task<List<ProgramExercise>> GetExercisesByProgramAsync(string programFirebaseId, string userId)
     {
-        return await _db.WorkoutPrograms
-            .Include(wp => wp.ProgramExercises)
-            .ThenInclude(wp => wp.Exercise)
-            .Where(wp => wp.UserId == userId)
-            .ToListAsync();
-    }
-    
-    public async Task<List<ProgramExercise>> GetExercisesByProgramAsync(int programId)
-    {
-        return await _db.WorkoutExercises
-            .Include(x => x.Exercise)
-            .Where(x => x.ProgramId == programId)
-            .OrderBy(x => x.OrderIndex)
-            .ToListAsync();
+        var snapshot = await _db.Collection("users").Document(userId)
+            .Collection("workoutPrograms").Document(programFirebaseId)
+            .Collection("exercises").GetSnapshotAsync();
+
+        var exercises = new List<ProgramExercise>();
+        foreach (var doc in snapshot.Documents)
+        {
+            exercises.Add(new ProgramExercise
+            {
+                FirebaseId = doc.Id,
+                ProgramFirebaseId = programFirebaseId,
+                ExerciseFirebaseId = doc.GetValue<string>("exerciseId"),
+                Sets = doc.GetValue<int>("sets"),
+                Reps = doc.GetValue<int>("reps"),
+                RestTime = doc.GetValue<int>("restTime"),
+                OrderIndex = doc.GetValue<int>("orderIndex")
+            });
+        }
+        return exercises;
     }
 
     public async Task AddProgramAsync(WorkoutProgram program)
     {
-        _db.WorkoutPrograms.Add(program);
-        await _db.SaveChangesAsync();
-    }
-
-    public async Task DeleteProgramAsync(WorkoutProgram program)
-    {
-        _db.WorkoutPrograms.Remove(program);
-        await _db.SaveChangesAsync();
+        await _db.Collection("users").Document(program.UserId)
+            .Collection("workoutPrograms").AddAsync(new
+            {
+                name = program.Name,
+                description = program.Description,
+                createdDate = DateTime.Now.ToString("yyyy-MM-dd")
+            });
     }
 
     public async Task UpdateProgramAsync(WorkoutProgram program)
     {
-        var existing = await _db.WorkoutPrograms.FindAsync(program.Id);
-        
-        if  (existing == null)
-            throw new KeyNotFoundException($"Program with id={program.Id} is not found");
-        
-        existing.Name = program.Name;
-        existing.Description = program.Description;
-        
-        await _db.SaveChangesAsync();
-    }
-    
-    public async Task AddExerciseToProgramAsync(ProgramExercise programExercise)
-    {
-        _db.WorkoutExercises.Add(programExercise);
-        await _db.SaveChangesAsync();
+        await _db.Collection("users").Document(program.UserId)
+            .Collection("workoutPrograms").Document(program.FirebaseId)
+            .UpdateAsync(new Dictionary<string, object>
+            {
+                { "name", program.Name },
+                { "description", program.Description }
+            });
     }
 
-    public async Task DeleteExerciseFromProgramAsync(ProgramExercise programExercise)
+    public async Task DeleteProgramAsync(WorkoutProgram program)
     {
-        _db.WorkoutExercises.Remove(programExercise);
-        await _db.SaveChangesAsync();
+        await _db.Collection("users").Document(program.UserId)
+            .Collection("workoutPrograms").Document(program.FirebaseId).DeleteAsync();
+    }
+
+    public async Task AddExerciseToProgramAsync(ProgramExercise pe, string userId)
+    {
+        await _db.Collection("users").Document(userId)
+            .Collection("workoutPrograms").Document(pe.ProgramFirebaseId)
+            .Collection("exercises").AddAsync(new
+            {
+                exerciseId = pe.ExerciseFirebaseId,
+                sets = pe.Sets,
+                reps = pe.Reps,
+                restTime = pe.RestTime,
+                orderIndex = pe.OrderIndex
+            });
+    }
+
+    public async Task DeleteExerciseFromProgramAsync(ProgramExercise pe, string userId)
+    {
+        await _db.Collection("users").Document(userId)
+            .Collection("workoutPrograms").Document(pe.ProgramFirebaseId)
+            .Collection("exercises").Document(pe.FirebaseId).DeleteAsync();
     }
 }

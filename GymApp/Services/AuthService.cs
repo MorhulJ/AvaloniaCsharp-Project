@@ -1,159 +1,96 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
-using GymApp.Data;
-using GymApp.Models;
-using Microsoft.EntityFrameworkCore;
+using Firebase.Auth;
+using Google.Cloud.Firestore;
 
 namespace GymApp.Services;
 
 public class AuthService
 {
-    private readonly AppDbContext _db;
-    private static User? _currentUser;
+    private static UserCredential? _currentCredential;
+    private static string? _currentUserId;
 
-    public AuthService(AppDbContext db)
+    public string? CurrentUserId => _currentUserId;
+
+    public async Task<bool> RegisterAsync(string email, string password, string name)
     {
-        _db = db;
+        try
+        {
+            var auth = FirebaseService.GetAuth();
+            var credential = await auth.CreateUserWithEmailAndPasswordAsync(email, password, name);
+
+            _currentCredential = credential;
+            _currentUserId = credential.User.Uid;
+
+            var db = FirebaseService.GetDb();
+            await db.Collection("users").Document(_currentUserId).SetAsync(new
+            {
+                name = name,
+                email = email,
+                gender = "Male",
+                weight = 0,
+                height = 0,
+                dateOfBirth = DateTime.Now.ToString("yyyy-MM-dd")
+            });
+
+            await SeedUserDataAsync(_currentUserId);
+
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 
-    public User? CurrentUser => _currentUser;
-
-    public string HashPassword(string password)
+    public async Task<bool> LoginAsync(string email, string password)
     {
-        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(password));
-        return Convert.ToHexString(bytes);
+        try
+        {
+            var auth = FirebaseService.GetAuth();
+            var credential = await auth.SignInWithEmailAndPasswordAsync(email, password);
+
+            _currentCredential = credential;
+            _currentUserId = credential.User.Uid;
+
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
-
-    public async Task<User?> LoginAsync(string login, string password)
-    {
-        var hash = HashPassword(password);
-        var user = await _db.Users
-            .FirstOrDefaultAsync(u => u.Login == login && u.PasswordHash == hash);
-
-        if (user != null)
-            _currentUser = user;
-
-        return user;
-    }
-
-    public async Task<bool> RegisterAsync(string login, string password, string name)
-{
-    var exists = await _db.Users.AnyAsync(u => u.Login == login);
-    if (exists) return false;
-
-    var user = new User
-    {
-        Login = login,
-        PasswordHash = HashPassword(password),
-        Name = name,
-        DateOfBirth = DateTime.Now,
-    };
-
-    _db.Users.Add(user);
-    await _db.SaveChangesAsync();
-    _currentUser = user;
-
-    await SeedUserDataAsync(user.Id);
-
-    return true;
-}
-
-private async Task SeedUserDataAsync(int userId)
-{
-    var exercises = new List<Exercise>
-    {
-        new() { Name = "Bench Press", MuscleGroup = "Chest", Description = "Barbell press on flat bench" },
-        new() { Name = "Squat", MuscleGroup = "Legs", Description = "Barbell squat" },
-        new() { Name = "Deadlift", MuscleGroup = "Back", Description = "Conventional deadlift" },
-        new() { Name = "Pull-up", MuscleGroup = "Back", Description = "Bodyweight pull-up" },
-        new() { Name = "Overhead Press", MuscleGroup = "Shoulders", Description = "Standing barbell press" },
-        new() { Name = "Barbell Row", MuscleGroup = "Back", Description = "Bent-over barbell row" },
-        new() { Name = "Dumbbell Curl", MuscleGroup = "Biceps", Description = "Standing dumbbell curl" },
-        new() { Name = "Tricep Pushdown", MuscleGroup = "Triceps", Description = "Cable pushdown" },
-        new() { Name = "Leg Press", MuscleGroup = "Legs", Description = "Machine leg press" },
-        new() { Name = "Plank", MuscleGroup = "Core", Description = "Static plank hold" }
-    };
-
-    _db.Exercises.AddRange(exercises);
-    await _db.SaveChangesAsync();
-    
-    var supplements = new List<Supplement>
-    {
-        new() { Name = "Creatine", DosageUnit = "g", Description = "Increases strength and muscle mass" },
-        new() { Name = "Whey Protein", DosageUnit = "g", Description = "Fast protein for muscle recovery" },
-        new() { Name = "BCAA", DosageUnit = "g", Description = "Amino acids for muscle protection" },
-        new() { Name = "Vitamin D", DosageUnit = "mg", Description = "Supports bone health and immunity" },
-        new() { Name = "Omega-3", DosageUnit = "mg", Description = "Supports heart and joint health" }
-    };
-
-    _db.Supplements.AddRange(supplements);
-    await _db.SaveChangesAsync();
-    
-    var fullbody = new WorkoutProgram
-    {
-        UserId = userId,
-        Name = "Fullbody",
-        Description = "Full body workout 3 times per week",
-        CreatedDate = DateTime.Now
-    };
-
-    _db.WorkoutPrograms.Add(fullbody);
-    await _db.SaveChangesAsync();
-    
-    var benchPress = exercises.First(e => e.Name == "Bench Press");
-    var squat = exercises.First(e => e.Name == "Squat");
-    var deadlift = exercises.First(e => e.Name == "Deadlift");
-    var pullUp = exercises.First(e => e.Name == "Pull-up");
-    var ohp = exercises.First(e => e.Name == "Overhead Press");
-
-    var programExercises = new List<ProgramExercise>
-    {
-        new() { ProgramId = fullbody.Id, ExerciseId = squat.Id, Sets = 4, Reps = 8, RestTime = 120, OrderIndex = 1 },
-        new() { ProgramId = fullbody.Id, ExerciseId = benchPress.Id, Sets = 4, Reps = 8, RestTime = 90, OrderIndex = 2 },
-        new() { ProgramId = fullbody.Id, ExerciseId = deadlift.Id, Sets = 3, Reps = 6, RestTime = 150, OrderIndex = 3 },
-        new() { ProgramId = fullbody.Id, ExerciseId = pullUp.Id, Sets = 3, Reps = 10, RestTime = 90, OrderIndex = 4 },
-        new() { ProgramId = fullbody.Id, ExerciseId = ohp.Id, Sets = 3, Reps = 10, RestTime = 90, OrderIndex = 5 }
-    };
-
-    _db.WorkoutExercises.AddRange(programExercises);
-    await _db.SaveChangesAsync();
-}
 
     public void Logout()
     {
-        _currentUser = null;
+        _currentCredential = null;
+        _currentUserId = null;
         DeleteRememberMe();
     }
 
-    public void SaveRememberMe(int userId)
+    public void SaveRememberMe(string userId)
     {
         var path = GetRememberMePath();
         var directory = Path.GetDirectoryName(path)!;
-    
+
         if (!Directory.Exists(directory))
             Directory.CreateDirectory(directory);
-    
-        File.WriteAllText(path, userId.ToString());
+
+        File.WriteAllText(path, userId);
     }
 
-    public async Task<User?> TryAutoLoginAsync()
+    public async Task<bool> TryAutoLoginAsync()
     {
         var path = GetRememberMePath();
-        if (!File.Exists(path)) return null;
+        if (!File.Exists(path)) return false;
 
-        var content = await File.ReadAllTextAsync(path);
-        if (!int.TryParse(content, out var userId)) return null;
+        var userId = await File.ReadAllTextAsync(path);
+        if (string.IsNullOrEmpty(userId)) return false;
 
-        var user = await _db.Users.FindAsync(userId);
-        if (user != null)
-            _currentUser = user;
-
-        return user;
+        _currentUserId = userId;
+        return true;
     }
 
     public void DeleteRememberMe()
@@ -170,5 +107,72 @@ private async Task SeedUserDataAsync(int userId)
             "GymApp",
             "remember.txt"
         );
+    }
+
+    private async Task SeedUserDataAsync(string userId)
+    {
+        var db = FirebaseService.GetDb();
+
+        var exercises = new[]
+        {
+            new { name = "Bench Press", muscleGroup = "Chest", description = "Barbell press on flat bench" },
+            new { name = "Squat", muscleGroup = "Legs", description = "Barbell squat" },
+            new { name = "Deadlift", muscleGroup = "Back", description = "Conventional deadlift" },
+            new { name = "Pull-up", muscleGroup = "Back", description = "Bodyweight pull-up" },
+            new { name = "Overhead Press", muscleGroup = "Shoulders", description = "Standing barbell press" },
+            new { name = "Barbell Row", muscleGroup = "Back", description = "Bent-over barbell row" },
+            new { name = "Dumbbell Curl", muscleGroup = "Biceps", description = "Standing dumbbell curl" },
+            new { name = "Tricep Pushdown", muscleGroup = "Triceps", description = "Cable pushdown" },
+            new { name = "Leg Press", muscleGroup = "Legs", description = "Machine leg press" },
+            new { name = "Plank", muscleGroup = "Core", description = "Static plank hold" }
+        };
+
+        var exerciseIds = new List<string>();
+
+        foreach (var exercise in exercises)
+        {
+            var docRef = await db.Collection("users").Document(userId)
+                .Collection("exercises").AddAsync(exercise);
+            exerciseIds.Add(docRef.Id);
+        }
+
+        var supplements = new[]
+        {
+            new { name = "Creatine", dosageUnit = "g", description = "Increases strength and muscle mass" },
+            new { name = "Whey Protein", dosageUnit = "g", description = "Fast protein for muscle recovery" },
+            new { name = "BCAA", dosageUnit = "g", description = "Amino acids for muscle protection" },
+            new { name = "Vitamin D", dosageUnit = "mg", description = "Supports bone health and immunity" },
+            new { name = "Omega-3", dosageUnit = "mg", description = "Supports heart and joint health" }
+        };
+
+        foreach (var supplement in supplements)
+        {
+            await db.Collection("users").Document(userId)
+                .Collection("supplements").AddAsync(supplement);
+        }
+
+        var programRef = await db.Collection("users").Document(userId)
+            .Collection("workoutPrograms").AddAsync(new
+            {
+                name = "Fullbody",
+                description = "Full body workout 3 times per week",
+                createdDate = DateTime.Now.ToString("yyyy-MM-dd")
+            });
+
+        var programExercises = new[]
+        {
+            new { exerciseId = exerciseIds[1], sets = 4, reps = 8, restTime = 120, orderIndex = 1 },
+            new { exerciseId = exerciseIds[0], sets = 4, reps = 8, restTime = 90, orderIndex = 2 },
+            new { exerciseId = exerciseIds[2], sets = 3, reps = 6, restTime = 150, orderIndex = 3 },
+            new { exerciseId = exerciseIds[3], sets = 3, reps = 10, restTime = 90, orderIndex = 4 },
+            new { exerciseId = exerciseIds[4], sets = 3, reps = 10, restTime = 90, orderIndex = 5 }
+        };
+
+        foreach (var pe in programExercises)
+        {
+            await db.Collection("users").Document(userId)
+                .Collection("workoutPrograms").Document(programRef.Id)
+                .Collection("exercises").AddAsync(pe);
+        }
     }
 }
