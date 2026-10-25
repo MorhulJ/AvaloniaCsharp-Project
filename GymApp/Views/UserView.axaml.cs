@@ -23,12 +23,10 @@ public partial class UserView : UserControl
     {
         if (DataContext is not UserViewModel vm) return;
 
-        var dialog = new ConfirmDialog();
+        var dialog = new DeleteAccountDialog();
         await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Window);
 
-        if (dialog.Result)
-        {
-            await vm.DeleteAccountCommand.ExecuteAsync(null);
-        }
+        if (dialog.Confirmed)
+            await vm.DeleteAccountAsync(dialog.Password);
     }
 }

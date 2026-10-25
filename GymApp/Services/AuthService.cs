@@ -11,8 +11,15 @@ public class AuthService
 {
     private static UserCredential? _currentCredential;
     private static string? _currentUserId;
+    private static string? _currentEmail;
 
     public string? CurrentUserId => _currentUserId;
+    public string? CurrentEmail => _currentEmail;
+
+    public AuthService()
+    {
+        FirebaseService.RefreshTokenUpdated += PersistRotatedRefreshToken;
+    }
 
     public async Task<bool> RegisterAsync(string email, string password, string name)
     {
@@ -23,6 +30,8 @@ public class AuthService
 
             _currentCredential = credential;
             _currentUserId = credential.User.Uid;
+            _currentEmail = email;
+            FirebaseService.SetSession(credential);
 
             var db = FirebaseService.GetDb();
             await db.Collection("users").Document(_currentUserId).SetAsync(new
@@ -54,6 +63,8 @@ public class AuthService
 
             _currentCredential = credential;
             _currentUserId = credential.User.Uid;
+            _currentEmail = email;
+            FirebaseService.SetSession(credential);
 
             return true;
         }
@@ -67,34 +78,92 @@ public class AuthService
     {
         _currentCredential = null;
         _currentUserId = null;
+        _currentEmail = null;
+        FirebaseService.ClearSession();
         DeleteRememberMe();
     }
 
-    public void SaveRememberMe(string userId)
+    public async Task ReauthenticateAsync(string email, string password)
     {
-        var path = GetRememberMePath();
-        var directory = Path.GetDirectoryName(path)!;
+        var credential = await FirebaseService.GetAuth()
+            .SignInWithEmailAndPasswordAsync(email, password);
+        _currentCredential = credential;
+        _currentUserId = credential.User.Uid;
+        _currentEmail = email;
+        FirebaseService.SetSession(credential);
+        if (ProtectedSessionStore.Exists && !string.IsNullOrWhiteSpace(credential.User.Credential.RefreshToken))
+            ProtectedSessionStore.Save(credential.User.Credential.RefreshToken, email);
+    }
 
-        if (!Directory.Exists(directory))
-            Directory.CreateDirectory(directory);
+    public async Task DeleteCurrentAccountAsync()
+    {
+        await FirebaseService.DeleteCurrentAccountAsync();
+        _currentCredential = null;
+        _currentUserId = null;
+        _currentEmail = null;
+        FirebaseService.ClearSession();
+        DeleteRememberMe();
+    }
 
-        File.WriteAllText(path, userId);
+    public bool SaveRememberMe(bool rememberMe)
+    {
+        if (!rememberMe)
+        {
+            ProtectedSessionStore.Delete();
+            return true;
+        }
+
+        try
+        {
+            var refreshToken = FirebaseService.GetRefreshToken();
+            if (string.IsNullOrWhiteSpace(refreshToken)) return false;
+            ProtectedSessionStore.Save(refreshToken, _currentEmail ?? "");
+            return true;
+        }
+        catch { return false; }
     }
 
     public async Task<bool> TryAutoLoginAsync()
     {
-        var path = GetRememberMePath();
-        if (!File.Exists(path)) return false;
+        // Discard the old insecure UID-only marker from previous app versions.
+        var legacyPath = GetRememberMePath();
+        if (File.Exists(legacyPath)) File.Delete(legacyPath);
+        if (!ProtectedSessionStore.Exists) return false;
 
-        var userId = await File.ReadAllTextAsync(path);
-        if (string.IsNullOrEmpty(userId)) return false;
+        try
+        {
+            var session = ProtectedSessionStore.Load();
+            if (string.IsNullOrWhiteSpace(session?.RefreshToken)) return false;
+            _currentUserId = await FirebaseService.RestoreSessionAsync(session.RefreshToken);
+            _currentEmail = session.Email;
+            return true;
+        }
+        catch
+        {
+            FirebaseService.ClearSession();
+            ProtectedSessionStore.Delete();
+            _currentUserId = null;
+            _currentEmail = null;
+            return false;
+        }
+    }
 
-        _currentUserId = userId;
-        return true;
+    private static void PersistRotatedRefreshToken(string refreshToken)
+    {
+        try
+        {
+            if (ProtectedSessionStore.Exists)
+            {
+                var session = ProtectedSessionStore.Load();
+                ProtectedSessionStore.Save(refreshToken, session?.Email ?? _currentEmail ?? "");
+            }
+        }
+        catch { ProtectedSessionStore.Delete(); }
     }
 
     public void DeleteRememberMe()
     {
+        ProtectedSessionStore.Delete();
         var path = GetRememberMePath();
         if (File.Exists(path))
             File.Delete(path);

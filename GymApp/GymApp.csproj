@@ -9,12 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Update="firebase-credentials.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-    </ItemGroup>
-
-    <ItemGroup>
         <Content Include="Assets\gymapp_icon.ico" />
     </ItemGroup>
 
@@ -32,10 +26,8 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1" />
-        <PackageReference Include="FirebaseAdmin" Version="3.6.0" />
         <PackageReference Include="FirebaseAuthentication.net" Version="4.1.0" />
         <PackageReference Include="FluentValidation" Version="12.1.1" />
-        <PackageReference Include="Google.Cloud.Firestore" Version="4.3.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.9">
           <PrivateAssets>all</PrivateAssets>
@@ -98,6 +90,9 @@
       </Compile>
       <Compile Update="Views\LoginWindow.axaml.cs">
         <DependentUpon>LoginWindow.axaml</DependentUpon>
+      </Compile>
+      <Compile Update="Views\DeleteAccountDialog.axaml.cs">
+        <DependentUpon>DeleteAccountDialog.axaml</DependentUpon>
       </Compile>
     </ItemGroup>
 

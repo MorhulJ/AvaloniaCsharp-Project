@@ -4,3 +4,4 @@ obj/
 .vs/
 *.user
 *.suo
+GymApp/firebase-credentials.json

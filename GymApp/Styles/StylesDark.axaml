@@ -85,6 +85,13 @@
         <Setter Property="Foreground" Value="#F2E9DD" />
     </Style>
 
+    <Style Selector="Button.secondary">
+        <Setter Property="Background" Value="{StaticResource CardBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
     <Style Selector="ListBox">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />

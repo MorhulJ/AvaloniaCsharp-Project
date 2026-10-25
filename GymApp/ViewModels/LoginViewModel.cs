@@ -19,9 +19,9 @@ public partial class LoginViewModel : ViewModelBase
     [ObservableProperty] 
     private string validationMessage = "";
     [ObservableProperty] 
-    private bool rememberMe = false;
-    [ObservableProperty] 
     private bool isRegistering = false;
+    [ObservableProperty]
+    private bool rememberMe;
     
     public string ModeTitle => IsRegistering ? "Create account" : "Sign in";
     public string ToggleModeText => IsRegistering ? "Already have an account? Login" : "Don't have an account? Register";
@@ -50,9 +50,8 @@ public partial class LoginViewModel : ViewModelBase
             return;
         }
 
-        if (RememberMe)
-            _authService.SaveRememberMe(_authService.CurrentUserId!);
-
+        if (!_authService.SaveRememberMe(RememberMe) && RememberMe)
+            ValidationMessage = "Could not securely save this session. You can still continue, but will need to sign in next time.";
         LoginSuccessful?.Invoke();
     }
 
@@ -73,9 +72,8 @@ public partial class LoginViewModel : ViewModelBase
             return;
         }
 
-        if (RememberMe)
-            _authService.SaveRememberMe(_authService.CurrentUserId!);
-
+        if (!_authService.SaveRememberMe(RememberMe) && RememberMe)
+            ValidationMessage = "Could not securely save this session. You can still continue, but will need to sign in next time.";
         LoginSuccessful?.Invoke();
     }
 

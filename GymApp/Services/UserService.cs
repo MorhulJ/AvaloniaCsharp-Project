@@ -24,6 +24,7 @@ public class UserService
         {
             FirebaseId = doc.Id,
             Name = doc.GetValue<string>("name"),
+            Email = doc.ContainsField("email") ? doc.GetValue<string>("email") : "",
             Gender = doc.GetValue<string>("gender"),
             weight = doc.ContainsField("weight") ? doc.GetValue<int>("weight") : 0,
             height = doc.ContainsField("height") ? doc.GetValue<int>("height") : 0,
@@ -48,6 +49,30 @@ public class UserService
 
     public async Task DeleteUserAsync(string userId)
     {
-        await _db.Collection("users").Document(userId).DeleteAsync();
+        var userDocument = _db.Collection("users").Document(userId);
+
+        // These are the collections currently used by GymApp. listCollectionIds is
+        // a database-metadata endpoint and is not reliable with user-scoped rules;
+        // list and delete each known collection through normal document requests.
+        await DeleteCollectionAsync(userDocument.Collection("exercises"));
+        await DeleteCollectionAsync(userDocument.Collection("goals"));
+        await DeleteCollectionAsync(userDocument.Collection("personalRecords"));
+        await DeleteCollectionAsync(userDocument.Collection("supplements"));
+        await DeleteCollectionAsync(userDocument.Collection("supplementIntakes"));
+        await DeleteCollectionAsync(userDocument.Collection("workoutPrograms"), deleteProgramExercises: true);
+
+        await userDocument.DeleteAsync();
+    }
+
+    private static async Task DeleteCollectionAsync(CollectionReference collection, bool deleteProgramExercises = false)
+    {
+        var snapshot = await collection.GetSnapshotAsync();
+        foreach (var item in snapshot.Documents)
+        {
+            var document = collection.Document(item.Id);
+            if (deleteProgramExercises)
+                await DeleteCollectionAsync(document.Collection("exercises"));
+            await document.DeleteAsync();
+        }
     }
 }

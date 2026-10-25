@@ -13,6 +13,7 @@ public partial class UserViewModel : ViewModelBase
 {
     private readonly UserService _userService;
     private readonly string _userId;
+    private string _userEmail = "";
     
     [ObservableProperty]
     private string validationMessage = "";
@@ -38,6 +39,7 @@ public partial class UserViewModel : ViewModelBase
         _userService = userService;
         _userId = userId;
         _authService = authService;
+        _userEmail = authService.CurrentEmail ?? "";
     }
     
     private readonly UserValidator _validator = new UserValidator();
@@ -74,6 +76,7 @@ public partial class UserViewModel : ViewModelBase
         if (user == null)
             return;
         
+        if (!string.IsNullOrWhiteSpace(user.Email)) _userEmail = user.Email;
         UserName = user.Name;
         UserGender = user.Gender;
         UserDateOfBirth = new DateTimeOffset(user.DateOfBirth);
@@ -88,11 +91,30 @@ public partial class UserViewModel : ViewModelBase
         LoggedOut?.Invoke();
     }
 
-    [RelayCommand]
-    private async Task DeleteAccountAsync()
+    public async Task DeleteAccountAsync(string password)
     {
-        await _userService.DeleteUserAsync(_userId);
-        _authService.Logout();
-        AccountDeleted?.Invoke();
+        ValidationMessage = "";
+        var stage = "checking the password";
+        if (string.IsNullOrWhiteSpace(_userEmail))
+        {
+            ValidationMessage = "Could not find the account email. Sign out and sign in again, then retry.";
+            return;
+        }
+
+        try
+        {
+            // Reauthentication gives Firebase a fresh sign-in timestamp, which it
+            // requires for sensitive actions such as deleting an account.
+            await _authService.ReauthenticateAsync(_userEmail, password);
+            stage = "removing saved workout data";
+            await _userService.DeleteUserAsync(_userId);
+            stage = "deleting the Firebase account";
+            await _authService.DeleteCurrentAccountAsync();
+            AccountDeleted?.Invoke();
+        }
+        catch (Exception ex)
+        {
+            ValidationMessage = $"Account deletion stopped while {stage}: {ex.Message}";
+        }
     }
 }
