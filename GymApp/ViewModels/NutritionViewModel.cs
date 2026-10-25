@@ -51,6 +51,7 @@ public partial class NutritionViewModel : ViewModelBase
     
         if (!result.IsValid)
         {
+            ClearResults();
             ValidationMessage = result.Errors[0].ErrorMessage;
             return;
         }
@@ -62,11 +63,35 @@ public partial class NutritionViewModel : ViewModelBase
         double calculatedCalories = NutritionCalculator.AdjustCaloriesForGoal(calculatedTdee, goal);
         var (calculatedProtein, calculatedFat, calculatedCarbs) = NutritionCalculator.CalculateMacros(calculatedCalories, weight);
 
+        if (!double.IsFinite(calculatedCalories) || calculatedCalories <= 1000)
+        {
+            ClearResults();
+            ValidationMessage = "This estimate is 1,000 kcal/day or lower, which can require professional supervision. Try Maintain or ask a dietitian for personal guidance.";
+            return;
+        }
+
+        if (calculatedProtein * 4 + calculatedFat * 9 > calculatedCalories)
+        {
+            ClearResults();
+            ValidationMessage = "The default protein and fat estimates exceed this calorie target. Try Maintain or ask a dietitian for personal guidance.";
+            return;
+        }
+
         Bmr = Math.Round(calculatedBmr, 1);
         Tdee = Math.Round(calculatedTdee, 1);
         Calories = Math.Round(calculatedCalories, 1);
         Protein = Math.Round(calculatedProtein, 1);
         Fat = Math.Round(calculatedFat, 1);
         Carbs = Math.Round(calculatedCarbs, 1);
+    }
+
+    private void ClearResults()
+    {
+        Bmr = 0;
+        Tdee = 0;
+        Calories = 0;
+        Protein = 0;
+        Fat = 0;
+        Carbs = 0;
     }
 }

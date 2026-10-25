@@ -8,6 +8,9 @@
         <StackPanel Margin="30" Spacing="16">
 
             <TextBlock Text="Nutrition calculator" Classes="title" />
+            <TextBlock Text="Rough estimate for adults only. This is not medical advice or a personalized meal plan. Very low-calorie diets may need professional supervision."
+                       Classes="label"
+                       TextWrapping="Wrap" />
 
             <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto">
 
@@ -55,6 +58,7 @@
             <TextBlock Text="{Binding ValidationMessage}" 
                        VerticalAlignment="Center" 
                        Foreground="Red"
+                       TextWrapping="Wrap"
                        IsVisible="{Binding ValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" /> 
             </StackPanel>
             

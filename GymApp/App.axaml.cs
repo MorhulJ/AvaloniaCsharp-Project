@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using System.Threading.Tasks;
@@ -27,27 +28,37 @@ public partial class App : Application
 
             SetTheme("Dark");
 
-            FirebaseService.Initialize();
-
             var authService = new AuthService();
-            var autoLoggedIn = await authService.TryAutoLoginAsync();
+            try
+            {
+                FirebaseService.Initialize();
+                var autoLoggedIn = await authService.TryAutoLoginAsync();
 
-            if (!autoLoggedIn)
-            {
-                ShowLoginWindow(desktop, authService);
+                if (!autoLoggedIn)
+                {
+                    ShowLoginWindow(desktop, authService);
+                }
+                else
+                {
+                    await ShowMainWindowAsync(desktop, authService);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                await ShowMainWindowAsync(desktop, authService);
+                Trace.TraceError($"GymApp startup failed: {ex}");
+                ShowLoginWindow(desktop, authService,
+                    "Couldn't load your cloud data. Check your connection and sign in again.");
             }
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 
-    private void ShowLoginWindow(IClassicDesktopStyleApplicationLifetime desktop, AuthService authService)
+    private void ShowLoginWindow(IClassicDesktopStyleApplicationLifetime desktop, AuthService authService, string? initialMessage = null)
     {
         var loginVm = new LoginViewModel(authService);
+        if (!string.IsNullOrWhiteSpace(initialMessage))
+            loginVm.ValidationMessage = initialMessage;
         var loginWindow = new LoginWindow(loginVm);
 
         desktop.MainWindow = loginWindow;
@@ -56,8 +67,18 @@ public partial class App : Application
         loginVm.LoginSuccessful += async () =>
         {
             loginWindow.Hide();
-            await ShowMainWindowAsync(desktop, authService);
-            loginWindow.Close();
+            try
+            {
+                await ShowMainWindowAsync(desktop, authService);
+                loginWindow.Close();
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError($"GymApp failed to load user data: {ex}");
+                loginVm.ValidationMessage = "Signed in, but couldn't load your cloud data. Check your connection and try again.";
+                loginWindow.Show();
+                loginWindow.Activate();
+            }
         };
     }
 
@@ -93,13 +114,13 @@ public partial class App : Application
         await goalViewModel.LoadGoalsAsync(userId);
         await goalViewModel.LoadExercisesAsync();
         await supplementViewModel.LoadSupplementAsync(userId);
-        await supplementIntakeViewModel.LoadSupplementIntakesAsync(userId);
         await supplementIntakeViewModel.LoadSupplementsAsync(userId);
-        await workoutProgramViewModel.LoadProgramsAsync(userId);
+        await supplementIntakeViewModel.LoadSupplementIntakesAsync(userId);
         await workoutProgramViewModel.LoadExercisesAsync();
+        await workoutProgramViewModel.LoadProgramsAsync(userId);
         await userViewModel.LoadUserAsync();
-        await personalRecordViewModel.LoadRecordsAsync(userId);
         await personalRecordViewModel.LoadExercisesAsync();
+        await personalRecordViewModel.LoadRecordsAsync(userId);
 
         var mainWindowViewModel = new MainWindowViewModel(
             exerciseViewModel, goalViewModel, supplementViewModel,

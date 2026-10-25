@@ -15,6 +15,7 @@ public class AuthService
 
     public string? CurrentUserId => _currentUserId;
     public string? CurrentEmail => _currentEmail;
+    public string? LastErrorMessage { get; private set; }
 
     public AuthService()
     {
@@ -23,8 +24,15 @@ public class AuthService
 
     public async Task<bool> RegisterAsync(string email, string password, string name)
     {
+        LastErrorMessage = null;
+        _currentCredential = null;
+        _currentUserId = null;
+        _currentEmail = null;
+        FirebaseService.ClearSession();
+        var stage = "create the Firebase account";
         try
         {
+            FirebaseService.Initialize();
             var auth = FirebaseService.GetAuth();
             var credential = await auth.CreateUserWithEmailAndPasswordAsync(email, password, name);
 
@@ -33,6 +41,7 @@ public class AuthService
             _currentEmail = email;
             FirebaseService.SetSession(credential);
 
+            stage = "save the account profile";
             var db = FirebaseService.GetDb();
             await db.Collection("users").Document(_currentUserId).SetAsync(new
             {
@@ -44,20 +53,31 @@ public class AuthService
                 dateOfBirth = DateTime.Now.ToString("yyyy-MM-dd")
             });
 
+            stage = "add the starter workout data";
             await SeedUserDataAsync(_currentUserId);
 
             return true;
         }
-        catch (Exception)
+        catch (FirebaseAuthException ex)
         {
+            LastErrorMessage = GetAuthErrorMessage(ex.Reason);
+            return false;
+        }
+        catch
+        {
+            LastErrorMessage = _currentUserId is not null && stage != "create the Firebase account"
+                ? $"Your account was created, but Firebase couldn't {stage}. Sign in with this account instead of registering again."
+                : "Couldn't connect to Firebase to create the account. Check your connection and try again.";
             return false;
         }
     }
 
     public async Task<bool> LoginAsync(string email, string password)
     {
+        LastErrorMessage = null;
         try
         {
+            FirebaseService.Initialize();
             var auth = FirebaseService.GetAuth();
             var credential = await auth.SignInWithEmailAndPasswordAsync(email, password);
 
@@ -68,11 +88,31 @@ public class AuthService
 
             return true;
         }
-        catch (Exception)
+        catch (FirebaseAuthException ex)
         {
+            LastErrorMessage = GetAuthErrorMessage(ex.Reason);
+            return false;
+        }
+        catch
+        {
+            LastErrorMessage = "Couldn't connect to Firebase. Check your connection and try again.";
             return false;
         }
     }
+
+    private static string GetAuthErrorMessage(AuthErrorReason reason) => reason switch
+    {
+        AuthErrorReason.EmailExists => "An account with this email already exists. Sign in instead.",
+        AuthErrorReason.InvalidEmailAddress => "Enter a valid email address.",
+        AuthErrorReason.WeakPassword => "Choose a stronger password (at least 6 characters).",
+        AuthErrorReason.UnknownEmailAddress or AuthErrorReason.UserNotFound or AuthErrorReason.WrongPassword
+            => "Email or password is incorrect.",
+        AuthErrorReason.UserDisabled => "This account is disabled. Contact support.",
+        AuthErrorReason.TooManyAttemptsTryLater => "Too many attempts. Wait a while, then try again.",
+        AuthErrorReason.OperationNotAllowed => "Email and password sign-in is disabled in Firebase.",
+        AuthErrorReason.InvalidApiKey => "Firebase configuration is invalid. Contact the app developer.",
+        _ => "Firebase couldn't complete this request. Please try again."
+    };
 
     public void Logout()
     {
@@ -85,6 +125,7 @@ public class AuthService
 
     public async Task ReauthenticateAsync(string email, string password)
     {
+        FirebaseService.Initialize();
         var credential = await FirebaseService.GetAuth()
             .SignInWithEmailAndPasswordAsync(email, password);
         _currentCredential = credential;

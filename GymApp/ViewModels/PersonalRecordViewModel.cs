@@ -112,6 +112,6 @@ public partial class PersonalRecordViewModel : ViewModelBase
 
     public void ResetValidation()
     {
-        validationMessage = "";
+        ValidationMessage = "";
     }
 }

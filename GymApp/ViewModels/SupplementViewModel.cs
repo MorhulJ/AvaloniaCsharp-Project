@@ -41,41 +41,28 @@ public partial class SupplementViewModel : ViewModelBase
     [RelayCommand]
     private async Task SaveSupplementAsync()
     {
+        var supplement = new Supplement
+        {
+            FirebaseId = _editingSupplementFirebaseId ?? "",
+            UserId = CurrentUserId,
+            Name = supplementName,
+            DosageUnit = dosageUnit,
+            Description = description
+        };
+            
+        var result = _validator.Validate(supplement);
+        if (!result.IsValid)
+        {
+            ValidationMessage = result.Errors[0].ErrorMessage;
+            return;
+        }
+
+        ValidationMessage = "";
         if (_editingSupplementFirebaseId == null)
-        {
-            var supplement = new Supplement
-            {
-                UserId = CurrentUserId,
-                Name = supplementName,
-                DosageUnit = dosageUnit,
-                Description = description
-            };
-            
-            var result = _validator.Validate(supplement);
-
-            if (!result.IsValid)
-            {
-                ValidationMessage = result.Errors[0].ErrorMessage;
-                return;
-            }
-
-            ValidationMessage = "";
             await _supplementService.AddSupplementAsync(supplement);
-        }
         else
-        {
-            var supplement = new Supplement
-            {
-                FirebaseId = _editingSupplementFirebaseId,
-                UserId = CurrentUserId,
-                Name = supplementName,
-                DosageUnit = dosageUnit,
-                Description = description
-            };
-            
             await _supplementService.UpdateSupplementAsync(supplement);
-            _editingSupplementFirebaseId = null;
-        }
+        _editingSupplementFirebaseId = null;
 
         SupplementName = "";
         DosageUnit = "";
@@ -127,6 +114,6 @@ public partial class SupplementViewModel : ViewModelBase
 
     public void ResetValidation()
     {
-        validationMessage = "";
+        ValidationMessage = "";
     }
 }

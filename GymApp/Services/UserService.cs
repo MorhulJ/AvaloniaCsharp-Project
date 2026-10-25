@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using Google.Cloud.Firestore;
 using GymApp.Models;
@@ -29,7 +30,7 @@ public class UserService
             weight = doc.ContainsField("weight") ? doc.GetValue<int>("weight") : 0,
             height = doc.ContainsField("height") ? doc.GetValue<int>("height") : 0,
             DateOfBirth = doc.ContainsField("dateOfBirth") 
-                ? DateTime.Parse(doc.GetValue<string>("dateOfBirth")) 
+                ? DateTime.ParseExact(doc.GetValue<string>("dateOfBirth"), "yyyy-MM-dd", CultureInfo.InvariantCulture)
                 : DateTime.Now
         };
     }

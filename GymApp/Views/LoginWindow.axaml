@@ -35,6 +35,7 @@
 
         <TextBlock Text="{Binding ValidationMessage}"
                    Foreground="Red"
+                   TextWrapping="Wrap"
                    IsVisible="{Binding ValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
 
         <Button Content="Login"

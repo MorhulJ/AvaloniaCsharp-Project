@@ -60,39 +60,27 @@ public partial class WorkoutProgramViewModel : ViewModelBase
     [RelayCommand]
     private async Task SaveProgramAsync()
     {
+        var program = new WorkoutProgram
+        {
+            FirebaseId = _editingProgramFirebaseId ?? "",
+            UserId = CurrentUserId,
+            Name = ProgramName,
+            Description = ProgramDescription,
+        };
+            
+        var programResult = _programValidator.Validate(program);
+        if (!programResult.IsValid)
+        {
+            ProgramValidationMessage = programResult.Errors[0].ErrorMessage;
+            return;
+        }
+
+        ProgramValidationMessage = "";
         if (_editingProgramFirebaseId == null)
-        {
-            var program = new WorkoutProgram
-            {
-                UserId = CurrentUserId,
-                Name = ProgramName,
-                Description = ProgramDescription,
-            };
-            
-            var programResult = _programValidator.Validate(program);
-            
-            if (!programResult.IsValid)
-            {
-                ProgramValidationMessage = programResult.Errors[0].ErrorMessage;
-                return;
-            }
-
-            ProgramValidationMessage = "";
             await _programService.AddProgramAsync(program);
-        }
         else
-        {
-            var program = new WorkoutProgram
-            {
-                FirebaseId = _editingProgramFirebaseId,
-                UserId = CurrentUserId,
-                Name = ProgramName,
-                Description = ProgramDescription,
-            };
-
             await _programService.UpdateProgramAsync(program);
-            _editingProgramFirebaseId = null;
-        }
+        _editingProgramFirebaseId = null;
 
         ProgramName = "";
         ProgramDescription = "";

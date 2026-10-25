@@ -101,8 +101,16 @@ public class WorkoutProgramService
 
     public async Task DeleteProgramAsync(WorkoutProgram program)
     {
-        await _db.Collection("users").Document(program.UserId)
-            .Collection("workoutPrograms").Document(program.FirebaseId).DeleteAsync();
+        var programDocument = _db.Collection("users").Document(program.UserId)
+            .Collection("workoutPrograms").Document(program.FirebaseId);
+
+        // Firestore does not remove a document's subcollections automatically.
+        // Remove the program's exercise entries first to avoid leaving orphaned data.
+        var exercises = await programDocument.Collection("exercises").GetSnapshotAsync();
+        foreach (var exercise in exercises.Documents)
+            await programDocument.Collection("exercises").Document(exercise.Id).DeleteAsync();
+
+        await programDocument.DeleteAsync();
     }
 
     public async Task AddExerciseToProgramAsync(ProgramExercise pe, string userId)

@@ -23,7 +23,7 @@
                             <TextBlock Classes="label" Text="·" />
                             <TextBlock Classes="label">
                                 <Run Text="{Binding Dosage}" />
-                                <Run Text=" g" />
+                                <Run Text="{Binding Supplement.DosageUnit}" />
                             </TextBlock>
                         </StackPanel>
                     </StackPanel>

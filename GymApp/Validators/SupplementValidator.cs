@@ -12,6 +12,10 @@ public class SupplementValidator : AbstractValidator<Supplement>
             .MaximumLength(100).WithMessage("Supplement name must be under 100 characters");
 
         RuleFor(s => s.DosageUnit)
-            .NotEmpty().WithMessage("Dosage unit is required");
+            .NotEmpty().WithMessage("Dosage unit is required")
+            .MaximumLength(20).WithMessage("Dosage unit cannot exceed 20 characters");
+
+        RuleFor(s => s.Description)
+            .MaximumLength(1000).WithMessage("Description cannot exceed 1,000 characters");
     }
 }

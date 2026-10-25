@@ -50,44 +50,30 @@ public partial class GoalViewModel : ViewModelBase
     [RelayCommand]
     private async Task SaveGoalAsync()
     {
-        if (_editingGoalFirebaseId == null)
+        var goal = new Goal
         {
-            var goal = new Goal
-            {
-                UserId = CurrentUserId,
-                ExerciseFirebaseId = goalExercise?.FirebaseId,
-                Title = goalTitle,
-                TargetValue = goalValue,
-                CurrentValue = currentValue
-            };
-            
-            var result = _validator.Validate(goal);
+            FirebaseId = _editingGoalFirebaseId ?? "",
+            UserId = CurrentUserId,
+            ExerciseFirebaseId = goalExercise?.FirebaseId,
+            Title = goalTitle,
+            TargetValue = goalValue,
+            CurrentValue = currentValue
+        };
 
-            if (!result.IsValid)
-            {
-                ValidationMessage = result.Errors[0].ErrorMessage;
-                return;
-            }
-
-            ValidationMessage = "";
-
-            await _goalService.AddGoalAsync(goal);
+        var result = _validator.Validate(goal);
+        if (!result.IsValid)
+        {
+            ValidationMessage = result.Errors[0].ErrorMessage;
+            return;
         }
-        else
-        {
-            var goal = new Goal
-            {
-                FirebaseId = _editingGoalFirebaseId,
-                Title = goalTitle,
-                ExerciseFirebaseId = goalExercise?.FirebaseId,
-                TargetValue = goalValue,
-                CurrentValue = currentValue
-            };
 
+        ValidationMessage = "";
+        if (_editingGoalFirebaseId == null)
+            await _goalService.AddGoalAsync(goal);
+        else
             await _goalService.UpdateGoalAsync(goal);
 
-            _editingGoalFirebaseId = null;
-        }
+        _editingGoalFirebaseId = null;
 
         GoalTitle = "";
         GoalExercise = null;
@@ -153,6 +139,6 @@ public partial class GoalViewModel : ViewModelBase
 
     public void ResetValidation()
     {
-        validationMessage = "";
+        ValidationMessage = "";
     }
 }

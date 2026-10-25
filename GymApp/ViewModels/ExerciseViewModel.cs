@@ -41,39 +41,28 @@ public partial class ExerciseViewModel : ViewModelBase
     [RelayCommand]
     private async Task SaveExerciseAsync()
     {
-        if (_editingExerciseFirebaseId == null)
+        var exercise = new Exercise
         {
-            var exercise = new Exercise
-            {
-                Name = exerciseName,
-                MuscleGroup = muscleGroup,
-                Description = description
-            };
+            FirebaseId = _editingExerciseFirebaseId ?? "",
+            Name = exerciseName,
+            MuscleGroup = muscleGroup,
+            Description = description
+        };
             
-            var result = _validator.Validate(exercise);
-
-            if (!result.IsValid)
-            {
-                ValidationMessage = result.Errors[0].ErrorMessage;
-                return;
-            }
-
-            ValidationMessage = "";
-            await _exerciseService.AddExerciseAsync(exercise, CurrentUserId);
-        }
-        else
+        var result = _validator.Validate(exercise);
+        if (!result.IsValid)
         {
-            var exercise = new Exercise
-            {
-                FirebaseId = _editingExerciseFirebaseId,
-                Name = exerciseName,
-                MuscleGroup = muscleGroup,
-                Description = description
-            };
-
-            await _exerciseService.UpdateExerciseAsync(exercise, CurrentUserId);
-            _editingExerciseFirebaseId = null;
+            ValidationMessage = result.Errors[0].ErrorMessage;
+            return;
         }
+
+        ValidationMessage = "";
+        if (_editingExerciseFirebaseId == null)
+            await _exerciseService.AddExerciseAsync(exercise, CurrentUserId);
+        else
+            await _exerciseService.UpdateExerciseAsync(exercise, CurrentUserId);
+
+        _editingExerciseFirebaseId = null;
 
         ExerciseName = "";
         MuscleGroup = "";

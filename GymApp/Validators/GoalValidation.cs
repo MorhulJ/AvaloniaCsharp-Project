@@ -15,6 +15,11 @@ public class GoalValidator : AbstractValidator<Goal>
             .NotEmpty().WithMessage("Goal exercise is required");
         
         RuleFor(g => g.TargetValue)
-            .GreaterThan(0).WithMessage("Target value must be greater than 0");
+            .Must(value => double.IsFinite(value) && value > 0)
+            .WithMessage("Target value must be a finite number greater than 0");
+
+        RuleFor(g => g.CurrentValue)
+            .Must(value => double.IsFinite(value) && value >= 0)
+            .WithMessage("Current value must be a finite number and cannot be negative");
     }
 }

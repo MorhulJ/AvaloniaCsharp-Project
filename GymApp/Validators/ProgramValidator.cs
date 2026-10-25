@@ -10,5 +10,8 @@ public class ProgramValidator : AbstractValidator<WorkoutProgram>
         RuleFor(p => p.Name)
             .NotEmpty().WithMessage("Workout program name is required")
             .MaximumLength(100).WithMessage("Name must be under 100 characters");
+
+        RuleFor(p => p.Description)
+            .MaximumLength(1000).WithMessage("Description cannot exceed 1,000 characters");
     }
 }

@@ -42,11 +42,12 @@ public partial class LoginViewModel : ViewModelBase
             return;
         }
 
-        var success = await _authService.LoginAsync(Login, Password);
+        ValidationMessage = "";
+        var success = await _authService.LoginAsync(Login.Trim(), Password);
 
         if (!success)
         {
-            ValidationMessage = "Invalid login or password";
+            ValidationMessage = _authService.LastErrorMessage ?? "Couldn't sign in. Please try again.";
             return;
         }
 
@@ -64,11 +65,12 @@ public partial class LoginViewModel : ViewModelBase
             return;
         }
 
-        var success = await _authService.RegisterAsync(Login, Password, Name);
+        ValidationMessage = "";
+        var success = await _authService.RegisterAsync(Login.Trim(), Password, Name.Trim());
 
         if (!success)
         {
-            ValidationMessage = "Email already exists";
+            ValidationMessage = _authService.LastErrorMessage ?? "Couldn't create the account. Please try again.";
             return;
         }
 
