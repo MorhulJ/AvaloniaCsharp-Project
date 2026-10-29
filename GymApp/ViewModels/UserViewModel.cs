@@ -66,23 +66,38 @@ public partial class UserViewModel : ViewModelBase
         }
 
         ValidationMessage = "";
-        await _userService.UpdateUserAsync(user);
+        try { await _userService.UpdateUserAsync(user); }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "save your profile", canRetry: false);
+            ValidationMessage = StatusMessage;
+        }
     }
 
     public async Task LoadUserAsync()
     {
-        var user = await _userService.GetUserByIdAsync(_userId);
-        
-        if (user == null)
-            return;
-        
-        if (!string.IsNullOrWhiteSpace(user.Email)) _userEmail = user.Email;
-        UserName = user.Name;
-        UserGender = user.Gender;
-        UserDateOfBirth = new DateTimeOffset(user.DateOfBirth);
-        UserWeight = user.weight;
-        UserHeight = user.height;
+        SetStatusMessage("Loading your profile from Firebase…");
+        try
+        {
+            var user = await _userService.GetUserByIdAsync(_userId);
+            if (user == null)
+            {
+                ClearStatusMessage();
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(user.Email)) _userEmail = user.Email;
+            UserName = user.Name;
+            UserGender = user.Gender;
+            UserDateOfBirth = new DateTimeOffset(user.DateOfBirth);
+            UserWeight = user.weight;
+            UserHeight = user.height;
+            ClearStatusMessage();
+        }
+        catch (Exception ex) { ReportCloudFailure(ex, "load your profile"); }
     }
+
+    public override Task RetryAsync() => LoadUserAsync();
     
     [RelayCommand]
     private void Logout()
@@ -114,7 +129,8 @@ public partial class UserViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            ValidationMessage = $"Account deletion stopped while {stage}: {ex.Message}";
+            ReportCloudFailure(ex, stage, canRetry: false);
+            ValidationMessage = $"Account deletion stopped while {stage}. {GetCloudFailureMessage(ex, stage)}";
         }
     }
 }

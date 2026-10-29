@@ -8,23 +8,23 @@
         Width="420" Height="370"
         WindowStartupLocation="CenterOwner">
 
-    <StackPanel Margin="24" Spacing="14">
+    <StackPanel Classes="dialog-content">
 
-        <TextBlock Text="Supplement" Classes="title" FontSize="20" />
+        <TextBlock Text="Supplement" Classes="title dialog-title" />
 
         <StackPanel Spacing="6">
             <TextBlock Text="Supplement name" Classes="label" />
-            <TextBox Text="{Binding SupplementName}" />
+            <TextBox Text="{Binding SupplementName}" PlaceholderText="e.g., Creatine" />
         </StackPanel>
 
         <StackPanel Spacing="6">
             <TextBlock Text="Dosage unit" Classes="label" />
-            <TextBox Text="{Binding DosageUnit}" />
+            <TextBox Text="{Binding DosageUnit}" PlaceholderText="e.g., g, mg, capsules" />
         </StackPanel>
 
         <StackPanel Spacing="6">
             <TextBlock Text="Description" Classes="label" />
-            <TextBox Text="{Binding Description}" />
+            <TextBox Text="{Binding Description}" PlaceholderText="Optional notes about this supplement" />
         </StackPanel>
 
         <Button Content="Save" Command="{Binding SaveSupplementCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,10,0,0" />

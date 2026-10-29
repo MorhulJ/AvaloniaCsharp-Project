@@ -4,15 +4,13 @@
              x:Class="GymApp.Views.WorkoutProgramView"
              x:DataType="vm:WorkoutProgramViewModel">
 
-    <StackPanel Margin="30" Spacing="16">
+    <Grid Margin="30" RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto">
 
-        <TextBlock Text="Workout programs" Classes="title" />
+        <TextBlock Grid.Row="0" Text="Workout programs" Classes="title" Margin="0,0,0,16" />
 
-        <StackPanel Orientation="Horizontal" Spacing="10">
-            <Button Content="+ Add program" Click="OpenAddProgramWindow" />
-        </StackPanel>
+        <Button Grid.Row="1" Content="+ Add program" Click="OpenAddProgramWindow" HorizontalAlignment="Left" Margin="0,0,0,12" />
 
-        <StackPanel Spacing="6">
+        <StackPanel Grid.Row="2" Spacing="6" Margin="0,0,0,12">
             <TextBlock Text="Select program" Classes="label" />
             <ComboBox ItemsSource="{Binding WorkoutPrograms}"
                       SelectedItem="{Binding SelectedProgram}">
@@ -24,16 +22,16 @@
             </ComboBox>
         </StackPanel>
 
-        <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Content="Edit" Click="OpenEditProgramWindow" HorizontalContentAlignment="Center" Width="80"/>
-            <Button Content="Delete" Classes="danger" Click="OnDeleteWorkoutProgram" HorizontalContentAlignment="Center" Width="80"/>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="8" Margin="0,0,0,12">
+            <Button Content="Edit" Click="OpenEditProgramWindow" HorizontalContentAlignment="Center" Width="80" IsEnabled="{Binding HasSelectedProgram}" />
+            <Button Content="Delete" Classes="danger" Click="OnDeleteWorkoutProgram" HorizontalContentAlignment="Center" Width="80" IsEnabled="{Binding HasSelectedProgram}" />
         </StackPanel>
 
-        <TextBlock Text="Exercises in program" Classes="label" Margin="0,10,0,0" />
+        <TextBlock Grid.Row="4" Text="Exercises in program" Classes="label" Margin="0,0,0,8" />
 
+        <Grid Grid.Row="5">
         <ListBox ItemsSource="{Binding ProgramExercises}"
-                 SelectedItem="{Binding SelectedProgramExercise}"
-                 Height="350">
+                 SelectedItem="{Binding SelectedProgramExercise}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Spacing="4">
@@ -57,12 +55,21 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        <Border IsVisible="{Binding IsProgramExerciseListEmpty}" IsHitTestVisible="False"
+                Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1" CornerRadius="12" Margin="4" Padding="24">
+            <StackPanel Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="No exercises in this program" FontSize="17" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                <TextBlock Text="Add an exercise to build this workout." Classes="label" TextWrapping="Wrap" TextAlignment="Center" />
+            </StackPanel>
+        </Border>
+        </Grid>
 
-        <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Content="+ Add exercise" Click="OpenAddExerciseToProgramWindow" />
-            <Button Content="Delete exercise" Classes="danger" Click="OnDeleteExerciseFromProgram" />
+        <StackPanel Grid.Row="6" Orientation="Horizontal" Spacing="8" Margin="0,12,0,0">
+            <Button Content="+ Add exercise" Click="OpenAddExerciseToProgramWindow" IsEnabled="{Binding HasSelectedProgram}" />
+            <Button Content="Delete exercise" Classes="danger" Click="OnDeleteExerciseFromProgram" IsEnabled="{Binding HasSelectedProgramExercise}" />
         </StackPanel>
 
-    </StackPanel>
+    </Grid>
 
 </UserControl>

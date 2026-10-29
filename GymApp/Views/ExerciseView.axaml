@@ -4,13 +4,16 @@
              x:Class="GymApp.Views.ExerciseView"
              x:DataType="vm:ExerciseViewModel">
 
-    <StackPanel Margin="30" Spacing="16">
+    <Grid Margin="30" RowDefinitions="Auto,Auto,Auto,*,Auto">
 
-        <TextBlock Text="My Exercises" Classes="title" />
+        <TextBlock Grid.Row="0" Text="My Exercises" Classes="title" Margin="0,0,0,16" />
 
-        <Button Content="+ Add exercise" Click="OpenAddExerciseWindow" HorizontalAlignment="Left" />
+        <Button Grid.Row="1" Content="+ Add exercise" Click="OpenAddExerciseWindow" HorizontalAlignment="Left" Margin="0,0,0,12" />
 
-        <ListBox ItemsSource="{Binding Exercises}" SelectedItem="{Binding SelectedExercise}" Height="420">
+        <TextBlock Grid.Row="2" Text="Exercise list" Classes="label" Margin="0,0,0,8" />
+
+        <Grid Grid.Row="3">
+        <ListBox ItemsSource="{Binding Exercises}" SelectedItem="{Binding SelectedExercise}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Spacing="4">
@@ -24,12 +27,21 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        <Border IsVisible="{Binding IsExerciseListEmpty}" IsHitTestVisible="False"
+                Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1" CornerRadius="12" Margin="4" Padding="24">
+            <StackPanel Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="No exercises yet" FontSize="17" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                <TextBlock Text="Add an exercise to start building your library." Classes="label" TextWrapping="Wrap" TextAlignment="Center" />
+            </StackPanel>
+        </Border>
+        </Grid>
 
-        <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Content="Edit" Click="OpenEditExerciseWindow" HorizontalContentAlignment="Center" Width="80"/>
-            <Button Content="Delete" Classes="danger" Click="OnDeleteExercise" HorizontalContentAlignment="Center" Width="80"/>
+        <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="8" Margin="0,12,0,0">
+            <Button Content="Edit" Click="OpenEditExerciseWindow" HorizontalContentAlignment="Center" Width="80" IsEnabled="{Binding HasSelection}" />
+            <Button Content="Delete" Classes="danger" Click="OnDeleteExercise" HorizontalContentAlignment="Center" Width="80" IsEnabled="{Binding HasSelection}" />
         </StackPanel>
 
-    </StackPanel>
+    </Grid>
 
 </UserControl>

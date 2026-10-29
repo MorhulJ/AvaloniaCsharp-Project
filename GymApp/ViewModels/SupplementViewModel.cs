@@ -15,6 +15,9 @@ public partial class SupplementViewModel : ViewModelBase
 
     public ObservableCollection<Supplement> Suplements { get; } = new();
 
+    [ObservableProperty]
+    private bool isSupplementListEmpty = true;
+
     [ObservableProperty] 
     private string validationMessage = "";
     [ObservableProperty] 
@@ -58,10 +61,19 @@ public partial class SupplementViewModel : ViewModelBase
         }
 
         ValidationMessage = "";
-        if (_editingSupplementFirebaseId == null)
-            await _supplementService.AddSupplementAsync(supplement);
-        else
-            await _supplementService.UpdateSupplementAsync(supplement);
+        try
+        {
+            if (_editingSupplementFirebaseId == null)
+                await _supplementService.AddSupplementAsync(supplement);
+            else
+                await _supplementService.UpdateSupplementAsync(supplement);
+        }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "save the supplement", canRetry: false);
+            ValidationMessage = StatusMessage;
+            return;
+        }
         _editingSupplementFirebaseId = null;
 
         SupplementName = "";
@@ -74,12 +86,25 @@ public partial class SupplementViewModel : ViewModelBase
 
     public async Task LoadSupplementAsync(string userId)
     {
-        var supplementList = await _supplementService.GetAllSupplementsAsync(userId);
-        
-        Suplements.Clear();
-        foreach (var supplement in supplementList)
-            Suplements.Add(supplement);
+        SetStatusMessage("Loading supplements from Firebase…");
+        IsSupplementListEmpty = false;
+        try
+        {
+            var supplementList = await _supplementService.GetAllSupplementsAsync(userId);
+            Suplements.Clear();
+            foreach (var supplement in supplementList)
+                Suplements.Add(supplement);
+            IsSupplementListEmpty = Suplements.Count == 0;
+            ClearStatusMessage();
+        }
+        catch (Exception ex)
+        {
+            IsSupplementListEmpty = false;
+            ReportCloudFailure(ex, "load supplements");
+        }
     }
+
+    public override Task RetryAsync() => LoadSupplementAsync(CurrentUserId);
 
     [RelayCommand]
     private async Task DeleteSupplementAsync()
@@ -87,7 +112,13 @@ public partial class SupplementViewModel : ViewModelBase
         if (SelectedSupplement == null)
             return;
 
-        await _supplementService.DeleteSupplementAsync(SelectedSupplement);
+        try { await _supplementService.DeleteSupplementAsync(SelectedSupplement); }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "delete the supplement", canRetry: false);
+            ValidationMessage = StatusMessage;
+            return;
+        }
 
         SupplementName = "";
         DosageUnit = "";
@@ -99,6 +130,7 @@ public partial class SupplementViewModel : ViewModelBase
 
     partial void OnSelectedSupplementChanged(Supplement? value)
     {
+        HasSelection = value != null;
         if (value == null) return;
     
         SupplementName = value.Name;

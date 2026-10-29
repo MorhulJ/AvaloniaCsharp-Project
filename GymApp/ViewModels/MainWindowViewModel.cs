@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GymApp.Models;
@@ -66,7 +67,34 @@ public partial class MainWindowViewModel : ViewModelBase
         _userViewModel.LoggedOut += () => LoggedOut?.Invoke();
         _userViewModel.AccountDeleted += () => LoggedOut?.Invoke();
 
-        currentView = _workoutProgramViewModel;
+        CurrentView = _workoutProgramViewModel;
+    }
+
+    [ObservableProperty] private bool isWorkoutProgramActive;
+    [ObservableProperty] private bool isExercisesActive;
+    [ObservableProperty] private bool isGoalsActive;
+    [ObservableProperty] private bool isRecordsActive;
+    [ObservableProperty] private bool isSupplementsActive;
+    [ObservableProperty] private bool isSupplementScheduleActive;
+    [ObservableProperty] private bool isNutritionActive;
+    [ObservableProperty] private bool isProfileActive;
+
+    partial void OnCurrentViewChanged(ViewModelBase value)
+    {
+        IsWorkoutProgramActive = ReferenceEquals(value, _workoutProgramViewModel);
+        IsExercisesActive = ReferenceEquals(value, _exerciseViewModel);
+        IsGoalsActive = ReferenceEquals(value, _goalViewModel);
+        IsRecordsActive = ReferenceEquals(value, _personalRecordViewModel);
+        IsSupplementsActive = ReferenceEquals(value, _supplementViewModel);
+        IsSupplementScheduleActive = ReferenceEquals(value, _supplementIntakeViewModel);
+        IsNutritionActive = ReferenceEquals(value, _nutritionViewModel);
+        IsProfileActive = ReferenceEquals(value, _userViewModel);
+    }
+
+    [RelayCommand]
+    private async Task RetryCurrentViewAsync()
+    {
+        await CurrentView.RetryAsync();
     }
     
     [ObservableProperty]

@@ -14,7 +14,7 @@
             BorderThickness="1"
             CornerRadius="12">
         <StackPanel Spacing="16">
-            <TextBlock Text="Delete account" Classes="title" FontSize="22" />
+            <TextBlock Text="Delete account" Classes="title dialog-title" />
 
             <TextBlock Text="This permanently deletes your account and saved workout data. You can't undo this."
                        TextWrapping="Wrap" />

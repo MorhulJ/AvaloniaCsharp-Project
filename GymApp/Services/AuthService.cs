@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Firebase.Auth;
 using Google.Cloud.Firestore;
@@ -179,12 +180,20 @@ public class AuthService
             _currentEmail = session.Email;
             return true;
         }
-        catch
+        catch (Exception ex)
         {
             FirebaseService.ClearSession();
-            ProtectedSessionStore.Delete();
             _currentUserId = null;
             _currentEmail = null;
+
+            if (ex is HttpRequestException or TaskCanceledException)
+            {
+                LastErrorMessage = "Couldn't check your saved sign-in because GymApp couldn't reach Firebase. Check your internet connection and try again. Your saved sign-in was kept.";
+                return false;
+            }
+
+            ProtectedSessionStore.Delete();
+            LastErrorMessage = "Your saved sign-in has expired. Sign in again to continue.";
             return false;
         }
     }

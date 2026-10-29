@@ -8,9 +8,9 @@
         Width="420" Height="430"
         WindowStartupLocation="CenterOwner">
 
-    <StackPanel Margin="24" Spacing="14">
+    <StackPanel Classes="dialog-content">
 
-        <TextBlock Text="Supplement intake" Classes="title" FontSize="20" />
+        <TextBlock Text="Supplement intake" Classes="title dialog-title" />
 
         <StackPanel Spacing="6">
             <TextBlock Text="Supplement" Classes="label" />
@@ -27,7 +27,7 @@
 
         <StackPanel Spacing="6">
             <TextBlock Text="Dosage" Classes="label" />
-            <TextBox Text="{Binding SupplementDosage}" />
+            <TextBox Text="{Binding SupplementDosage}" PlaceholderText="e.g., 5" />
         </StackPanel>
 
         <StackPanel Spacing="6">
@@ -39,7 +39,7 @@
 
         <StackPanel Spacing="6">
             <TextBlock Text="Time (hh:mm)" Classes="label" />
-            <TextBox Text="{Binding SupplementTime}" />
+            <TextBox Text="{Binding SupplementTime}" PlaceholderText="e.g., 08:30" />
         </StackPanel>
 
         <Button Content="Save" Command="{Binding SaveSupplementIntakeCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,10,0,0" />

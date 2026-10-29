@@ -4,14 +4,15 @@
              x:Class="GymApp.Views.SupplementIntakeView"
              x:DataType="vm:SupplementIntakeViewModel">
 
-    <StackPanel Margin="30" Spacing="16">
+    <Grid Margin="30" RowDefinitions="Auto,Auto,Auto,*,Auto">
 
-        <TextBlock Text="Supplement schedule" Classes="title" />
+        <TextBlock Grid.Row="0" Text="Supplement schedule" Classes="title" Margin="0,0,0,16" />
 
-        <Button Content="+ Add intake" Click="OpenAddIntakeWindow" HorizontalAlignment="Left" HorizontalContentAlignment="Center" />
+        <Button Grid.Row="1" Content="+ Add intake" Click="OpenAddIntakeWindow" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="0,0,0,12" />
 
-        <TextBlock Text="Schedule" Classes="label" Margin="0,10,0,0" />
-        <ListBox ItemsSource="{Binding SupplementIntakes}" SelectedItem="{Binding SelectedSupplementIntake}" Height="400">
+        <TextBlock Grid.Row="2" Text="Schedule" Classes="label" Margin="0,0,0,8" />
+        <Grid Grid.Row="3">
+        <ListBox ItemsSource="{Binding SupplementIntakes}" SelectedItem="{Binding SelectedSupplementIntake}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Spacing="4">
@@ -30,9 +31,18 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        <Border IsVisible="{Binding IsIntakeListEmpty}" IsHitTestVisible="False"
+                Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1" CornerRadius="12" Margin="4" Padding="24">
+            <StackPanel Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="Schedule is empty" FontSize="17" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                <TextBlock Text="Add a supplement reminder to see it here." Classes="label" TextWrapping="Wrap" TextAlignment="Center" />
+            </StackPanel>
+        </Border>
+        </Grid>
 
-        <Button Content="Delete" Classes="danger" Click="OnDeleteSupplementIntake" HorizontalContentAlignment="Center" Width="80" />
+        <Button Grid.Row="4" Content="Delete" Classes="danger" Click="OnDeleteSupplementIntake" HorizontalContentAlignment="Center" Width="80" Margin="0,12,0,0" IsEnabled="{Binding HasSelection}" />
 
-    </StackPanel>
+    </Grid>
 
 </UserControl>

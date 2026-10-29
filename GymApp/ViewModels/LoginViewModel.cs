@@ -22,6 +22,8 @@ public partial class LoginViewModel : ViewModelBase
     private bool isRegistering = false;
     [ObservableProperty]
     private bool rememberMe;
+    [ObservableProperty]
+    private bool wasJustRegistered;
     
     public string ModeTitle => IsRegistering ? "Create account" : "Sign in";
     public string ToggleModeText => IsRegistering ? "Already have an account? Login" : "Don't have an account? Register";
@@ -36,6 +38,7 @@ public partial class LoginViewModel : ViewModelBase
     [RelayCommand]
     private async Task LoginAsync()
     {
+        WasJustRegistered = false;
         if (string.IsNullOrWhiteSpace(Login) || string.IsNullOrWhiteSpace(Password))
         {
             ValidationMessage = "Email and password are required";
@@ -73,6 +76,8 @@ public partial class LoginViewModel : ViewModelBase
             ValidationMessage = _authService.LastErrorMessage ?? "Couldn't create the account. Please try again.";
             return;
         }
+
+        WasJustRegistered = true;
 
         if (!_authService.SaveRememberMe(RememberMe) && RememberMe)
             ValidationMessage = "Could not securely save this session. You can still continue, but will need to sign in next time.";

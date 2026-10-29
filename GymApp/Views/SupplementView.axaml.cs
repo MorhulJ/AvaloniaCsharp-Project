@@ -46,7 +46,9 @@ public partial class SupplementView : UserControl
         if (DataContext is not SupplementViewModel vm) return;
         if (vm.SelectedSupplement == null) return;
 
-        var dialog = new ConfirmDialog();
+        var dialog = new ConfirmDialog(
+            "Delete supplement?",
+            $"This will permanently delete '{vm.SelectedSupplement.Name}' from your supplements.");
         await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Window);
 
         if (dialog.Result)

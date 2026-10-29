@@ -39,7 +39,11 @@ public partial class SupplementIntakeView : UserControl
         if (DataContext is not SupplementIntakeViewModel vm) return;
         if (vm.SelectedSupplementIntake == null) return;
 
-        var dialog = new ConfirmDialog();
+        var intake = vm.SelectedSupplementIntake;
+        var supplementName = intake.Supplement?.Name ?? "this supplement";
+        var dialog = new ConfirmDialog(
+            "Delete schedule entry?",
+            $"Delete the {supplementName} reminder for {intake.Date} at {intake.Time}?");
         await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Window);
 
         if (dialog.Result)

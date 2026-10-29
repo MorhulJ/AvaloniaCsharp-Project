@@ -46,7 +46,9 @@ public partial class ExerciseView : UserControl
         if (DataContext is not ExerciseViewModel vm) return;
         if (vm.SelectedExercise == null) return;
 
-        var dialog = new ConfirmDialog();
+        var dialog = new ConfirmDialog(
+            "Delete exercise?",
+            $"This will permanently delete '{vm.SelectedExercise.Name}' from your exercise list.");
         await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Window);
 
         if (dialog.Result)

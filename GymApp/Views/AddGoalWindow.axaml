@@ -8,13 +8,13 @@
         Width="420" Height="440"
         WindowStartupLocation="CenterOwner">
 
-    <StackPanel Margin="24" Spacing="14">
+    <StackPanel Classes="dialog-content">
 
-        <TextBlock Text="Goal" Classes="title" FontSize="20" />
+        <TextBlock Text="Goal" Classes="title dialog-title" />
 
         <StackPanel Spacing="6">
             <TextBlock Text="Goal title" Classes="label" />
-            <TextBox Text="{Binding GoalTitle}" />
+            <TextBox Text="{Binding GoalTitle}" PlaceholderText="e.g., Bench press 60 kg" />
         </StackPanel>
 
         <StackPanel Spacing="6">
@@ -32,12 +32,12 @@
 
         <StackPanel Spacing="6">
             <TextBlock Text="Target value" Classes="label" />
-            <TextBox Text="{Binding GoalValue}" />
+            <TextBox Text="{Binding GoalValue}" PlaceholderText="e.g., 60" />
         </StackPanel>
 
         <StackPanel Spacing="6">
             <TextBlock Text="Current value" Classes="label" />
-            <TextBox Text="{Binding CurrentValue}" />
+            <TextBox Text="{Binding CurrentValue}" PlaceholderText="e.g., 40" />
         </StackPanel>
 
         <Button Content="Save" Command="{Binding SaveGoalCommand}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" Margin="0,10,0,0" />

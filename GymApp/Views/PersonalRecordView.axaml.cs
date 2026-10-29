@@ -38,7 +38,11 @@ public partial class PersonalRecordView : UserControl
         if (DataContext is not PersonalRecordViewModel vm) return;
         if (vm.SelectedRecord == null) return;
 
-        var dialog = new ConfirmDialog();
+        var record = vm.SelectedRecord;
+        var exerciseName = record.Exercise?.Name ?? "this exercise";
+        var dialog = new ConfirmDialog(
+            "Delete personal record?",
+            $"Delete the {record.Value} kg record for '{exerciseName}' dated {record.Date:dd.MM.yyyy}?");
         await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Window);
 
         if (dialog.Result)

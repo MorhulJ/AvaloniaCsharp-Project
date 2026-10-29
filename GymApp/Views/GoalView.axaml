@@ -4,14 +4,15 @@
              x:Class="GymApp.Views.GoalView"
              x:DataType="vm:GoalViewModel">
 
-    <StackPanel Margin="30" Spacing="16">
+    <Grid Margin="30" RowDefinitions="Auto,Auto,Auto,*,Auto">
 
-        <TextBlock Text="Goals" Classes="title" />
+        <TextBlock Grid.Row="0" Text="Goals" Classes="title" Margin="0,0,0,16" />
 
-        <Button Content="+ Add goal" Click="OpenAddGoalWindow" HorizontalAlignment="Left" HorizontalContentAlignment="Center" />
+        <Button Grid.Row="1" Content="+ Add goal" Click="OpenAddGoalWindow" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="0,0,0,12" />
 
-        <TextBlock Text="Goal list" Classes="label" Margin="0,10,0,0" />
-        <ListBox ItemsSource="{Binding Goals}" SelectedItem="{Binding SelectedGoal}" Height="400">
+        <TextBlock Grid.Row="2" Text="Goal list" Classes="label" Margin="0,0,0,8" />
+        <Grid Grid.Row="3">
+        <ListBox ItemsSource="{Binding Goals}" SelectedItem="{Binding SelectedGoal}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Spacing="4">
@@ -30,12 +31,21 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        <Border IsVisible="{Binding IsGoalListEmpty}" IsHitTestVisible="False"
+                Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1" CornerRadius="12" Margin="4" Padding="24">
+            <StackPanel Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="No goals yet" FontSize="17" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                <TextBlock Text="Set a goal to keep your progress in focus." Classes="label" TextWrapping="Wrap" TextAlignment="Center" />
+            </StackPanel>
+        </Border>
+        </Grid>
 
-        <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Content="Edit" Click="OpenEditGoalWindow" HorizontalContentAlignment="Center" Width="80"/>
-            <Button Content="Delete" Classes="danger" Click="OnDeleteGoal" HorizontalContentAlignment="Center" Width="80"/>
+        <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="8" Margin="0,12,0,0">
+            <Button Content="Edit" Click="OpenEditGoalWindow" HorizontalContentAlignment="Center" Width="80" IsEnabled="{Binding HasSelection}" />
+            <Button Content="Delete" Classes="danger" Click="OnDeleteGoal" HorizontalContentAlignment="Center" Width="80" IsEnabled="{Binding HasSelection}" />
         </StackPanel>
 
-    </StackPanel>
+    </Grid>
 
 </UserControl>

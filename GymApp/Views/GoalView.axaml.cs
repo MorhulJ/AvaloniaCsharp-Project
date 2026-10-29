@@ -49,7 +49,9 @@ public partial class GoalView : UserControl
         if (DataContext is not GoalViewModel vm) return;
         if (vm.SelectedGoal == null) return;
 
-        var dialog = new ConfirmDialog();
+        var dialog = new ConfirmDialog(
+            "Delete goal?",
+            $"This will permanently delete the goal '{vm.SelectedGoal.Title}'.");
         await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Window);
 
         if (dialog.Result)

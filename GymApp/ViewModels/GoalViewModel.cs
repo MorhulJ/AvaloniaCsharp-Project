@@ -17,6 +17,9 @@ public partial class GoalViewModel : ViewModelBase
 
     public ObservableCollection<Goal> Goals { get; } = new();
 
+    [ObservableProperty]
+    private bool isGoalListEmpty = true;
+
     public ObservableCollection<Exercise> Exercises { get; } = new();
 
     [ObservableProperty] 
@@ -68,10 +71,19 @@ public partial class GoalViewModel : ViewModelBase
         }
 
         ValidationMessage = "";
-        if (_editingGoalFirebaseId == null)
-            await _goalService.AddGoalAsync(goal);
-        else
-            await _goalService.UpdateGoalAsync(goal);
+        try
+        {
+            if (_editingGoalFirebaseId == null)
+                await _goalService.AddGoalAsync(goal);
+            else
+                await _goalService.UpdateGoalAsync(goal);
+        }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "save the goal", canRetry: false);
+            ValidationMessage = StatusMessage;
+            return;
+        }
 
         _editingGoalFirebaseId = null;
 
@@ -87,26 +99,42 @@ public partial class GoalViewModel : ViewModelBase
 
     public async Task LoadGoalsAsync(string userId)
     {
-        var goalList = await _goalService.GetAllGoalsByUserAsync(userId);
-
-        Goals.Clear();
-
-        foreach (var goal in goalList)
+        SetStatusMessage("Loading goals from Firebase…");
+        IsGoalListEmpty = false;
+        try
         {
-            Goals.Add(goal);
+            var goalList = await _goalService.GetAllGoalsByUserAsync(userId);
+            Goals.Clear();
+            foreach (var goal in goalList)
+                Goals.Add(goal);
+            IsGoalListEmpty = Goals.Count == 0;
+            ClearStatusMessage();
         }
+        catch (Exception ex)
+        {
+            IsGoalListEmpty = false;
+            ReportCloudFailure(ex, "load goals");
+        }
+    }
+
+    public override async Task RetryAsync()
+    {
+        await LoadGoalsAsync(CurrentUserId);
+        await LoadExercisesAsync();
     }
 
     public async Task LoadExercisesAsync()
     {
-        var exercisesList = await _exerciseService.GetAllExercisesAsync(CurrentUserId);
-
-        Exercises.Clear();
-
-        foreach (var exercise in exercisesList)
+        SetStatusMessage("Loading exercises from Firebase…");
+        try
         {
-            Exercises.Add(exercise);
+            var exercisesList = await _exerciseService.GetAllExercisesAsync(CurrentUserId);
+            Exercises.Clear();
+            foreach (var exercise in exercisesList)
+                Exercises.Add(exercise);
+            ClearStatusMessage();
         }
+        catch (Exception ex) { ReportCloudFailure(ex, "load exercises for your goals"); }
     }
 
     [RelayCommand]
@@ -115,12 +143,19 @@ public partial class GoalViewModel : ViewModelBase
         if (SelectedGoal == null)
             return;
 
-        await _goalService.DeleteGoalAsync(SelectedGoal);
+        try { await _goalService.DeleteGoalAsync(SelectedGoal); }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "delete the goal", canRetry: false);
+            ValidationMessage = StatusMessage;
+            return;
+        }
         await LoadGoalsAsync(CurrentUserId);
     }
 
     partial void OnSelectedGoalChanged(Goal? value)
     {
+        HasSelection = value != null;
         if (value == null)
             return;
 

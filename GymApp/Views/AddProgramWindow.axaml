@@ -8,18 +8,18 @@
         Width="420" Height="300"
         WindowStartupLocation="CenterOwner">
 
-    <StackPanel Margin="24" Spacing="14">
+    <StackPanel Classes="dialog-content">
 
-        <TextBlock Text="Program" Classes="title" FontSize="20" />
+        <TextBlock Text="Program" Classes="title dialog-title" />
 
         <StackPanel Spacing="6">
             <TextBlock Text="Program name" Classes="label" />
-            <TextBox Text="{Binding ProgramName}" />
+            <TextBox Text="{Binding ProgramName}" PlaceholderText="e.g., Full body A" />
         </StackPanel>
 
         <StackPanel Spacing="6">
             <TextBlock Text="Description" Classes="label" />
-            <TextBox Text="{Binding ProgramDescription}" />
+            <TextBox Text="{Binding ProgramDescription}" PlaceholderText="A short note about this workout plan" />
         </StackPanel>
 
         <Button Content="Save" Command="{Binding SaveProgramCommand}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" Margin="0,10,0,0" />

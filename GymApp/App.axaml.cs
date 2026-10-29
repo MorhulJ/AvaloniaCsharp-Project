@@ -36,7 +36,7 @@ public partial class App : Application
 
                 if (!autoLoggedIn)
                 {
-                    ShowLoginWindow(desktop, authService);
+                    ShowLoginWindow(desktop, authService, authService.LastErrorMessage);
                 }
                 else
                 {
@@ -69,7 +69,7 @@ public partial class App : Application
             loginWindow.Hide();
             try
             {
-                await ShowMainWindowAsync(desktop, authService);
+                await ShowMainWindowAsync(desktop, authService, loginVm.WasJustRegistered);
                 loginWindow.Close();
             }
             catch (Exception ex)
@@ -82,7 +82,8 @@ public partial class App : Application
         };
     }
 
-    private async Task ShowMainWindowAsync(IClassicDesktopStyleApplicationLifetime desktop, AuthService authService)
+    private async Task ShowMainWindowAsync(IClassicDesktopStyleApplicationLifetime desktop, AuthService authService,
+        bool showWelcome = false)
     {
         var exerciseService = new ExerciseService();
         var goalService = new GoalService();
@@ -110,18 +111,6 @@ public partial class App : Application
         supplementIntakeViewModel.CurrentUserId = userId;
         workoutProgramViewModel.CurrentUserId = userId;
 
-        await exerciseViewModel.LoadExercisesAsync(userId);
-        await goalViewModel.LoadGoalsAsync(userId);
-        await goalViewModel.LoadExercisesAsync();
-        await supplementViewModel.LoadSupplementAsync(userId);
-        await supplementIntakeViewModel.LoadSupplementsAsync(userId);
-        await supplementIntakeViewModel.LoadSupplementIntakesAsync(userId);
-        await workoutProgramViewModel.LoadExercisesAsync();
-        await workoutProgramViewModel.LoadProgramsAsync(userId);
-        await userViewModel.LoadUserAsync();
-        await personalRecordViewModel.LoadExercisesAsync();
-        await personalRecordViewModel.LoadRecordsAsync(userId);
-
         var mainWindowViewModel = new MainWindowViewModel(
             exerciseViewModel, goalViewModel, supplementViewModel,
             nutritionViewModel, personalRecordViewModel,
@@ -142,6 +131,12 @@ public partial class App : Application
 
         desktop.MainWindow = mainWindow;
         mainWindow.Show();
+
+        if (showWelcome)
+        {
+            var welcomeDialog = new WelcomeDialog();
+            await welcomeDialog.ShowDialog(mainWindow);
+        }
     }
 
     public void SetTheme(string themeName)

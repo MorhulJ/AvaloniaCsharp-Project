@@ -12,7 +12,7 @@
 
             <StackPanel Grid.Column="0" Grid.Row="0" Spacing="6" Margin="0,0,40,10">
                 <TextBlock Text="Name" Classes="label" />
-                <TextBox Text="{Binding UserName}" />
+                <TextBox Text="{Binding UserName}" PlaceholderText="Your name" />
             </StackPanel>
 
             <StackPanel Grid.Column="1" Grid.Row="0" Spacing="6" Margin="0,0,0,10">
@@ -24,17 +24,17 @@
 
             <StackPanel Grid.Column="0" Grid.Row="1" Spacing="6" Margin="0,0,40,10">
                 <TextBlock Text="Weight (kg)" Classes="label" />
-                <TextBox Text="{Binding UserWeight}" />
+                <TextBox Text="{Binding UserWeight}" PlaceholderText="e.g., 75" />
             </StackPanel>
 
             <StackPanel Grid.Column="1" Grid.Row="1" Spacing="6" Margin="0,0,0,10">
                 <TextBlock Text="Height (cm)" Classes="label" />
-                <TextBox Text="{Binding UserHeight}" />
+                <TextBox Text="{Binding UserHeight}" PlaceholderText="e.g., 180" />
             </StackPanel>
 
             <StackPanel Grid.Column="0" Grid.Row="2" Spacing="6" Margin="0,0,10,0">
                 <TextBlock Text="Date of birth" Classes="label" />
-                <DatePicker SelectedDate="{Binding UserDateOfBirth}"/>
+                <DatePicker Classes="profile-date" SelectedDate="{Binding UserDateOfBirth}" />
             </StackPanel>
 
         </Grid>

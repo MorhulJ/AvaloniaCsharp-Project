@@ -8,9 +8,9 @@
         Width="420" Height="360"
         WindowStartupLocation="CenterOwner">
 
-    <StackPanel Margin="24" Spacing="14">
+    <StackPanel Classes="dialog-content">
 
-        <TextBlock Text="Record" Classes="title" FontSize="20" />
+        <TextBlock Text="Record" Classes="title dialog-title" />
 
         <StackPanel Spacing="6">
             <TextBlock Text="Exercise" Classes="label" />
@@ -27,7 +27,7 @@
 
         <StackPanel Spacing="6">
             <TextBlock Text="Value (kg)" Classes="label" />
-            <TextBox Text="{Binding RecordValue}" />
+            <TextBox Text="{Binding RecordValue}" PlaceholderText="e.g., 80" />
         </StackPanel>
 
         <StackPanel Spacing="6">

@@ -3,20 +3,23 @@
         x:Class="GymApp.Views.ConfirmDialog"
         Title="Confirm"
         Icon="avares://GymApp/Assets/gymapp_icon.png"
-        Width="320" Height="160"
+        Width="420" Height="210"
         WindowStartupLocation="CenterOwner"
-        CanResize="False">
+        CanResize="False"
+        Opened="OnOpened"
+        KeyDown="OnKeyDown">
 
-    <StackPanel Margin="30" Spacing="24">
+    <StackPanel Classes="dialog-content" HorizontalAlignment="Center" VerticalAlignment="Center">
 
-        <TextBlock Text="Are you sure?" 
-                   Classes="title"
-                   FontSize="20"
-                   HorizontalAlignment="Center" />
+        <TextBlock x:Name="DialogTitle" Text="Confirm action"
+                   Classes="title dialog-title"
+                   HorizontalAlignment="Center" TextWrapping="Wrap" />
+
+        <TextBlock x:Name="DialogMessage" TextWrapping="Wrap" TextAlignment="Center" />
 
         <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
-            <Button Content="Yes" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Click="OnYes" Width="80" />
-            <Button Content="No" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Click="OnNo" Width="80" Classes="danger" />
+            <Button x:Name="CancelButton" Content="Cancel" Classes="secondary" HorizontalContentAlignment="Center" Click="OnNo" MinWidth="100" />
+            <Button x:Name="ConfirmButton" Content="Delete" Classes="danger" HorizontalContentAlignment="Center" Click="OnYes" MinWidth="100" />
         </StackPanel>
 
     </StackPanel>

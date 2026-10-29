@@ -14,6 +14,9 @@ public partial class ExerciseViewModel : ViewModelBase
     private readonly ExerciseService _exerciseService;
     
     public ObservableCollection<Exercise> Exercises { get; } = new();
+
+    [ObservableProperty]
+    private bool isExerciseListEmpty = true;
     
     [ObservableProperty]
     private string validationMessage = "";
@@ -57,10 +60,19 @@ public partial class ExerciseViewModel : ViewModelBase
         }
 
         ValidationMessage = "";
-        if (_editingExerciseFirebaseId == null)
-            await _exerciseService.AddExerciseAsync(exercise, CurrentUserId);
-        else
-            await _exerciseService.UpdateExerciseAsync(exercise, CurrentUserId);
+        try
+        {
+            if (_editingExerciseFirebaseId == null)
+                await _exerciseService.AddExerciseAsync(exercise, CurrentUserId);
+            else
+                await _exerciseService.UpdateExerciseAsync(exercise, CurrentUserId);
+        }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "save the exercise", canRetry: false);
+            ValidationMessage = StatusMessage;
+            return;
+        }
 
         _editingExerciseFirebaseId = null;
 
@@ -74,12 +86,26 @@ public partial class ExerciseViewModel : ViewModelBase
 
     public async Task LoadExercisesAsync(string userId)
     {
-        var exercisesList = await _exerciseService.GetAllExercisesAsync(userId);
-        
-        Exercises.Clear();
-        foreach (var exercise in exercisesList)
-            Exercises.Add(exercise);
+        SetStatusMessage("Loading exercises from Firebase…");
+        IsExerciseListEmpty = false;
+        try
+        {
+            var exercisesList = await _exerciseService.GetAllExercisesAsync(userId);
+
+            Exercises.Clear();
+            foreach (var exercise in exercisesList)
+                Exercises.Add(exercise);
+            IsExerciseListEmpty = Exercises.Count == 0;
+            ClearStatusMessage();
+        }
+        catch (Exception ex)
+        {
+            IsExerciseListEmpty = false;
+            ReportCloudFailure(ex, "load exercises");
+        }
     }
+
+    public override Task RetryAsync() => LoadExercisesAsync(CurrentUserId);
     
     [RelayCommand]
     private async Task DeleteExerciseAsync()
@@ -87,7 +113,16 @@ public partial class ExerciseViewModel : ViewModelBase
         if (SelectedExercise == null)
             return;
 
-        await _exerciseService.DeleteExerciseAsync(SelectedExercise, CurrentUserId);
+        try
+        {
+            await _exerciseService.DeleteExerciseAsync(SelectedExercise, CurrentUserId);
+        }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "delete the exercise", canRetry: false);
+            ValidationMessage = StatusMessage;
+            return;
+        }
         
         ExerciseName = "";
         MuscleGroup = "";
@@ -99,6 +134,7 @@ public partial class ExerciseViewModel : ViewModelBase
     
     partial void OnSelectedExerciseChanged(Exercise? value)
     {
+        HasSelection = value != null;
         if (value == null) return;
     
         ExerciseName = value.Name;

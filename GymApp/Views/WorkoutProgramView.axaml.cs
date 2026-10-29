@@ -61,7 +61,9 @@ public partial class WorkoutProgramView : UserControl
         if (DataContext is not WorkoutProgramViewModel vm) return;
         if (vm.SelectedProgram == null) return;
 
-        var dialog = new ConfirmDialog();
+        var dialog = new ConfirmDialog(
+            "Delete workout program?",
+            $"This will permanently delete '{vm.SelectedProgram.Name}' and its exercises.");
         await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Window);
 
         if (dialog.Result)
@@ -75,7 +77,10 @@ public partial class WorkoutProgramView : UserControl
         if (DataContext is not WorkoutProgramViewModel vm) return;
         if (vm.SelectedProgramExercise == null) return;
 
-        var dialog = new ConfirmDialog();
+        var exerciseName = vm.SelectedProgramExercise.Exercise?.Name ?? "this exercise";
+        var dialog = new ConfirmDialog(
+            "Remove exercise from program?",
+            $"Remove '{exerciseName}' from '{vm.SelectedProgram?.Name}'?");
         await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Window);
 
         if (dialog.Result)

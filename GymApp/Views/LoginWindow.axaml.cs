@@ -12,4 +12,12 @@ public partial class LoginWindow : Window
 
         vm.LoginSuccessful += () => Close();
     }
+
+    private void OnOpened(object? sender, System.EventArgs e)
+    {
+        if (DataContext is LoginViewModel { IsRegistering: true })
+            NameInput.Focus();
+        else
+            EmailInput.Focus();
+    }
 }

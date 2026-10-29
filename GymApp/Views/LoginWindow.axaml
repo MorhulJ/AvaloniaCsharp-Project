@@ -7,7 +7,8 @@
         Icon="avares://GymApp/Assets/gymapp_icon.png"
         Width="400" Height="480"
         WindowStartupLocation="CenterScreen"
-        CanResize="False">
+        CanResize="False"
+        Opened="OnOpened">
 
     <StackPanel Margin="30" Spacing="14">
 
@@ -18,17 +19,17 @@
 
         <StackPanel Spacing="6" IsVisible="{Binding IsRegistering}">
             <TextBlock Text="Name" Classes="label" />
-            <TextBox Text="{Binding Name}" />
+            <TextBox x:Name="NameInput" Text="{Binding Name}" PlaceholderText="Your name" />
         </StackPanel>
 
         <StackPanel Spacing="6">
             <TextBlock Text="Email" Classes="label" />
-            <TextBox Text="{Binding Login}" />
+            <TextBox x:Name="EmailInput" Text="{Binding Login}" PlaceholderText="you@example.com" />
         </StackPanel>
 
         <StackPanel Spacing="6">
             <TextBlock Text="Password" Classes="label" />
-            <TextBox Text="{Binding Password}" PasswordChar="*" />
+            <TextBox Text="{Binding Password}" PasswordChar="*" PlaceholderText="Password" />
         </StackPanel>
 
         <CheckBox Content="Remember me" IsChecked="{Binding RememberMe}" />

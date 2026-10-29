@@ -28,6 +28,9 @@ public partial class SupplementIntakeViewModel : ViewModelBase
     private readonly SupplementService _supplementService;
 
     public ObservableCollection<SupplementIntake> SupplementIntakes { get; } = new();
+
+    [ObservableProperty]
+    private bool isIntakeListEmpty = true;
     public ObservableCollection<Supplement> Supplements { get; } = new();
 
     [ObservableProperty] 
@@ -75,7 +78,13 @@ public partial class SupplementIntakeViewModel : ViewModelBase
         }
 
         ValidationMessage = "";
-        await _supplementIntakeService.AddSupplementAsync(supplementIntake);
+        try { await _supplementIntakeService.AddSupplementAsync(supplementIntake); }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "save the supplement schedule entry", canRetry: false);
+            ValidationMessage = StatusMessage;
+            return;
+        }
         
         Supplement = null;
         SupplementDosage = 0;
@@ -88,23 +97,45 @@ public partial class SupplementIntakeViewModel : ViewModelBase
     
     public async Task LoadSupplementIntakesAsync(string userId)
     {
-        var list = await _supplementIntakeService.GetAllSupplementsByUserAsync(userId);
-        
-        SupplementIntakes.Clear();
-        foreach (var intake in list)
+        SetStatusMessage("Loading the supplement schedule from Firebase…");
+        IsIntakeListEmpty = false;
+        try
         {
-            intake.Supplement = Supplements.FirstOrDefault(s => s.FirebaseId == intake.SupplementFirebaseId);
-            SupplementIntakes.Add(intake);
+            var list = await _supplementIntakeService.GetAllSupplementsByUserAsync(userId);
+            SupplementIntakes.Clear();
+            foreach (var intake in list)
+            {
+                intake.Supplement = Supplements.FirstOrDefault(s => s.FirebaseId == intake.SupplementFirebaseId);
+                SupplementIntakes.Add(intake);
+            }
+            IsIntakeListEmpty = SupplementIntakes.Count == 0;
+            ClearStatusMessage();
         }
+        catch (Exception ex)
+        {
+            IsIntakeListEmpty = false;
+            ReportCloudFailure(ex, "load the supplement schedule");
+        }
+    }
+
+    public override async Task RetryAsync()
+    {
+        await LoadSupplementsAsync(CurrentUserId);
+        await LoadSupplementIntakesAsync(CurrentUserId);
     }
     
     public async Task LoadSupplementsAsync(string userId)
     {
-        var list = await _supplementService.GetAllSupplementsAsync(userId);
-        
-        Supplements.Clear();
-        foreach (var supplement in list)
-            Supplements.Add(supplement);
+        SetStatusMessage("Loading supplements from Firebase…");
+        try
+        {
+            var list = await _supplementService.GetAllSupplementsAsync(userId);
+            Supplements.Clear();
+            foreach (var supplement in list)
+                Supplements.Add(supplement);
+            ClearStatusMessage();
+        }
+        catch (Exception ex) { ReportCloudFailure(ex, "load supplements for the schedule"); }
     }
 
     [RelayCommand]
@@ -113,12 +144,19 @@ public partial class SupplementIntakeViewModel : ViewModelBase
         if (selectedSupplementIntake == null) 
             return;
         
-        await _supplementIntakeService.DeleteSupplementAsync(selectedSupplementIntake);
+        try { await _supplementIntakeService.DeleteSupplementAsync(selectedSupplementIntake); }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "delete the schedule entry", canRetry: false);
+            ValidationMessage = StatusMessage;
+            return;
+        }
         await LoadSupplementIntakesAsync(CurrentUserId);
     }
 
     partial void OnSelectedSupplementIntakeChanged(SupplementIntake? value)
     {
+        HasSelection = value != null;
         if (value == null)
             return;
         

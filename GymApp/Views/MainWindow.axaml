@@ -5,33 +5,95 @@
         x:DataType="vm:MainWindowViewModel"
         Title="GymApp"
         Icon="avares://GymApp/Assets/gymapp_icon.png"
+        MinWidth="900"
+        MinHeight="560"
         WindowState="Maximized">
 
-    <DockPanel>
+    <Grid ColumnDefinitions="248,*">
+        <Border Grid.Column="0"
+                Background="{DynamicResource CardBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,1,0">
+            <Grid RowDefinitions="Auto,*,Auto">
+                <StackPanel Grid.Row="0" Margin="17,26,23,22" Spacing="8">
+                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center"
+                                HorizontalAlignment="Center">
+                        <Border Width="38" Height="38" CornerRadius="12"
+                                Background="{DynamicResource AccentBrush}">
+                            <TextBlock Text="G" FontSize="22" FontWeight="Bold"
+                                       Foreground="{DynamicResource BgBrush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <TextBlock Text="GymApp" FontSize="23" FontWeight="Bold"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Text="TRAINING • TRACKING • PROGRESS"
+                               Classes="label" FontSize="9"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center" />
+                </StackPanel>
 
-        <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="10">
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="12,4,12,12" Spacing="5">
+                    <TextBlock Text="WORKSPACE" Classes="label" FontSize="12"
+                               Foreground="{DynamicResource AccentBrush}"
+                               FontWeight="Bold" Margin="13,0,0,8" />
+                    <Button Content="Workout Program" Classes="nav" Classes.active="{Binding IsWorkoutProgramActive}" Command="{Binding ShowWorkoutProgramCommand}" />
+                    <Button Content="Exercises" Classes="nav" Classes.active="{Binding IsExercisesActive}" Command="{Binding ShowExercisesCommand}" />
+                    <Button Content="Goals" Classes="nav" Classes.active="{Binding IsGoalsActive}" Command="{Binding ShowGoalsCommand}" />
+                    <Button Content="Personal Records" Classes="nav" Classes.active="{Binding IsRecordsActive}" Command="{Binding ShowPersonalRecordCommand}" />
+                    <Button Content="Supplements" Classes="nav" Classes.active="{Binding IsSupplementsActive}" Command="{Binding ShowSupplementsCommand}" />
+                    <Button Content="Supplement Schedule" Classes="nav" Classes.active="{Binding IsSupplementScheduleActive}" Command="{Binding ShowSupplementIntakeCommand}" />
+                    <Button Content="Nutrition Calculator" Classes="nav" Classes.active="{Binding IsNutritionActive}" Command="{Binding ShowNutritionCommand}" />
+                    <Button Content="Profile" Classes="nav" Classes.active="{Binding IsProfileActive}" Command="{Binding ShowUserCommand}" />
+                </StackPanel>
+                </ScrollViewer>
 
-            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10">
-                <Button Content="Workout Program" Command="{Binding ShowWorkoutProgramCommand}" />
-                <Button Content="Exercises" Command="{Binding ShowExercisesCommand}" />
-                <Button Content="Goals" Command="{Binding ShowGoalsCommand}" />
-                <Button Content="Personal Records" Command="{Binding ShowPersonalRecordCommand}" />
-                <Button Content="Supplements" Command="{Binding ShowSupplementsCommand}" />
-                <Button Content="Supplement Intake" Command="{Binding ShowSupplementIntakeCommand}" />
-                <Button Content="Nutrition calculator" Command="{Binding ShowNutritionCommand}" />
-                <Button Content="User" Command="{Binding ShowUserCommand}" />
-            </StackPanel>
+                <StackPanel Grid.Row="2" Margin="12,12,12,18" Spacing="6">
+                    <Border Height="1" Background="{DynamicResource BorderBrush}" Margin="8,0,8,10" />
+                    <Button Content="Exit GymApp" Classes="exit"
+                            HorizontalAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            MinWidth="190"
+                            Command="{Binding ExitCommand}" />
+                </StackPanel>
+            </Grid>
+        </Border>
 
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
-                <Button Content="Generate Report" Command="{Binding GenerateReportCommand}" />
-                <Button Content="Theme" Command="{Binding ToggleThemeCommand}" />
-                <Button Content="Exit" Command="{Binding ExitCommand}" Classes="danger" />
-            </StackPanel>
+        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,*">
+            <Border Grid.Row="0" Padding="28,18"
+                    Background="{DynamicResource BgBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="0,0,0,1">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Spacing="3" VerticalAlignment="Center">
+                        <TextBlock Text="Your training space" FontSize="20" FontWeight="SemiBold" />
+                        <TextBlock Text="Plan workouts, follow your progress, and stay consistent."
+                                   Classes="label" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                        <Button Content="Generate report" Command="{Binding GenerateReportCommand}" />
+                        <Button Content="Switch theme" Classes="secondary" Command="{Binding ToggleThemeCommand}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
 
+            <Border Grid.Row="1" IsVisible="{Binding CurrentView.StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                    Margin="24,12,24,0" Padding="14,10"
+                    Background="{DynamicResource CardBrush}"
+                    BorderBrush="{DynamicResource AccentBrush}"
+                    BorderThickness="1" CornerRadius="9">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <TextBlock Grid.Column="0" Text="{Binding CurrentView.StatusMessage}"
+                               VerticalAlignment="Center" TextWrapping="Wrap" />
+                    <Button Grid.Column="1" Content="Try again" Classes="secondary"
+                            IsVisible="{Binding CurrentView.CanRetry}"
+                            Command="{Binding RetryCurrentViewCommand}"
+                            MinWidth="100" />
+                </Grid>
+            </Border>
+
+            <ContentControl Grid.Row="2" Content="{Binding CurrentView}" />
         </Grid>
-
-        <ContentControl Content="{Binding CurrentView}" />
-
-    </DockPanel>
-
+    </Grid>
 </Window>

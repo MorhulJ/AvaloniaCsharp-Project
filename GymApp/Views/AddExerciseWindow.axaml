@@ -8,23 +8,23 @@
         Width="420" Height="370"
         WindowStartupLocation="CenterOwner">
 
-    <StackPanel Margin="24" Spacing="14">
+    <StackPanel Classes="dialog-content">
 
-        <TextBlock Text="Exercise" Classes="title" FontSize="20" />
+        <TextBlock Text="Exercise" Classes="title dialog-title" />
 
         <StackPanel Spacing="6">
             <TextBlock Text="Exercise name" Classes="label" />
-            <TextBox Text="{Binding ExerciseName}" />
+            <TextBox Text="{Binding ExerciseName}" PlaceholderText="e.g., Barbell squat" />
         </StackPanel>
 
         <StackPanel Spacing="6">
             <TextBlock Text="Muscle group" Classes="label" />
-            <TextBox Text="{Binding MuscleGroup}" />
+            <TextBox Text="{Binding MuscleGroup}" PlaceholderText="e.g., Legs" />
         </StackPanel>
 
         <StackPanel Spacing="6">
             <TextBlock Text="Description" Classes="label" />
-            <TextBox Text="{Binding Description}" />
+            <TextBox Text="{Binding Description}" PlaceholderText="Short description of the movement" />
         </StackPanel>
 
         <Button Content="Save" Command="{Binding SaveExerciseCommand}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" Margin="0,10,0,0" />

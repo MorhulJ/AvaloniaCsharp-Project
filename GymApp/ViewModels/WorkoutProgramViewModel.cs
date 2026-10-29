@@ -19,6 +19,14 @@ public partial class WorkoutProgramViewModel : ViewModelBase
     public ObservableCollection<ProgramExercise> ProgramExercises { get; } = new();
     public ObservableCollection<Exercise> Exercises { get; } = new();
 
+    [ObservableProperty]
+    private bool isProgramExerciseListEmpty = true;
+
+    [ObservableProperty]
+    private bool hasSelectedProgram;
+    [ObservableProperty]
+    private bool hasSelectedProgramExercise;
+
     [ObservableProperty] 
     private string programValidationMessage = "";
     [ObservableProperty] 
@@ -76,10 +84,19 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         }
 
         ProgramValidationMessage = "";
-        if (_editingProgramFirebaseId == null)
-            await _programService.AddProgramAsync(program);
-        else
-            await _programService.UpdateProgramAsync(program);
+        try
+        {
+            if (_editingProgramFirebaseId == null)
+                await _programService.AddProgramAsync(program);
+            else
+                await _programService.UpdateProgramAsync(program);
+        }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "save the workout program", canRetry: false);
+            ProgramValidationMessage = StatusMessage;
+            return;
+        }
         _editingProgramFirebaseId = null;
 
         ProgramName = "";
@@ -121,7 +138,13 @@ public partial class WorkoutProgramViewModel : ViewModelBase
 
         ProgramExerciseValidationMessage = "";
         
-        await _programService.AddExerciseToProgramAsync(programExercise, CurrentUserId);
+        try { await _programService.AddExerciseToProgramAsync(programExercise, CurrentUserId); }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "add the exercise to this program", canRetry: false);
+            ProgramExerciseValidationMessage = StatusMessage;
+            return;
+        }
         await LoadProgramExercisesAsync();
         
         SelectedExercise = null;
@@ -134,26 +157,50 @@ public partial class WorkoutProgramViewModel : ViewModelBase
 
     public async Task LoadProgramsAsync(string userId)
     {
-        var programList = await _programService.GetAllProgramsAByUserAsync(userId);
-
-        WorkoutPrograms.Clear();
-        foreach (var program in programList)
+        SetStatusMessage("Loading workout programs from Firebase…");
+        IsProgramExerciseListEmpty = false;
+        try
         {
-            foreach (var pe in program.ProgramExercises)
+            var selectedProgramId = SelectedProgram?.FirebaseId;
+            var programList = await _programService.GetAllProgramsAByUserAsync(userId);
+            WorkoutPrograms.Clear();
+            foreach (var program in programList)
             {
-                pe.Exercise = Exercises.FirstOrDefault(e => e.FirebaseId == pe.ExerciseFirebaseId);
+                foreach (var pe in program.ProgramExercises)
+                    pe.Exercise = Exercises.FirstOrDefault(e => e.FirebaseId == pe.ExerciseFirebaseId);
+                WorkoutPrograms.Add(program);
             }
-            WorkoutPrograms.Add(program);
+
+            SelectedProgram = WorkoutPrograms.FirstOrDefault(program => program.FirebaseId == selectedProgramId)
+                              ?? WorkoutPrograms.FirstOrDefault();
+            IsProgramExerciseListEmpty = ProgramExercises.Count == 0;
+            ClearStatusMessage();
         }
+        catch (Exception ex)
+        {
+            IsProgramExerciseListEmpty = false;
+            ReportCloudFailure(ex, "load workout programs");
+        }
+    }
+
+    public override async Task RetryAsync()
+    {
+        await LoadExercisesAsync();
+        await LoadProgramsAsync(CurrentUserId);
     }
     
     public async Task LoadExercisesAsync()
     {
-        var exercisesList = await _exerciseService.GetAllExercisesAsync(CurrentUserId);
-
-        Exercises.Clear();
-        foreach (var exercise in exercisesList)
-            Exercises.Add(exercise);
+        SetStatusMessage("Loading exercises from Firebase…");
+        try
+        {
+            var exercisesList = await _exerciseService.GetAllExercisesAsync(CurrentUserId);
+            Exercises.Clear();
+            foreach (var exercise in exercisesList)
+                Exercises.Add(exercise);
+            ClearStatusMessage();
+        }
+        catch (Exception ex) { ReportCloudFailure(ex, "load exercises for workout programs"); }
     }
     
     public async Task LoadProgramExercisesAsync()
@@ -161,13 +208,24 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         if (SelectedProgram == null)
             return;
 
-        var exercises = await _programService.GetExercisesByProgramAsync(SelectedProgram.FirebaseId, CurrentUserId);
-
-        ProgramExercises.Clear();
-        foreach (var exercise in exercises)
+        SetStatusMessage("Loading program exercises from Firebase…");
+        IsProgramExerciseListEmpty = false;
+        try
         {
-            exercise.Exercise = Exercises.FirstOrDefault(e => e.FirebaseId == exercise.ExerciseFirebaseId);
-            ProgramExercises.Add(exercise);
+            var exercises = await _programService.GetExercisesByProgramAsync(SelectedProgram.FirebaseId, CurrentUserId);
+            ProgramExercises.Clear();
+            foreach (var exercise in exercises)
+            {
+                exercise.Exercise = Exercises.FirstOrDefault(e => e.FirebaseId == exercise.ExerciseFirebaseId);
+                ProgramExercises.Add(exercise);
+            }
+            IsProgramExerciseListEmpty = ProgramExercises.Count == 0;
+            ClearStatusMessage();
+        }
+        catch (Exception ex)
+        {
+            IsProgramExerciseListEmpty = false;
+            ReportCloudFailure(ex, "load exercises in this program");
         }
     }
     
@@ -177,7 +235,13 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         if (SelectedProgram == null)
             return;
 
-        await _programService.DeleteProgramAsync(SelectedProgram);
+        try { await _programService.DeleteProgramAsync(SelectedProgram); }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "delete the workout program", canRetry: false);
+            ProgramValidationMessage = StatusMessage;
+            return;
+        }
         
         ProgramExercises.Clear();
         SelectedProgram = null;
@@ -194,12 +258,23 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         if (SelectedProgramExercise == null)
             return;
 
-        await _programService.DeleteExerciseFromProgramAsync(SelectedProgramExercise, CurrentUserId);
+        try { await _programService.DeleteExerciseFromProgramAsync(SelectedProgramExercise, CurrentUserId); }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "delete the exercise from this program", canRetry: false);
+            ProgramExerciseValidationMessage = StatusMessage;
+            return;
+        }
         ProgramExercises.Remove(SelectedProgramExercise);
+        IsProgramExerciseListEmpty = ProgramExercises.Count == 0;
     }
 
     partial void OnSelectedProgramChanged(WorkoutProgram? value)
     {
+        ProgramExercises.Clear();
+        IsProgramExerciseListEmpty = true;
+        HasSelectedProgram = value != null;
+
         if (value == null)
             return;
         
@@ -208,6 +283,11 @@ public partial class WorkoutProgramViewModel : ViewModelBase
         _editingProgramFirebaseId = value.FirebaseId;
 
         _ = LoadProgramExercisesAsync();
+    }
+
+    partial void OnSelectedProgramExerciseChanged(ProgramExercise? value)
+    {
+        HasSelectedProgramExercise = value != null;
     }
     
     public void ResetEditingState()

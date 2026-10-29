@@ -16,6 +16,9 @@ public partial class PersonalRecordViewModel : ViewModelBase
     private readonly ExerciseService _exerciseService;
 
     public ObservableCollection<PersonalRecord> Records { get; } = new();
+
+    [ObservableProperty]
+    private bool isRecordListEmpty = true;
     public ObservableCollection<Exercise> Exercises { get; } = new();
 
     [ObservableProperty] 
@@ -61,7 +64,13 @@ public partial class PersonalRecordViewModel : ViewModelBase
 
         ValidationMessage = "";
 
-        await _personalRecordService.AddRecordAsync(record);
+        try { await _personalRecordService.AddRecordAsync(record); }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "save the personal record", canRetry: false);
+            ValidationMessage = StatusMessage;
+            return;
+        }
         
         RecordExercise = null;
         RecordValue = 0;
@@ -73,22 +82,45 @@ public partial class PersonalRecordViewModel : ViewModelBase
 
     public async Task LoadRecordsAsync(string userId)
     {
-        var recordList = await _personalRecordService.GetAllRecordsByUserAsync(userId);
-        
-        Records.Clear();
-        foreach (var record in recordList)
+        SetStatusMessage("Loading personal records from Firebase…");
+        IsRecordListEmpty = false;
+        try
         {
-            record.Exercise = Exercises.FirstOrDefault(e => e.FirebaseId == record.ExerciseFirebaseId);
-            Records.Add(record);
+            var recordList = await _personalRecordService.GetAllRecordsByUserAsync(userId);
+            Records.Clear();
+            foreach (var record in recordList)
+            {
+                record.Exercise = Exercises.FirstOrDefault(e => e.FirebaseId == record.ExerciseFirebaseId);
+                Records.Add(record);
+            }
+            IsRecordListEmpty = Records.Count == 0;
+            ClearStatusMessage();
         }
+        catch (Exception ex)
+        {
+            IsRecordListEmpty = false;
+            ReportCloudFailure(ex, "load personal records");
+        }
+    }
+
+    public override async Task RetryAsync()
+    {
+        await LoadExercisesAsync();
+        await LoadRecordsAsync(CurrentUserId);
     }
     
     public async Task LoadExercisesAsync()
     {
-        var exercisesList = await _exerciseService.GetAllExercisesAsync(CurrentUserId);
-        Exercises.Clear();
-        foreach (var exercise in exercisesList)
-            Exercises.Add(exercise);
+        SetStatusMessage("Loading exercises from Firebase…");
+        try
+        {
+            var exercisesList = await _exerciseService.GetAllExercisesAsync(CurrentUserId);
+            Exercises.Clear();
+            foreach (var exercise in exercisesList)
+                Exercises.Add(exercise);
+            ClearStatusMessage();
+        }
+        catch (Exception ex) { ReportCloudFailure(ex, "load exercises for personal records"); }
     }
 
     [RelayCommand]
@@ -97,12 +129,19 @@ public partial class PersonalRecordViewModel : ViewModelBase
         if (selectedRecord == null)
             return;
         
-        await _personalRecordService.DeleteRecordAsync(selectedRecord);
+        try { await _personalRecordService.DeleteRecordAsync(selectedRecord); }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "delete the personal record", canRetry: false);
+            ValidationMessage = StatusMessage;
+            return;
+        }
         await LoadRecordsAsync(CurrentUserId);
     }
 
     partial void OnSelectedRecordChanged(PersonalRecord? value)
     {
+        HasSelection = value != null;
         if (value == null) return;
         
         RecordExercise = Exercises.FirstOrDefault(e => e.FirebaseId == value.ExerciseFirebaseId);
