@@ -38,6 +38,14 @@ public sealed class FirestoreDb
         return await Http.SendAsync(request);
     }
 
+    internal async Task<HttpResponseMessage> PatchRawAsync(string path, string json, string query)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Patch, DocumentUrl(path) + "?" + query);
+        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await _getIdToken());
+        request.Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        return await Http.SendAsync(request);
+    }
+
     internal static Dictionary<string, object> ToFirestoreFields(object value)
     {
         var element = JsonSerializer.SerializeToElement(value);
@@ -112,9 +120,12 @@ public sealed class DocumentReference
     public string Id => Uri.UnescapeDataString(_path[( _path.LastIndexOf('/') + 1)..]);
     public CollectionReference Collection(string path) => new(_db, $"{_path}/{path}");
 
-    public async Task<DocumentSnapshot> GetSnapshotAsync()
+    public async Task<DocumentSnapshot> GetSnapshotAsync(params string[] fieldPaths)
     {
-        using var response = await _db.SendAsync(HttpMethod.Get, _path);
+        var query = fieldPaths.Length == 0
+            ? null
+            : string.Join("&", fieldPaths.Select(field => "mask.fieldPaths=" + Uri.EscapeDataString(field)));
+        using var response = await _db.SendAsync(HttpMethod.Get, _path, query: query);
         if (response.StatusCode == HttpStatusCode.NotFound) return DocumentSnapshot.Missing;
         await FirestoreDb.EnsureSuccessAsync(response);
         using var json = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
@@ -131,6 +142,14 @@ public sealed class DocumentReference
     {
         var mask = string.Join("&", data.Keys.Select(k => "updateMask.fieldPaths=" + Uri.EscapeDataString(k)));
         using var response = await _db.SendAsync(HttpMethod.Patch, _path, data, mask);
+        await FirestoreDb.EnsureSuccessAsync(response);
+    }
+
+    public async Task DeleteFieldsAsync(params string[] fieldPaths)
+    {
+        if (fieldPaths.Length == 0) return;
+        var mask = string.Join("&", fieldPaths.Select(field => "updateMask.fieldPaths=" + Uri.EscapeDataString(field)));
+        using var response = await _db.PatchRawAsync(_path, "{}", mask);
         await FirestoreDb.EnsureSuccessAsync(response);
     }
 

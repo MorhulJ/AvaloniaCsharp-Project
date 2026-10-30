@@ -53,6 +53,9 @@ public abstract class ViewModelBase : ObservableObject
         if (exception is HttpRequestException { StatusCode: HttpStatusCode.Forbidden })
             return "You don't have permission to do that. Check your account access and try again.";
 
+        if (exception is HttpRequestException { StatusCode: { } statusCode })
+            return $"Couldn't {operation}: Firebase returned HTTP {(int)statusCode}. Please retry. If it continues, share this code with support.";
+
         if (exception is HttpRequestException or TaskCanceledException
             || exception.Message.Contains("connection", StringComparison.OrdinalIgnoreCase)
             || exception.Message.Contains("network", StringComparison.OrdinalIgnoreCase))

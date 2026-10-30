@@ -5,11 +5,12 @@
         x:DataType="vm:LoginViewModel"
         Title="GymApp — Login"
         Icon="avares://GymApp/Assets/gymapp_icon.png"
-        Width="400" Height="480"
+        Width="400" Height="620"
         WindowStartupLocation="CenterScreen"
         CanResize="False"
         Opened="OnOpened">
 
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
     <StackPanel Margin="30" Spacing="14">
 
         <TextBlock Text="GymApp" Classes="title" FontSize="28" HorizontalAlignment="Center" />
@@ -34,6 +35,12 @@
 
         <CheckBox Content="Remember me" IsChecked="{Binding RememberMe}" />
 
+        <CheckBox IsChecked="{Binding ProfileDataConsent}"
+                  IsVisible="{Binding IsRegistering}">
+            <TextBlock Text="Optional consent: I explicitly agree to GymApp processing and storing my gender, date of birth, height and weight in my Firebase profile for Profile and Nutrition Calculator features. Calculator inputs are processed on this device and are not saved to Firebase. Workout tracking remains available if I decline. I can withdraw in Profile; saved profile measurements will be deleted."
+                       TextWrapping="Wrap" MaxWidth="310" />
+        </CheckBox>
+
         <TextBlock Text="{Binding ValidationMessage}"
                    Foreground="Red"
                    TextWrapping="Wrap"
@@ -56,5 +63,6 @@
                 HorizontalAlignment="Center" />
 
     </StackPanel>
+    </ScrollViewer>
 
 </Window>

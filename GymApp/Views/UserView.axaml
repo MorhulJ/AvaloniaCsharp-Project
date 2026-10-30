@@ -8,42 +8,69 @@
 
         <TextBlock Text="Profile" Classes="title" />
 
-        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto">
+        <StackPanel Spacing="8">
+            <TextBlock Text="Name" Classes="label" />
+            <TextBox Text="{Binding UserName}" PlaceholderText="Your name" />
+        </StackPanel>
+
+        <Border IsVisible="{Binding !ProfileDataConsentGranted}"
+                Background="{DynamicResource CardBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1" CornerRadius="10" Padding="18">
+            <StackPanel Spacing="12">
+                <TextBlock Text="Optional profile data" Classes="title dialog-title" />
+                <TextBlock Text="Gender, date of birth, weight and height are optional. If you agree, GymApp will process and save them to your Firebase profile for Profile and Nutrition Calculator features. Calculator inputs are processed on this device and are not saved to Firebase. You can still use workout tracking without agreeing. You can withdraw at any time; saved profile measurements will be deleted."
+                           TextWrapping="Wrap" />
+                <CheckBox IsChecked="{Binding ProfileDataConsentChoice}">
+                    <TextBlock Text="I explicitly consent to GymApp processing and saving these optional profile details."
+                               TextWrapping="Wrap" />
+                </CheckBox>
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Button Content="Agree and enable" Command="{Binding GrantProfileDataConsentCommand}"
+                            HorizontalContentAlignment="Center" />
+                    <Button Content="Delete saved measurements" Click="OnDeleteUnconsentedData"
+                            Classes="secondary" HorizontalContentAlignment="Center" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Grid IsVisible="{Binding ProfileDataConsentGranted}"
+              ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
 
             <StackPanel Grid.Column="0" Grid.Row="0" Spacing="6" Margin="0,0,40,10">
-                <TextBlock Text="Name" Classes="label" />
-                <TextBox Text="{Binding UserName}" PlaceholderText="Your name" />
-            </StackPanel>
-
-            <StackPanel Grid.Column="1" Grid.Row="0" Spacing="6" Margin="0,0,0,10">
                 <TextBlock Text="Gender" Classes="label" />
                 <ComboBox ItemsSource="{Binding GenderOptions}"
                           SelectedItem="{Binding UserGender}"
                           HorizontalAlignment="Stretch" />
             </StackPanel>
 
-            <StackPanel Grid.Column="0" Grid.Row="1" Spacing="6" Margin="0,0,40,10">
+            <StackPanel Grid.Column="1" Grid.Row="0" Spacing="6" Margin="0,0,0,10">
                 <TextBlock Text="Weight (kg)" Classes="label" />
                 <TextBox Text="{Binding UserWeight}" PlaceholderText="e.g., 75" />
             </StackPanel>
 
-            <StackPanel Grid.Column="1" Grid.Row="1" Spacing="6" Margin="0,0,0,10">
+            <StackPanel Grid.Column="0" Grid.Row="1" Spacing="6" Margin="0,0,40,0">
                 <TextBlock Text="Height (cm)" Classes="label" />
                 <TextBox Text="{Binding UserHeight}" PlaceholderText="e.g., 180" />
             </StackPanel>
 
-            <StackPanel Grid.Column="0" Grid.Row="2" Spacing="6" Margin="0,0,10,0">
+            <StackPanel Grid.Column="1" Grid.Row="1" Spacing="6" Margin="0,0,0,0">
                 <TextBlock Text="Date of birth" Classes="label" />
                 <DatePicker Classes="profile-date" SelectedDate="{Binding UserDateOfBirth}" />
             </StackPanel>
 
         </Grid>
 
-        <Button Content="Save" Command="{Binding SaveUserCommand}"
+        <StackPanel Orientation="Horizontal" Spacing="10">
+        <Button Content="Save profile" Command="{Binding SaveUserCommand}"
                 HorizontalAlignment="Left"
                 HorizontalContentAlignment="Center"
                 Width="150"
                 Margin="0,10,0,0" />
+        <Button Content="Withdraw consent and delete measurements" Click="OnWithdrawProfileDataConsent"
+                Classes="secondary" HorizontalContentAlignment="Center" Margin="0,10,0,0"
+                IsVisible="{Binding ProfileDataConsentGranted}" />
+        </StackPanel>
         
         <TextBlock Text="{Binding ValidationMessage}" 
                    Foreground="Red"

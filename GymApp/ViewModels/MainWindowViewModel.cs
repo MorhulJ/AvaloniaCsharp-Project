@@ -63,6 +63,9 @@ public partial class MainWindowViewModel : ViewModelBase
         _workoutProgramViewModel = workoutProgramViewModel;
         _userViewModel = userViewModel;
         _authService = authService;
+
+        _nutritionViewModel.SetProfileDataConsent(_userViewModel.ProfileDataConsentGranted);
+        _userViewModel.ProfileDataConsentChanged += _nutritionViewModel.SetProfileDataConsent;
         
         _userViewModel.LoggedOut += () => LoggedOut?.Invoke();
         _userViewModel.AccountDeleted += () => LoggedOut?.Invoke();

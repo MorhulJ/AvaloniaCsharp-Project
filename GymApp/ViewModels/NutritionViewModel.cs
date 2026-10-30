@@ -15,6 +15,9 @@ public partial class NutritionViewModel : ViewModelBase
     
     [ObservableProperty]
     private string validationMessage = "";
+
+    [ObservableProperty]
+    private bool profileDataConsentGranted;
     
     [ObservableProperty] 
     private int weight;
@@ -43,10 +46,30 @@ public partial class NutritionViewModel : ViewModelBase
     private double carbs;
     
     private readonly NutritionValidator _validator = new();
+
+    public void SetProfileDataConsent(bool granted)
+    {
+        ProfileDataConsentGranted = granted;
+        if (granted) return;
+
+        Weight = 0;
+        Height = 0;
+        Age = 0;
+        Gender = "Male";
+        ClearResults();
+        ValidationMessage = "";
+    }
     
     [RelayCommand]
     private void Calculate()
     {
+        if (!ProfileDataConsentGranted)
+        {
+            ClearResults();
+            ValidationMessage = "Give consent for optional profile data in Profile before using this calculator.";
+            return;
+        }
+
         var result = _validator.Validate(this);
     
         if (!result.IsValid)

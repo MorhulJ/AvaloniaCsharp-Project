@@ -14,25 +14,31 @@ public partial class UserViewModel : ViewModelBase
     private readonly UserService _userService;
     private readonly string _userId;
     private string _userEmail = "";
+    private bool _profileLoaded;
     
     [ObservableProperty]
     private string validationMessage = "";
     [ObservableProperty]
     private string userName = "";
     [ObservableProperty]
-    private string userGender = "Male";
+    private string userGender = "";
     [ObservableProperty]
-    private DateTimeOffset? userDateOfBirth = new DateTimeOffset(new DateTime(1990, 1, 1));
+    private DateTimeOffset? userDateOfBirth;
     [ObservableProperty]
     private int userWeight;
     [ObservableProperty]
     private int userHeight;
+    [ObservableProperty]
+    private bool profileDataConsentGranted;
+    [ObservableProperty]
+    private bool profileDataConsentChoice;
     
     public List<string> GenderOptions { get; } = new() { "Male", "Female" };
     
     private readonly AuthService _authService;
     public event Action? LoggedOut;
     public event Action? AccountDeleted;
+    public event Action<bool>? ProfileDataConsentChanged;
     
     public UserViewModel(UserService userService, string userId, AuthService authService)
     {
@@ -51,12 +57,17 @@ public partial class UserViewModel : ViewModelBase
         {
             FirebaseId = _userId,
             Name = UserName,
-            Gender = UserGender,
-            DateOfBirth = UserDateOfBirth?.DateTime ?? DateTime.MinValue,
-            weight = UserWeight,
-            height = UserHeight
+            ProfileDataConsent = ProfileDataConsentGranted
         };
-        
+
+        if (ProfileDataConsentGranted)
+        {
+            user.Gender = UserGender;
+            user.DateOfBirth = UserDateOfBirth?.DateTime ?? DateTime.MinValue;
+            user.weight = UserWeight;
+            user.height = UserHeight;
+        }
+
         var result = _validator.Validate(user);
 
         if (!result.IsValid)
@@ -65,17 +76,22 @@ public partial class UserViewModel : ViewModelBase
             return;
         }
 
-        ValidationMessage = "";
-        try { await _userService.UpdateUserAsync(user); }
+        try
+        {
+            await _userService.UpdateUserAsync(user);
+            ValidationMessage = "Profile saved.";
+        }
         catch (Exception ex)
         {
             ReportCloudFailure(ex, "save your profile", canRetry: false);
-            ValidationMessage = StatusMessage;
+            ValidationMessage = GetCloudFailureMessage(ex, "save your profile");
         }
     }
 
     public async Task LoadUserAsync()
     {
+        if (_profileLoaded) return;
+
         SetStatusMessage("Loading your profile from Firebase…");
         try
         {
@@ -83,21 +99,109 @@ public partial class UserViewModel : ViewModelBase
             if (user == null)
             {
                 ClearStatusMessage();
+                _profileLoaded = true;
                 return;
             }
 
             if (!string.IsNullOrWhiteSpace(user.Email)) _userEmail = user.Email;
             UserName = user.Name;
-            UserGender = user.Gender;
-            UserDateOfBirth = new DateTimeOffset(user.DateOfBirth);
-            UserWeight = user.weight;
-            UserHeight = user.height;
+            ProfileDataConsentGranted = user.ProfileDataConsent;
+            if (ProfileDataConsentGranted)
+            {
+                UserGender = user.Gender;
+                UserDateOfBirth = user.DateOfBirth == DateTime.MinValue
+                    ? null
+                    : new DateTimeOffset(user.DateOfBirth);
+                UserWeight = user.weight;
+                UserHeight = user.height;
+            }
+            else
+            {
+                UserGender = "";
+                UserDateOfBirth = null;
+                UserWeight = 0;
+                UserHeight = 0;
+            }
+            ProfileDataConsentChanged?.Invoke(ProfileDataConsentGranted);
             ClearStatusMessage();
+            _profileLoaded = true;
         }
         catch (Exception ex) { ReportCloudFailure(ex, "load your profile"); }
     }
 
-    public override Task RetryAsync() => LoadUserAsync();
+    public override Task RetryAsync()
+    {
+        _profileLoaded = false;
+        return LoadUserAsync();
+    }
+
+    [RelayCommand]
+    private async Task GrantProfileDataConsentAsync()
+    {
+        ValidationMessage = "";
+        if (!ProfileDataConsentChoice)
+        {
+            ValidationMessage = "Check the consent box to enable these optional profile features.";
+            return;
+        }
+
+        try
+        {
+            await _userService.GrantProfileDataConsentAsync(_userId);
+            ProfileDataConsentGranted = true;
+            ProfileDataConsentChoice = false;
+            _profileLoaded = false;
+            await LoadUserAsync();
+            ProfileDataConsentChanged?.Invoke(true);
+        }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "save your consent", canRetry: false);
+            ValidationMessage = GetCloudFailureMessage(ex, "save your consent");
+        }
+    }
+
+    public async Task WithdrawProfileDataConsentAsync()
+    {
+        ValidationMessage = "";
+        ProfileDataConsentGranted = false;
+        ProfileDataConsentChoice = false;
+        UserGender = "";
+        UserDateOfBirth = null;
+        UserWeight = 0;
+        UserHeight = 0;
+        ProfileDataConsentChanged?.Invoke(false);
+
+        try
+        {
+            await _userService.RevokeProfileDataConsentAsync(_userId);
+            ValidationMessage = "Consent withdrawn. Saved profile measurements were deleted.";
+        }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "withdraw profile data consent", canRetry: false);
+            ValidationMessage = GetCloudFailureMessage(ex, "withdraw profile data consent");
+        }
+    }
+
+    public async Task DeleteUnconsentedProfileDataAsync()
+    {
+        ValidationMessage = "";
+        try
+        {
+            await _userService.DeleteUnconsentedProfileDataAsync(_userId);
+            UserGender = "";
+            UserDateOfBirth = null;
+            UserWeight = 0;
+            UserHeight = 0;
+            ValidationMessage = "Saved profile measurements were deleted.";
+        }
+        catch (Exception ex)
+        {
+            ReportCloudFailure(ex, "delete saved profile measurements", canRetry: false);
+            ValidationMessage = GetCloudFailureMessage(ex, "delete saved profile measurements");
+        }
+    }
     
     [RelayCommand]
     private void Logout()

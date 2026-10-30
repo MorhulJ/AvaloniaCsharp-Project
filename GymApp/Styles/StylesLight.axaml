@@ -19,6 +19,17 @@
         <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}" />
         <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextPrimary}" />
         <SolidColorBrush x:Key="MutedBrush" Color="{StaticResource TextMuted}" />
+        <!-- FluentTheme changes TextBox colors through these state resources.
+             Override them too, so focus/pointer-over keeps our light palette. -->
+        <SolidColorBrush x:Key="TextControlBackground" Color="{StaticResource CardColor}" />
+        <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="{StaticResource CardColor}" />
+        <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="{StaticResource CardColor}" />
+        <SolidColorBrush x:Key="TextControlForeground" Color="{StaticResource TextPrimary}" />
+        <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="{StaticResource TextPrimary}" />
+        <SolidColorBrush x:Key="TextControlForegroundFocused" Color="{StaticResource TextPrimary}" />
+        <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="{StaticResource TextMuted}" />
+        <SolidColorBrush x:Key="ComboBoxBackgroundFocused" Color="{StaticResource CardColor}" />
+        <SolidColorBrush x:Key="ComboBoxForegroundFocused" Color="{StaticResource TextPrimary}" />
     </Styles.Resources>
 
     <Style Selector="Window"><Setter Property="Background" Value="{StaticResource BgBrush}" /></Style>
@@ -55,7 +66,12 @@
         <Setter Property="FontFamily" Value="Segoe UI, Arial, sans-serif" />
         <Setter Property="MinHeight" Value="42" />
     </Style>
-    <Style Selector="TextBox:focus"><Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" /><Setter Property="BorderThickness" Value="2" /></Style>
+    <Style Selector="TextBox:focus">
+        <Setter Property="Background" Value="{StaticResource CardBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+        <Setter Property="BorderThickness" Value="2" />
+    </Style>
     <Style Selector="ComboBox">
         <Setter Property="Background" Value="{StaticResource CardBrush}" />
         <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
@@ -66,7 +82,12 @@
         <Setter Property="FontFamily" Value="Segoe UI, Arial, sans-serif" />
         <Setter Property="MinHeight" Value="42" />
     </Style>
-    <Style Selector="ComboBox:focus"><Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" /><Setter Property="BorderThickness" Value="2" /></Style>
+    <Style Selector="ComboBox:focus">
+        <Setter Property="Background" Value="{StaticResource CardBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+        <Setter Property="BorderThickness" Value="2" />
+    </Style>
     <Style Selector="ComboBoxItem">
         <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
         <Setter Property="Background" Value="{StaticResource CardBrush}" />
@@ -165,6 +186,7 @@
     </Style>
     <Style Selector="DatePicker"><Setter Property="Background" Value="{StaticResource CardBrush}" /><Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" /></Style>
     <Style Selector="DatePicker /template/ TextBlock, DatePickerPresenter TextBlock, DateTimePickerPanel TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
         <Setter Property="FontFamily" Value="Segoe UI, Arial, sans-serif" /><Setter Property="FontSize" Value="14" />
     </Style>
     <Style Selector="DatePicker.profile-date">
@@ -178,10 +200,16 @@
         <Setter Property="Padding" Value="0" />
     </Style>
     <Style Selector="DatePicker.profile-date /template/ Button#PART_FlyoutButton TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="TextAlignment" Value="Center" />
         <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="DatePicker.profile-date:focus">
+        <Setter Property="Background" Value="{StaticResource CardBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
     </Style>
     <Style Selector="DateTimePickerPanel ListBoxItem"><Setter Property="Margin" Value="0" /><Setter Property="Padding" Value="0" /><Setter Property="CornerRadius" Value="0" /><Setter Property="BorderThickness" Value="0" /></Style>
 </Styles>

@@ -103,6 +103,7 @@ public partial class App : Application
         var supplementIntakeViewModel = new SupplementIntakeViewModel(supplementIntakeService, supplementService);
         var workoutProgramViewModel = new WorkoutProgramViewModel(workoutProgramService, exerciseService);
         var userViewModel = new UserViewModel(userService, userId, authService);
+        await userViewModel.LoadUserAsync();
 
         exerciseViewModel.CurrentUserId = userId;
         goalViewModel.CurrentUserId = userId;

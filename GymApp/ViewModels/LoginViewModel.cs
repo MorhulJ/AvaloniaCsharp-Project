@@ -23,6 +23,8 @@ public partial class LoginViewModel : ViewModelBase
     [ObservableProperty]
     private bool rememberMe;
     [ObservableProperty]
+    private bool profileDataConsent;
+    [ObservableProperty]
     private bool wasJustRegistered;
     
     public string ModeTitle => IsRegistering ? "Create account" : "Sign in";
@@ -69,7 +71,7 @@ public partial class LoginViewModel : ViewModelBase
         }
 
         ValidationMessage = "";
-        var success = await _authService.RegisterAsync(Login.Trim(), Password, Name.Trim());
+        var success = await _authService.RegisterAsync(Login.Trim(), Password, Name.Trim(), ProfileDataConsent);
 
         if (!success)
         {

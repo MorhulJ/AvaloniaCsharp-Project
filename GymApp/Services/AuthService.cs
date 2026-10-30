@@ -23,7 +23,7 @@ public class AuthService
         FirebaseService.RefreshTokenUpdated += PersistRotatedRefreshToken;
     }
 
-    public async Task<bool> RegisterAsync(string email, string password, string name)
+    public async Task<bool> RegisterAsync(string email, string password, string name, bool profileDataConsent)
     {
         LastErrorMessage = null;
         _currentCredential = null;
@@ -44,15 +44,18 @@ public class AuthService
 
             stage = "save the account profile";
             var db = FirebaseService.GetDb();
-            await db.Collection("users").Document(_currentUserId).SetAsync(new
+            var userProfile = new Dictionary<string, object>
             {
-                name = name,
-                email = email,
-                gender = "Male",
-                weight = 0,
-                height = 0,
-                dateOfBirth = DateTime.Now.ToString("yyyy-MM-dd")
-            });
+                { "name", name },
+                { "email", email },
+                { "profileDataConsent", profileDataConsent }
+            };
+            if (profileDataConsent)
+            {
+                userProfile["profileDataConsentVersion"] = UserService.ProfileDataConsentVersion;
+                userProfile["profileDataConsentAtUtc"] = DateTimeOffset.UtcNow.ToString("O");
+            }
+            await db.Collection("users").Document(_currentUserId).SetAsync(userProfile);
 
             stage = "add the starter workout data";
             await SeedUserDataAsync(_currentUserId);
