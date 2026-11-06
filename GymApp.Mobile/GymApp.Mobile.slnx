@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="GymApp.Mobile.iOS/GymApp.Mobile.iOS.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="GymApp.Mobile/GymApp.Mobile.csproj" />
+</Solution>

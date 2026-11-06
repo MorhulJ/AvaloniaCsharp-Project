@@ -1,0 +1,28 @@
+<TabbedPage xmlns="https://github.com/avaloniaui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:vm="using:GymApp.Mobile.ViewModels"
+            x:Class="GymApp.Mobile.Views.MainView"
+            x:DataType="vm:MainViewModel">
+    <ContentPage Header="Workout">
+        <ContentControl Content="{Binding WorkoutProgram}" />
+    </ContentPage>
+    <ContentPage Header="Exercises">
+        <ContentControl Content="{Binding Exercises}" />
+    </ContentPage>
+    <ContentPage Header="Goals">
+        <ContentControl Content="{Binding Goals}" />
+    </ContentPage>
+    <ContentPage Header="Records">
+        <ContentControl Content="{Binding PersonalRecords}" />
+    </ContentPage>
+    <ContentPage Header="More">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="18" Margin="12">
+                <ContentControl Content="{Binding Supplements}" />
+                <ContentControl Content="{Binding SupplementSchedule}" />
+                <ContentControl Content="{Binding Nutrition}" />
+                <ContentControl Content="{Binding Profile}" />
+            </StackPanel>
+        </ScrollViewer>
+    </ContentPage>
+</TabbedPage>

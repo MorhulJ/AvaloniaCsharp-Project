@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GymApp.ViewModels"
+             x:Class="GymApp.Views.LoginView"
+             x:DataType="vm:LoginViewModel">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24" Spacing="16" VerticalAlignment="Center">
+            <Border Width="64" Height="64" CornerRadius="18"
+                    Background="{DynamicResource AccentBrush}"
+                    HorizontalAlignment="Center">
+                <TextBlock Text="G" FontSize="36" FontWeight="Bold"
+                           Foreground="White" HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
+            </Border>
+            <TextBlock Text="GymApp" FontSize="30" FontWeight="Bold"
+                       HorizontalAlignment="Center" />
+            <TextBlock Text="Your training space" Classes="label"
+                       HorizontalAlignment="Center" />
+
+            <StackPanel Spacing="6" IsVisible="{Binding IsRegistering}">
+                <TextBlock Text="Name" Classes="label" />
+                <TextBox Text="{Binding Name}" PlaceholderText="Your name" />
+            </StackPanel>
+            <StackPanel Spacing="6">
+                <TextBlock Text="Email" Classes="label" />
+                <TextBox Text="{Binding Login}" PlaceholderText="you@example.com"
+                         KeyboardNavigation.TabIndex="0" />
+            </StackPanel>
+            <StackPanel Spacing="6">
+                <TextBlock Text="Password" Classes="label" />
+                <TextBox Text="{Binding Password}" PasswordChar="●"
+                         PlaceholderText="Password" />
+            </StackPanel>
+
+            <CheckBox IsChecked="{Binding ProfileDataConsent}"
+                      IsVisible="{Binding IsRegistering}">
+                <TextBlock Text="Optional consent: I agree to GymApp processing and storing my gender, date of birth, height and weight in my Firebase profile for Profile and Nutrition Calculator features. Calculator inputs are processed on this device and are not saved to Firebase. Workout tracking remains available if I decline. I can withdraw consent in Profile; saved profile measurements will be deleted."
+                           TextWrapping="Wrap" />
+            </CheckBox>
+
+            <TextBlock Text="{Binding ValidationMessage}" Foreground="{DynamicResource AccentBrush}"
+                       TextWrapping="Wrap"
+                       IsVisible="{Binding ValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            <Button Content="Sign in" Command="{Binding LoginCommand}"
+                    IsVisible="{Binding !IsRegistering}" MinHeight="48" />
+            <Button Content="Create account" Command="{Binding RegisterCommand}"
+                    IsVisible="{Binding IsRegistering}" MinHeight="48" />
+            <Button Content="{Binding ToggleModeText}" Command="{Binding ToggleModeCommand}"
+                    Classes="secondary" MinHeight="44" />
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
