@@ -19,6 +19,16 @@ public partial class UserViewModel : ViewModelBase
     [ObservableProperty]
     private string validationMessage = "";
     [ObservableProperty]
+    private bool isValidationSuccess;
+
+    partial void OnValidationMessageChanged(string value) => IsValidationSuccess = false;
+
+    private void SetSuccessMessage(string message)
+    {
+        ValidationMessage = message;
+        IsValidationSuccess = true;
+    }
+    [ObservableProperty]
     private string userName = "";
     [ObservableProperty]
     private string userGender = "";
@@ -53,6 +63,7 @@ public partial class UserViewModel : ViewModelBase
     [RelayCommand]
     private async Task SaveUserAsync()
     {
+        ValidationMessage = "";
         var user = new User
         {
             FirebaseId = _userId,
@@ -79,7 +90,8 @@ public partial class UserViewModel : ViewModelBase
         try
         {
             await _userService.UpdateUserAsync(user);
-            ValidationMessage = "Profile saved.";
+            ClearStatusMessage();
+            SetSuccessMessage("Profile saved.");
         }
         catch (Exception ex)
         {
@@ -153,6 +165,8 @@ public partial class UserViewModel : ViewModelBase
             _profileLoaded = false;
             await LoadUserAsync();
             ProfileDataConsentChanged?.Invoke(true);
+            if (_profileLoaded && ProfileDataConsentGranted)
+                SetSuccessMessage("Consent saved. Optional profile features are enabled.");
         }
         catch (Exception ex)
         {
@@ -175,7 +189,8 @@ public partial class UserViewModel : ViewModelBase
         try
         {
             await _userService.RevokeProfileDataConsentAsync(_userId);
-            ValidationMessage = "Consent withdrawn. Saved profile measurements were deleted.";
+            ClearStatusMessage();
+            SetSuccessMessage("Consent withdrawn. Saved profile measurements were deleted.");
         }
         catch (Exception ex)
         {
@@ -194,7 +209,8 @@ public partial class UserViewModel : ViewModelBase
             UserDateOfBirth = null;
             UserWeight = 0;
             UserHeight = 0;
-            ValidationMessage = "Saved profile measurements were deleted.";
+            ClearStatusMessage();
+            SetSuccessMessage("Saved profile measurements were deleted.");
         }
         catch (Exception ex)
         {

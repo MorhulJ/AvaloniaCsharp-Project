@@ -1,0 +1,63 @@
+using Avalonia.Controls;
+using GymApp.ViewModels;
+
+namespace GymApp.Views;
+
+public partial class ExerciseView : UserControl
+{
+    public ExerciseView()
+    {
+        InitializeComponent();
+
+        Loaded += async (_, _) =>
+        {
+            if (DataContext is ExerciseViewModel vm)
+            {
+                await vm.LoadExercisesAsync(vm.CurrentUserId);
+            }
+        };
+    }
+
+    private void OpenAddExerciseWindow(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not ExerciseViewModel vm) return;
+
+        vm.ResetEditingState();
+        vm.ResetValidation();
+        vm.ExerciseName = "";
+        vm.MuscleGroup = "";
+        vm.Description = "";
+
+        var window = new AddExerciseWindow(vm);
+        window.ShowDialog(this);
+    }
+
+    private void OpenEditExerciseWindow(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not ExerciseViewModel vm) return;
+        if (vm.SelectedExercise == null) return;
+
+        var selected = vm.SelectedExercise;
+        vm.SelectedExercise = null;
+        vm.SelectedExercise = selected;
+
+        var window = new AddExerciseWindow(vm);
+        window.ShowDialog(this);
+    }
+
+    private async void OnDeleteExercise(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is not ExerciseViewModel vm) return;
+        if (vm.SelectedExercise == null) return;
+
+        var dialog = new ConfirmDialog(
+            "Delete exercise?",
+            $"This will permanently delete '{vm.SelectedExercise.Name}' from your exercise list.");
+        await dialog.ShowDialog(this);
+
+        if (dialog.Result)
+        {
+            await vm.DeleteExerciseCommand.ExecuteAsync(null);
+        }
+    }
+}

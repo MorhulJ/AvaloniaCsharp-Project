@@ -1,0 +1,36 @@
+<mobile:MobileDialog xmlns:mobile="using:GymApp.Mobile.Views" xmlns="https://github.com/avaloniaui"
+        xmlns:input="using:Avalonia.Input.TextInput"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GymApp.ViewModels"
+        Title="Supplement"
+        x:Class="GymApp.Views.AddSupplementWindow"
+        x:DataType="vm:SupplementViewModel">
+
+    <StackPanel Classes="dialog-content">
+
+
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Supplement name" Classes="label" />
+            <TextBox Text="{Binding SupplementName}" PlaceholderText="e.g., Creatine" />
+        </StackPanel>
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Dosage unit" Classes="label" />
+            <TextBox Text="{Binding DosageUnit}" PlaceholderText="e.g., g, mg, capsules" />
+        </StackPanel>
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Description" Classes="label" />
+            <TextBox Text="{Binding Description}" PlaceholderText="Optional notes about this supplement" />
+        </StackPanel>
+
+        <Button Content="Save" Command="{Binding SaveSupplementCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,10,0,0" />
+
+        <TextBlock Text="{Binding ValidationMessage}"
+                   Foreground="Red"
+                   IsVisible="{Binding ValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+    </StackPanel>
+
+</mobile:MobileDialog>

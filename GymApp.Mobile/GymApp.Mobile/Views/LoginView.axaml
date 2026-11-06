@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:input="using:Avalonia.Input.TextInput"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:GymApp.ViewModels"
              x:Class="GymApp.Views.LoginView"
              x:DataType="vm:LoginViewModel">
@@ -23,12 +24,12 @@
             </StackPanel>
             <StackPanel Spacing="6">
                 <TextBlock Text="Email" Classes="label" />
-                <TextBox Text="{Binding Login}" PlaceholderText="you@example.com"
+                <TextBox input:TextInputOptions.ContentType="Email" Text="{Binding Login}" PlaceholderText="you@example.com"
                          KeyboardNavigation.TabIndex="0" />
             </StackPanel>
             <StackPanel Spacing="6">
                 <TextBlock Text="Password" Classes="label" />
-                <TextBox Text="{Binding Password}" PasswordChar="●"
+                <TextBox input:TextInputOptions.ContentType="Password" Text="{Binding Password}" PasswordChar="●"
                          PlaceholderText="Password" />
             </StackPanel>
 
@@ -42,11 +43,11 @@
                        TextWrapping="Wrap"
                        IsVisible="{Binding ValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
             <Button Content="Sign in" Command="{Binding LoginCommand}"
-                    IsVisible="{Binding !IsRegistering}" MinHeight="48" />
+                    IsVisible="{Binding !IsRegistering}" MinHeight="48" HorizontalAlignment="Stretch" />
             <Button Content="Create account" Command="{Binding RegisterCommand}"
-                    IsVisible="{Binding IsRegistering}" MinHeight="48" />
+                    IsVisible="{Binding IsRegistering}" MinHeight="48" HorizontalAlignment="Stretch" />
             <Button Content="{Binding ToggleModeText}" Command="{Binding ToggleModeCommand}"
-                    Classes="secondary" MinHeight="44" />
+                    Classes="secondary" MinHeight="44" HorizontalAlignment="Stretch" />
         </StackPanel>
     </ScrollViewer>
 </UserControl>

@@ -42,6 +42,12 @@
         <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
         <Setter Property="FontSize" Value="13" />
     </Style>
+    <Style Selector="TextBlock.feedback">
+        <Setter Property="Foreground" Value="#B73030" />
+    </Style>
+    <Style Selector="TextBlock.feedback.success">
+        <Setter Property="Foreground" Value="#237A43" />
+    </Style>
     <Style Selector="TextBlock.title">
         <Setter Property="FontSize" Value="28" />
         <Setter Property="FontWeight" Value="SemiBold" />

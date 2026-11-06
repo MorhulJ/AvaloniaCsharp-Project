@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GymApp.ViewModels"
+             x:Class="GymApp.Mobile.Views.FeaturePage"
+             x:DataType="vm:ViewModelBase">
+    <Grid RowDefinitions="Auto,*">
+        <Border IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                Margin="20,12,20,0" Padding="12"
+                Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1" CornerRadius="12">
+            <StackPanel Spacing="8">
+                <TextBlock x:Name="StatusText" Text="{Binding StatusMessage}" TextWrapping="Wrap" />
+                <Button Content="Try again" Classes="secondary" Click="OnRetry"
+                        IsVisible="{Binding CanRetry}" HorizontalAlignment="Stretch" />
+            </StackPanel>
+        </Border>
+        <ContentControl x:Name="PageContent" Grid.Row="1" />
+    </Grid>
+</UserControl>

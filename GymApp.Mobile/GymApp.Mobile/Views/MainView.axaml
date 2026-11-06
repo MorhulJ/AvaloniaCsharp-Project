@@ -16,13 +16,23 @@
         <ContentControl Content="{Binding PersonalRecords}" />
     </ContentPage>
     <ContentPage Header="More">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="18" Margin="12">
+        <TabControl FontSize="12" Padding="0">
+            <TabItem>
+                <TabItem.Header><TextBlock Text="Supplements" FontSize="13" /></TabItem.Header>
                 <ContentControl Content="{Binding Supplements}" />
+            </TabItem>
+            <TabItem>
+                <TabItem.Header><TextBlock Text="Schedule" FontSize="13" /></TabItem.Header>
                 <ContentControl Content="{Binding SupplementSchedule}" />
+            </TabItem>
+            <TabItem>
+                <TabItem.Header><TextBlock Text="Calculator" FontSize="13" /></TabItem.Header>
                 <ContentControl Content="{Binding Nutrition}" />
+            </TabItem>
+            <TabItem>
+                <TabItem.Header><TextBlock Text="Profile" FontSize="13" /></TabItem.Header>
                 <ContentControl Content="{Binding Profile}" />
-            </StackPanel>
-        </ScrollViewer>
+            </TabItem>
+        </TabControl>
     </ContentPage>
 </TabbedPage>

@@ -20,5 +20,6 @@
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://GymApp.Mobile/Styles/StylesDark.axaml" />
+        <StyleInclude Source="avares://GymApp.Mobile/Styles/Mobile.axaml" />
     </Application.Styles>
 </Application>

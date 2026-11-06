@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using GymApp.Services;
 using GymApp.ViewModels;
 
@@ -10,6 +11,20 @@ public partial class MainViewModel : ViewModelBase
 {
     private readonly AuthService _authService = new();
     private readonly LoginViewModel _loginViewModel;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ThemeActionText))]
+    private bool isDarkTheme = true;
+
+    public string ThemeActionText => IsDarkTheme ? "Light theme" : "Dark theme";
+
+    [RelayCommand]
+    private void ToggleTheme()
+    {
+        IsDarkTheme = !IsDarkTheme;
+        if (Avalonia.Application.Current is App app)
+            app.SetTheme(IsDarkTheme);
+    }
 
     [ObservableProperty]
     private ViewModelBase currentContent;
@@ -103,14 +118,15 @@ public partial class MainViewModel : ViewModelBase
             Exercises.LoadExercisesAsync(userId),
             Goals.LoadGoalsAsync(userId),
             Goals.LoadExercisesAsync(),
-            PersonalRecords.LoadRecordsAsync(userId),
             PersonalRecords.LoadExercisesAsync(),
             Supplements.LoadSupplementAsync(userId),
             SupplementSchedule.LoadSupplementsAsync(userId),
-            SupplementSchedule.LoadSupplementIntakesAsync(userId),
             WorkoutProgram.LoadExercisesAsync());
 
-        await WorkoutProgram.LoadProgramsAsync(userId);
+        await Task.WhenAll(
+            PersonalRecords.LoadRecordsAsync(userId),
+            SupplementSchedule.LoadSupplementIntakesAsync(userId),
+            WorkoutProgram.LoadProgramsAsync(userId));
     }
 
     private void ReturnToLogin()

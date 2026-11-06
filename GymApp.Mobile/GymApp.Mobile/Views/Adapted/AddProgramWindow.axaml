@@ -1,0 +1,31 @@
+<mobile:MobileDialog xmlns:mobile="using:GymApp.Mobile.Views" xmlns="https://github.com/avaloniaui"
+        xmlns:input="using:Avalonia.Input.TextInput"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GymApp.ViewModels"
+        Title="Program"
+        x:Class="GymApp.Views.AddProgramWindow"
+        x:DataType="vm:WorkoutProgramViewModel">
+
+    <StackPanel Classes="dialog-content">
+
+
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Program name" Classes="label" />
+            <TextBox Text="{Binding ProgramName}" PlaceholderText="e.g., Full body A" />
+        </StackPanel>
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Description" Classes="label" />
+            <TextBox Text="{Binding ProgramDescription}" PlaceholderText="A short note about this workout plan" />
+        </StackPanel>
+
+        <Button Content="Save" Command="{Binding SaveProgramCommand}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" Margin="0,10,0,0" />
+
+        <TextBlock Text="{Binding ProgramValidationMessage}"
+                   Foreground="Red"
+                   IsVisible="{Binding ProgramValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+    </StackPanel>
+
+</mobile:MobileDialog>

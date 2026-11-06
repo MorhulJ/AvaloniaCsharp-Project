@@ -1,0 +1,25 @@
+<mobile:MobileDialog xmlns:mobile="using:GymApp.Mobile.Views" xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Welcome to GymApp"
+        x:Class="GymApp.Views.WelcomeDialog"
+        Opened="OnOpened">
+
+    <Border Padding="20,8,20,24">
+        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="18">
+            <StackPanel Grid.Row="0" Spacing="8">
+
+                <TextBlock Text="Your starter workout, exercise library and supplement list are ready. Here are a few good first steps:"
+                           Classes="label" TextWrapping="Wrap" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Spacing="12">
+                <TextBlock Text="1. Open Workout Program to review the sample Fullbody plan." TextWrapping="Wrap" />
+                <TextBlock Text="2. Visit Profile to add your details." TextWrapping="Wrap" />
+                <TextBlock Text="3. Add a goal or personal record to track your progress." TextWrapping="Wrap" />
+                <TextBlock Text="You can change or remove the starter items at any time." Classes="label" TextWrapping="Wrap" />
+            </StackPanel>
+
+            <Button x:Name="ContinueButton" Grid.Row="2" Content="Get started" HorizontalAlignment="Right" Click="OnContinue" />
+        </Grid>
+    </Border>
+</mobile:MobileDialog>

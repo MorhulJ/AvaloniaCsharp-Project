@@ -24,7 +24,12 @@ public class ViewLocator : IDataTemplate
 
         if (type != null)
         {
-            return (Control)Activator.CreateInstance(type)!;
+            var view = (Control)Activator.CreateInstance(type)!;
+            if (param is ViewModelBase viewModel
+                && param is not LoginViewModel
+                && param is not ViewModels.MainViewModel)
+                return new Views.FeaturePage(view, viewModel);
+            return view;
         }
 
         return new TextBlock { Text = "Not Found: " + name };

@@ -1,12 +1,30 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:GymApp.Mobile.ViewModels"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="using:GymApp.Mobile.Views"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="GymApp.Mobile.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="GymApp.Mobile">
-        <views:MainView />
+        Title="GymApp — iPhone 14 Pro Max Preview"
+        Width="450" Height="900" MinWidth="300" MinHeight="500"
+        WindowStartupLocation="CenterScreen"
+        Background="#111111">
+    <!-- Insets approximate portrait layout until verified on an iPhone.
+         Viewbox scaling preserves a fixed logical viewport on smaller monitors. -->
+    <Viewbox Stretch="Uniform" Margin="8">
+        <Border Width="430" Height="932" CornerRadius="42" ClipToBounds="True"
+                Background="{DynamicResource BgBrush}">
+            <Grid RowDefinitions="59,*,34">
+                <Border Grid.Row="0" Background="{DynamicResource BgBrush}">
+                    <Border Width="125" Height="37" CornerRadius="19"
+                            Background="Black" HorizontalAlignment="Center"
+                            VerticalAlignment="Top" Margin="0,11,0,0" />
+                </Border>
+                <views:RootView Grid.Row="1" />
+                <Border Grid.Row="2" Background="{DynamicResource BgBrush}">
+                    <Border Width="134" Height="5" CornerRadius="3"
+                            Background="{DynamicResource TextBrush}"
+                            HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                            Margin="0,0,0,8" />
+                </Border>
+            </Grid>
+        </Border>
+    </Viewbox>
 </Window>

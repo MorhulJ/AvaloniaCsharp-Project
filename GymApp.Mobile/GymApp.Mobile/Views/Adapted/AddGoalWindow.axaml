@@ -1,0 +1,49 @@
+<mobile:MobileDialog xmlns:mobile="using:GymApp.Mobile.Views" xmlns="https://github.com/avaloniaui"
+        xmlns:input="using:Avalonia.Input.TextInput"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GymApp.ViewModels"
+        Title="Goal"
+        x:Class="GymApp.Views.AddGoalWindow"
+        x:DataType="vm:GoalViewModel">
+
+    <StackPanel Classes="dialog-content">
+
+
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Goal title" Classes="label" />
+            <TextBox Text="{Binding GoalTitle}" PlaceholderText="e.g., Bench press 60 kg" />
+        </StackPanel>
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Exercise" Classes="label" />
+            <ComboBox ItemsSource="{Binding Exercises}"
+                      SelectedItem="{Binding GoalExercise}"
+                      HorizontalAlignment="Stretch">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Target value" Classes="label" />
+            <TextBox input:TextInputOptions.ContentType="Number" Text="{Binding GoalValue}" PlaceholderText="e.g., 60" />
+        </StackPanel>
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Current value" Classes="label" />
+            <TextBox input:TextInputOptions.ContentType="Number" Text="{Binding CurrentValue}" PlaceholderText="e.g., 40" />
+        </StackPanel>
+
+        <Button Content="Save" Command="{Binding SaveGoalCommand}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" Margin="0,10,0,0" />
+
+        <TextBlock Text="{Binding ValidationMessage}"
+                   Foreground="Red"
+                   IsVisible="{Binding ValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+    </StackPanel>
+
+</mobile:MobileDialog>

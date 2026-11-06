@@ -72,8 +72,8 @@
                 IsVisible="{Binding ProfileDataConsentGranted}" />
         </StackPanel>
         
-        <TextBlock Text="{Binding ValidationMessage}" 
-                   Foreground="Red"
+        <TextBlock Text="{Binding ValidationMessage}"
+                   Classes="feedback" Classes.success="{Binding IsValidationSuccess}"
                    TextWrapping="Wrap"
                    IsVisible="{Binding ValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
         

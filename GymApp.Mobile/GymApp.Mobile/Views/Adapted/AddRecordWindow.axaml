@@ -1,0 +1,44 @@
+<mobile:MobileDialog xmlns:mobile="using:GymApp.Mobile.Views" xmlns="https://github.com/avaloniaui"
+        xmlns:input="using:Avalonia.Input.TextInput"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GymApp.ViewModels"
+        Title="Record"
+        x:Class="GymApp.Views.AddRecordWindow"
+        x:DataType="vm:PersonalRecordViewModel">
+
+    <StackPanel Classes="dialog-content">
+
+
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Exercise" Classes="label" />
+            <ComboBox ItemsSource="{Binding Exercises}"
+                      SelectedItem="{Binding RecordExercise}"
+                      HorizontalAlignment="Stretch">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Value (kg)" Classes="label" />
+            <TextBox input:TextInputOptions.ContentType="Number" Text="{Binding RecordValue}" PlaceholderText="e.g., 80" />
+        </StackPanel>
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Date" Classes="label" />
+            <DatePicker SelectedDate="{Binding RecordDate}"/>
+        </StackPanel>
+
+        <Button Content="Save" Command="{Binding SaveRecordCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,10,0,0" />
+
+        <TextBlock Text="{Binding ValidationMessage}"
+                   Foreground="Red"
+                   IsVisible="{Binding ValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+    </StackPanel>
+
+</mobile:MobileDialog>
