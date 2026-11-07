@@ -1,9 +1,9 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:GymApp.Mobile.ViewModels"
-             x:Class="GymApp.Mobile.Views.RootView"
+             TopLevel.AutoSafeAreaPadding="True" x:Class="GymApp.Mobile.Views.RootView"
              x:DataType="vm:MainViewModel">
-    <Grid RowDefinitions="Auto,*">
+    <Grid x:Name="KeyboardLayout" RowDefinitions="Auto,Auto,*">
         <Border Grid.Row="0" Background="{DynamicResource CardBrush}"
                 BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="20,12">
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
@@ -18,8 +18,13 @@
                         Classes="secondary" FontSize="12" Padding="12,8" />
             </Grid>
         </Border>
-        <ContentControl Grid.Row="1" x:Name="Workspace" Content="{Binding CurrentContent}" />
-        <Border Grid.RowSpan="2" x:Name="ModalLayer" IsVisible="False" Background="#99000000" Padding="16">
+        <Border Grid.Row="1" Margin="20,10,20,0" Padding="12" CornerRadius="10"
+                Background="{DynamicResource CardBrush}"
+                IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" />
+        </Border>
+        <ContentControl Grid.Row="2" x:Name="Workspace" Content="{Binding CurrentContent}" />
+        <Border Grid.RowSpan="3" x:Name="ModalLayer" IsVisible="False" Background="#99000000" Padding="16">
             <Border Background="{DynamicResource CardBrush}" CornerRadius="16" ClipToBounds="True"
                     BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
                     MaxWidth="398" VerticalAlignment="Center" MaxHeight="780">
@@ -34,7 +39,7 @@
                                   Stroke="{DynamicResource TextBrush}" StrokeThickness="2" />
                         </Button>
                     </Grid>
-                    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+                    <ScrollViewer Grid.Row="1" BringIntoViewOnFocusChange="True" HorizontalScrollBarVisibility="Disabled">
                         <ContentControl x:Name="DialogContent" />
                     </ScrollViewer>
                 </Grid>

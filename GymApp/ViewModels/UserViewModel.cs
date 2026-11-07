@@ -222,8 +222,15 @@ public partial class UserViewModel : ViewModelBase
     [RelayCommand]
     private void Logout()
     {
-        _authService.Logout();
-        LoggedOut?.Invoke();
+        try
+        {
+            _authService.Logout();
+            LoggedOut?.Invoke();
+        }
+        catch
+        {
+            ValidationMessage = "Couldn't clear your saved sign-in. Please try signing out again.";
+        }
     }
 
     public async Task DeleteAccountAsync(string password)

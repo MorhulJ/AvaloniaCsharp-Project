@@ -1,38 +1,32 @@
-using System;
-using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using GymApp.Mobile.ViewModels;
+using GymApp.Mobile.Views;
 using GymApp.ViewModels;
+using GymApp.Views;
 
 namespace GymApp.Mobile;
 
-/// <summary>
-/// Given a view model, returns the corresponding view if possible.
-/// </summary>
-[RequiresUnreferencedCode(
-    "Default implementation of ViewLocator involves reflection which may be trimmed away.",
-    Url = "https://docs.avaloniaui.net/docs/concepts/view-locator")]
 public class ViewLocator : IDataTemplate
 {
     public Control? Build(object? param)
     {
-        if (param is null)
-            return null;
-
-        var name = param.GetType().FullName!.Replace("ViewModel", "View", StringComparison.Ordinal);
-        var type = Type.GetType(name);
-
-        if (type != null)
+        if (param is MainViewModel) return new MainView();
+        if (param is LoginViewModel) return new LoginView();
+        if (param is not ViewModelBase viewModel) return null;
+        Control view = viewModel switch
         {
-            var view = (Control)Activator.CreateInstance(type)!;
-            if (param is ViewModelBase viewModel
-                && param is not LoginViewModel
-                && param is not ViewModels.MainViewModel)
-                return new Views.FeaturePage(view, viewModel);
-            return view;
-        }
-
-        return new TextBlock { Text = "Not Found: " + name };
+            WorkoutProgramViewModel => new WorkoutProgramView(),
+            ExerciseViewModel => new ExerciseView(),
+            GoalViewModel => new GoalView(),
+            PersonalRecordViewModel => new PersonalRecordView(),
+            SupplementViewModel => new SupplementView(),
+            SupplementIntakeViewModel => new SupplementIntakeView(),
+            NutritionViewModel => new NutritionView(),
+            UserViewModel => new UserView(),
+            _ => new TextBlock { Text = "This section is unavailable." }
+        };
+        return new FeaturePage(view, viewModel);
     }
 
     public bool Match(object? data)

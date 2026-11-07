@@ -5,7 +5,7 @@
              x:Class="GymApp.Views.NutritionView"
              x:DataType="vm:NutritionViewModel">
 
-    <ScrollViewer>
+    <ScrollViewer BringIntoViewOnFocusChange="True">
         <StackPanel Margin="20" Spacing="16">
 
             <TextBlock Text="Nutrition calculator" Classes="title" />

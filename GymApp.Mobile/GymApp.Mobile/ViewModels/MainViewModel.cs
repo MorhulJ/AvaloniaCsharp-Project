@@ -1,15 +1,17 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GymApp.Services;
+using GymApp.Mobile.Reports;
 using GymApp.ViewModels;
 
 namespace GymApp.Mobile.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
-    private readonly AuthService _authService = new();
+    private readonly AuthService _authService;
     private readonly LoginViewModel _loginViewModel;
 
     [ObservableProperty]
@@ -53,8 +55,9 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private UserViewModel? profile;
 
-    public MainViewModel()
+    public MainViewModel(ISessionStore? sessionStore = null)
     {
+        _authService = new AuthService(sessionStore);
         _loginViewModel = new LoginViewModel(_authService);
         _loginViewModel.LoginSuccessful += OnLoginSuccessful;
         currentContent = _loginViewModel;
@@ -63,24 +66,32 @@ public partial class MainViewModel : ViewModelBase
 
     private async Task RestoreSessionAsync()
     {
+        _loginViewModel.IsRestoringSession = true;
+        _loginViewModel.ValidationMessage = "Checking saved sign-in…";
         try
         {
             FirebaseService.Initialize();
             if (await _authService.TryAutoLoginAsync())
+            {
+                _loginViewModel.RememberMe = true;
+                _loginViewModel.ValidationMessage = "";
                 await OpenWorkspaceAsync();
-            else if (!string.IsNullOrWhiteSpace(_authService.LastErrorMessage))
-                _loginViewModel.ValidationMessage = _authService.LastErrorMessage;
+            }
+            else
+                _loginViewModel.ValidationMessage = _authService.LastErrorMessage ?? "";
         }
         catch
         {
             _loginViewModel.ValidationMessage = "Couldn't connect to Firebase. Check your internet connection and try again.";
         }
+        finally { _loginViewModel.IsRestoringSession = false; }
     }
 
     private async void OnLoginSuccessful()
     {
         try
         {
+            SetStatusMessage(_loginViewModel.ValidationMessage);
             await OpenWorkspaceAsync();
         }
         catch
@@ -97,41 +108,37 @@ public partial class MainViewModel : ViewModelBase
             throw new InvalidOperationException("Firebase did not provide an account ID.");
 
         var exerciseService = new ExerciseService();
-        Exercises = new ExerciseViewModel(exerciseService) { CurrentUserId = userId };
-        Goals = new GoalViewModel(new GoalService(), exerciseService) { CurrentUserId = userId };
-        Supplements = new SupplementViewModel(new SupplementService()) { CurrentUserId = userId };
-        Nutrition = new NutritionViewModel();
-        PersonalRecords = new PersonalRecordViewModel(new PersonalRecordService(), exerciseService) { CurrentUserId = userId };
-        SupplementSchedule = new SupplementIntakeViewModel(new SupplementIntakeService(), new SupplementService()) { CurrentUserId = userId };
-        WorkoutProgram = new WorkoutProgramViewModel(new WorkoutProgramService(), exerciseService) { CurrentUserId = userId };
-        Profile = new UserViewModel(new UserService(), userId, _authService);
+        var exercises = Exercises = new ExerciseViewModel(exerciseService) { CurrentUserId = userId };
+        var goals = Goals = new GoalViewModel(new GoalService(), exerciseService) { CurrentUserId = userId };
+        var supplements = Supplements = new SupplementViewModel(new SupplementService()) { CurrentUserId = userId };
+        var nutrition = Nutrition = new NutritionViewModel();
+        var records = PersonalRecords = new PersonalRecordViewModel(new PersonalRecordService(), exerciseService) { CurrentUserId = userId };
+        var schedule = SupplementSchedule = new SupplementIntakeViewModel(new SupplementIntakeService(), new SupplementService()) { CurrentUserId = userId };
+        var workout = WorkoutProgram = new WorkoutProgramViewModel(new WorkoutProgramService(), exerciseService) { CurrentUserId = userId };
+        var profile = Profile = new UserViewModel(new UserService(), userId, _authService);
 
-        Profile.LoggedOut += ReturnToLogin;
-        Profile.AccountDeleted += ReturnToLogin;
-        Profile.ProfileDataConsentChanged += Nutrition.SetProfileDataConsent;
+        profile.LoggedOut += ReturnToLogin;
+        profile.AccountDeleted += ReturnToLogin;
+        profile.ProfileDataConsentChanged += nutrition.SetProfileDataConsent;
 
         CurrentContent = this;
-        await Profile.LoadUserAsync();
-        Nutrition.SetProfileDataConsent(Profile.ProfileDataConsentGranted);
+        await profile.LoadUserAsync();
+        if (!ReferenceEquals(Profile, profile)) return;
+        nutrition.SetProfileDataConsent(profile.ProfileDataConsentGranted);
 
         await Task.WhenAll(
-            Exercises.LoadExercisesAsync(userId),
-            Goals.LoadGoalsAsync(userId),
-            Goals.LoadExercisesAsync(),
-            PersonalRecords.LoadExercisesAsync(),
-            Supplements.LoadSupplementAsync(userId),
-            SupplementSchedule.LoadSupplementsAsync(userId),
-            WorkoutProgram.LoadExercisesAsync());
-
-        await Task.WhenAll(
-            PersonalRecords.LoadRecordsAsync(userId),
-            SupplementSchedule.LoadSupplementIntakesAsync(userId),
-            WorkoutProgram.LoadProgramsAsync(userId));
+            exercises.RetryAsync(),
+            goals.RetryAsync(),
+            records.RetryAsync(),
+            supplements.RetryAsync(),
+            schedule.RetryAsync(),
+            workout.RetryAsync());
     }
 
     private void ReturnToLogin()
     {
-        _authService.Logout();
+        _loginViewModel.ValidationMessage = "";
+        ClearStatusMessage();
         CurrentContent = _loginViewModel;
         WorkoutProgram = null;
         Exercises = null;
@@ -141,5 +148,23 @@ public partial class MainViewModel : ViewModelBase
         SupplementSchedule = null;
         Nutrition = null;
         Profile = null;
+    }
+
+    public async Task CreateReportAsync(string path)
+    {
+        var userId = _authService.CurrentUserId ?? throw new InvalidOperationException("Sign in to export a report.");
+        var goals = new GoalService().GetAllGoalsByUserAsync(userId);
+        var records = new PersonalRecordService().GetAllRecordsByUserAsync(userId);
+        var exercises = new ExerciseService().GetAllExercisesAsync(userId);
+        var user = new UserService().GetUserByIdAsync(userId);
+        await Task.WhenAll(goals, records, exercises, user);
+        var name = (await user)?.Name ?? "GymApp user";
+        await Task.Run(() =>
+        {
+            using var output = File.Create(path);
+            MobileWorkoutReport.Write(output, name, goals.Result, records.Result, exercises.Result);
+        });
+        if (userId != _authService.CurrentUserId)
+            throw new InvalidOperationException("The sign-in session changed while creating the report.");
     }
 }

@@ -26,6 +26,7 @@
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="FirebaseAuthentication.net" />
     <PackageReference Include="FluentValidation" />
+    <PackageReference Include="SkiaSharp" />
   </ItemGroup>
 
   <ItemGroup>

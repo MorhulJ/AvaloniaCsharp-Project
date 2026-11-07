@@ -13,7 +13,14 @@
         <ContentControl Content="{Binding Goals}" />
     </ContentPage>
     <ContentPage Header="Records">
-        <ContentControl Content="{Binding PersonalRecords}" />
+        <Grid RowDefinitions="Auto,*">
+            <StackPanel Margin="20,12,20,0" Spacing="8">
+                <Button Content="Export PDF report" Classes="secondary" HorizontalAlignment="Stretch"
+                        Click="OnExportReport" />
+                <TextBlock x:Name="ReportMessage" TextWrapping="Wrap" IsVisible="False" />
+            </StackPanel>
+            <ContentControl Grid.Row="1" Content="{Binding PersonalRecords}" />
+        </Grid>
     </ContentPage>
     <ContentPage Header="More">
         <TabControl FontSize="12" Padding="0">

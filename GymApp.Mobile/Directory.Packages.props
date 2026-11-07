@@ -16,6 +16,7 @@
         <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.1" />
         <PackageVersion Include="FirebaseAuthentication.net" Version="4.1.0" />
         <PackageVersion Include="FluentValidation" Version="12.1.1" />
+        <PackageVersion Include="SkiaSharp" Version="3.119.4" />
 
         <PackageVersion Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.15" />
     </ItemGroup>

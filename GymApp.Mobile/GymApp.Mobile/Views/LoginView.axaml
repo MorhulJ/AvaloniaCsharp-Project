@@ -4,8 +4,9 @@
              xmlns:vm="using:GymApp.ViewModels"
              x:Class="GymApp.Views.LoginView"
              x:DataType="vm:LoginViewModel">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="24" Spacing="16" VerticalAlignment="Center">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" BringIntoViewOnFocusChange="True">
+        <StackPanel Margin="24" Spacing="16" VerticalAlignment="Center"
+                    IsEnabled="{Binding !IsRestoringSession}">
             <Border Width="64" Height="64" CornerRadius="18"
                     Background="{DynamicResource AccentBrush}"
                     HorizontalAlignment="Center">
@@ -32,6 +33,8 @@
                 <TextBox input:TextInputOptions.ContentType="Password" Text="{Binding Password}" PasswordChar="●"
                          PlaceholderText="Password" />
             </StackPanel>
+
+            <CheckBox Content="Keep me signed in" IsChecked="{Binding RememberMe}" />
 
             <CheckBox IsChecked="{Binding ProfileDataConsent}"
                       IsVisible="{Binding IsRegistering}">

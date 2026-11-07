@@ -5,7 +5,7 @@
              x:Class="GymApp.Views.UserView"
              x:DataType="vm:UserViewModel">
 
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" BringIntoViewOnFocusChange="True">
     <StackPanel Margin="20" Spacing="16">
 
         <TextBlock Text="Profile" Classes="title" />

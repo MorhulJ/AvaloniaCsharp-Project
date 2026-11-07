@@ -1,9 +1,6 @@
 using Foundation;
-using UIKit;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.iOS;
-using Avalonia.Media;
 
 namespace GymApp.Mobile.iOS;
 
@@ -18,6 +15,12 @@ public partial class AppDelegate : AvaloniaAppDelegate<App>
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
     {
         return base.CustomizeAppBuilder(builder)
-            .WithInterFont();
+            .WithInterFont()
+            .AfterSetup(setup =>
+            {
+                var app = (App)setup.Instance!;
+                app.SessionStore = new KeychainSessionStore();
+                app.ShareReportAsync = ReportShareSheet.ShowAsync;
+            });
     }
 }

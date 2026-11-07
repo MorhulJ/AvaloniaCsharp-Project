@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace GymApp.Services;
 
-internal static class ProtectedSessionStore
+internal sealed class ProtectedSessionStore : ISessionStore
 {
     private const uint UiForbidden = 0x1;
 
@@ -32,16 +32,12 @@ internal static class ProtectedSessionStore
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "GymApp", "session.dat");
 
-    public static bool Exists => File.Exists(SessionPath);
-
-    internal sealed record StoredSession(string RefreshToken, string Email);
-
-    public static void Save(string refreshToken, string email)
+    public void Save(StoredSession session)
     {
         if (!OperatingSystem.IsWindows())
             throw new PlatformNotSupportedException("Protected sign-in is available on Windows only.");
 
-        var clearText = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new StoredSession(refreshToken, email)));
+        var clearText = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(session));
         var input = ToBlob(clearText);
         try
         {
@@ -61,7 +57,7 @@ internal static class ProtectedSessionStore
         finally { Marshal.FreeHGlobal(input.Data); }
     }
 
-    public static StoredSession? Load()
+    public StoredSession? Load()
     {
         if (!File.Exists(SessionPath)) return null;
         if (!OperatingSystem.IsWindows())
@@ -86,7 +82,7 @@ internal static class ProtectedSessionStore
         finally { Marshal.FreeHGlobal(input.Data); }
     }
 
-    public static void Delete()
+    public void Delete()
     {
         if (File.Exists(SessionPath)) File.Delete(SessionPath);
     }

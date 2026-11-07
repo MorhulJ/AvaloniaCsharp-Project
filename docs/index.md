@@ -58,9 +58,9 @@ Data is transmitted to Firebase services over HTTPS. Google's processing is gove
 
 ## 5. Data stored on your device and PDF reports
 
-If a user enables **Remember me**, GymApp stores the email address and a session-restoration token locally in `%AppData%\GymApp\session.dat`. Windows DPAPI encrypts the token for the current Windows user. Signing out deletes the saved session.
+If a user enables **Remember me**, GymApp stores the email address and a session-restoration token locally in `%AppData%\GymApp\session.dat`. Windows DPAPI encrypts the token for the current Windows user. On iPhone, **Keep me signed in** stores the email address and a session-restoration token in Apple Keychain on that device. Signing out deletes the saved session.
 
-When the user selects **Generate report**, GymApp creates a PDF file on the computer's Desktop. It may contain the user's name, goals, personal records, and dates. The file remains on the device and GymApp does not upload it to Firebase. The user must delete it manually when it is no longer needed. Deleting the account does not delete this local PDF.
+When the user selects **Generate report**, GymApp creates a PDF file on the computer's Desktop. It may contain the user's name, goals, personal records, and dates. The file remains on the device and GymApp does not upload it to Firebase. The user must delete it manually when it is no longer needed. On iPhone, **Export PDF report** creates a temporary PDF and opens the system share menu. The destination or recipient the user selects determines where the copy goes. Deleting the account does not remove saved or shared copies.
 
 ## 6. Retention and deletion
 
@@ -68,7 +68,7 @@ Account data and associated Firestore data are retained while the account is act
 
 If deletion fails, some data may not be fully deleted. Please contact us at **[morhulj@gmail.com](mailto:morhulj@gmail.com)**. Google may retain deleted data in backup systems for periods described in Firebase documentation. For example, Google states that Firebase Authentication data is removed from live and backup systems within up to 180 days after the customer initiates deletion. This does not mean that the same retention period applies to every type of Firebase data.
 
-The local session file is deleted when the user signs out. Nutrition Calculator inputs are not saved to Firebase. The user is responsible for deleting PDF reports from the Desktop.
+The saved session is deleted when the user signs out. Nutrition Calculator inputs are not saved to Firebase. The user is responsible for deleting saved PDF copies.
 
 ## 7. Your rights
 

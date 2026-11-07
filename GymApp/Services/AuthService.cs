@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Firebase.Auth;
 using Google.Cloud.Firestore;
@@ -18,8 +18,12 @@ public class AuthService
     public string? CurrentEmail => _currentEmail;
     public string? LastErrorMessage { get; private set; }
 
-    public AuthService()
+    private readonly ISessionStore _sessionStore;
+    private readonly object _sessionStoreLock = new();
+
+    public AuthService(ISessionStore? sessionStore = null)
     {
+        _sessionStore = sessionStore ?? new ProtectedSessionStore();
         FirebaseService.RefreshTokenUpdated += PersistRotatedRefreshToken;
     }
 
@@ -120,11 +124,11 @@ public class AuthService
 
     public void Logout()
     {
+        DeleteRememberMe();
         _currentCredential = null;
         _currentUserId = null;
         _currentEmail = null;
         FirebaseService.ClearSession();
-        DeleteRememberMe();
     }
 
     public async Task ReauthenticateAsync(string email, string password)
@@ -136,8 +140,8 @@ public class AuthService
         _currentUserId = credential.User.Uid;
         _currentEmail = email;
         FirebaseService.SetSession(credential);
-        if (ProtectedSessionStore.Exists && !string.IsNullOrWhiteSpace(credential.User.Credential.RefreshToken))
-            ProtectedSessionStore.Save(credential.User.Credential.RefreshToken, email);
+        if (!string.IsNullOrWhiteSpace(credential.User.Credential.RefreshToken))
+            PersistRotatedRefreshToken(credential.User.Credential.RefreshToken);
     }
 
     public async Task DeleteCurrentAccountAsync()
@@ -147,38 +151,52 @@ public class AuthService
         _currentUserId = null;
         _currentEmail = null;
         FirebaseService.ClearSession();
-        DeleteRememberMe();
+        TryDeleteRememberMe();
     }
 
     public bool SaveRememberMe(bool rememberMe)
     {
-        if (!rememberMe)
-        {
-            ProtectedSessionStore.Delete();
-            return true;
-        }
-
         try
         {
+            if (!rememberMe)
+            {
+                DeleteRememberMe();
+                return true;
+            }
+
             var refreshToken = FirebaseService.GetRefreshToken();
             if (string.IsNullOrWhiteSpace(refreshToken)) return false;
-            ProtectedSessionStore.Save(refreshToken, _currentEmail ?? "");
+            lock (_sessionStoreLock)
+                _sessionStore.Save(new StoredSession(refreshToken, _currentEmail ?? ""));
             return true;
         }
-        catch { return false; }
+        catch
+        {
+            TryDeleteRememberMe();
+            return false;
+        }
     }
 
     public async Task<bool> TryAutoLoginAsync()
     {
-        // Discard the old insecure UID-only marker from previous app versions.
-        var legacyPath = GetRememberMePath();
-        if (File.Exists(legacyPath)) File.Delete(legacyPath);
-        if (!ProtectedSessionStore.Exists) return false;
+        LastErrorMessage = null;
+        StoredSession? session;
+        try
+        {
+            DeleteLegacyMarker();
+            lock (_sessionStoreLock)
+                session = _sessionStore.Load();
+        }
+        catch
+        {
+            LastErrorMessage = "Couldn't read your saved sign-in. Sign in again to continue.";
+            return false;
+        }
+
+        if (session is null || string.IsNullOrWhiteSpace(session.RefreshToken)) return false;
 
         try
         {
-            var session = ProtectedSessionStore.Load();
-            if (string.IsNullOrWhiteSpace(session?.RefreshToken)) return false;
             _currentUserId = await FirebaseService.RestoreSessionAsync(session.RefreshToken);
             _currentEmail = session.Email;
             return true;
@@ -189,46 +207,54 @@ public class AuthService
             _currentUserId = null;
             _currentEmail = null;
 
-            if (ex is HttpRequestException or TaskCanceledException)
+            if (ex is not SavedSessionRejectedException)
             {
                 LastErrorMessage = "Couldn't check your saved sign-in because GymApp couldn't reach Firebase. Check your internet connection and try again. Your saved sign-in was kept.";
                 return false;
             }
 
-            ProtectedSessionStore.Delete();
+            TryDeleteRememberMe();
             LastErrorMessage = "Your saved sign-in has expired. Sign in again to continue.";
             return false;
         }
     }
 
-    private static void PersistRotatedRefreshToken(string refreshToken)
+    private void PersistRotatedRefreshToken(string refreshToken)
     {
         try
         {
-            if (ProtectedSessionStore.Exists)
+            lock (_sessionStoreLock)
             {
-                var session = ProtectedSessionStore.Load();
-                ProtectedSessionStore.Save(refreshToken, session?.Email ?? _currentEmail ?? "");
+                var session = _sessionStore.Load();
+                if (session is not null)
+                    _sessionStore.Save(session with { RefreshToken = refreshToken });
             }
         }
-        catch { ProtectedSessionStore.Delete(); }
+        catch { Trace.TraceWarning("GymApp couldn't update the saved sign-in."); }
     }
 
     public void DeleteRememberMe()
     {
-        ProtectedSessionStore.Delete();
-        var path = GetRememberMePath();
-        if (File.Exists(path))
-            File.Delete(path);
+        lock (_sessionStoreLock)
+            _sessionStore.Delete();
+        DeleteLegacyMarker();
     }
 
-    private string GetRememberMePath()
+    private void TryDeleteRememberMe()
     {
-        return Path.Combine(
+        try { DeleteRememberMe(); }
+        catch { Trace.TraceWarning("GymApp couldn't clear the saved sign-in."); }
+    }
+
+    private static void DeleteLegacyMarker()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        var path = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "GymApp",
             "remember.txt"
         );
+        if (File.Exists(path)) File.Delete(path);
     }
 
     private async Task SeedUserDataAsync(string userId)

@@ -23,6 +23,8 @@ public partial class LoginViewModel : ViewModelBase
     [ObservableProperty]
     private bool rememberMe;
     [ObservableProperty]
+    private bool isRestoringSession;
+    [ObservableProperty]
     private bool profileDataConsent;
     [ObservableProperty]
     private bool wasJustRegistered;
@@ -56,8 +58,8 @@ public partial class LoginViewModel : ViewModelBase
             return;
         }
 
-        if (!_authService.SaveRememberMe(RememberMe) && RememberMe)
-            ValidationMessage = "Could not securely save this session. You can still continue, but will need to sign in next time.";
+        UpdateSavedSignIn();
+        Password = "";
         LoginSuccessful?.Invoke();
     }
 
@@ -81,9 +83,15 @@ public partial class LoginViewModel : ViewModelBase
 
         WasJustRegistered = true;
 
-        if (!_authService.SaveRememberMe(RememberMe) && RememberMe)
-            ValidationMessage = "Could not securely save this session. You can still continue, but will need to sign in next time.";
+        UpdateSavedSignIn();
+        Password = "";
         LoginSuccessful?.Invoke();
+    }
+
+    private void UpdateSavedSignIn()
+    {
+        if (!_authService.SaveRememberMe(RememberMe))
+            ValidationMessage = "Couldn't update saved sign-in on this device. You may need to sign in again next time.";
     }
 
     [RelayCommand]
