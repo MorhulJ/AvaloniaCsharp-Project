@@ -37,6 +37,58 @@ jobs:
       - name: Build for iOS Simulator
         run: dotnet build "$IOS_PROJECT" -c Debug -r iossimulator-arm64 -p:EnableCodeSigning=false
 
+      - name: Launch GymApp and verify the login screen
+        id: startup
+        shell: bash
+        run: |
+          mkdir -p ios-startup
+          app="$(dirname "$IOS_PROJECT")/bin/Debug/net10.0-ios/iossimulator-arm64/GymApp.Mobile.iOS.app"
+          bundle_id=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Info.plist")
+          executable=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Info.plist")
+          device=$(xcrun simctl list devices available -j | jq -er '
+            [.devices | to_entries[] |
+             select(.key | startswith("com.apple.CoreSimulator.SimRuntime.iOS-26-")) |
+             .value[] | select(.isAvailable and (.name | startswith("iPhone")))] |
+            sort_by(.name != "iPhone 17 Pro Max") |
+            first // error("No available iPhone simulator with iOS 26") |
+            "\(.udid) \(.name)"')
+          echo "Simulator: $device"
+          udid="${device%% *}"
+
+          xcrun swiftc .github/scripts/verify-ios-login.swift -o "$RUNNER_TEMP/verify-ios-login"
+          xcrun simctl bootstatus "$udid" -b
+          xcrun simctl install "$udid" "$app"
+          launch=$(xcrun simctl launch --stdout="$PWD/ios-startup/app-stdout.log" \
+            --stderr="$PWD/ios-startup/app-stderr.log" "$udid" "$bundle_id")
+          echo "$launch"
+          pid="${launch##*: }"
+
+          for attempt in {1..12}; do
+            xcrun simctl io "$udid" screenshot ios-startup/login.png
+            if "$RUNNER_TEMP/verify-ios-login" ios-startup/login.png > ios-startup/recognized-text.txt &&
+               kill -0 "$pid" 2>/dev/null; then
+              cat ios-startup/recognized-text.txt
+              echo "GymApp is running and the login screen is visible."
+              exit 0
+            fi
+            kill -0 "$pid" 2>/dev/null || break
+            sleep 2
+          done
+
+          cat ios-startup/recognized-text.txt
+          xcrun simctl spawn "$udid" log show --last 2m \
+            --predicate "process == \"$executable\"" > ios-startup/simulator.log || true
+          echo "::error::GymApp exited or the login screen did not appear."
+          exit 1
+
+      - name: Upload the startup screenshot and diagnostics
+        if: ${{ !cancelled() && (steps.startup.outcome == 'success' || steps.startup.outcome == 'failure') }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: GymApp-iOS-Startup
+          path: ios-startup/
+          retention-days: 7
+
       - name: Archive the simulator app
         run: |
           app="$(dirname "$IOS_PROJECT")/bin/Debug/net10.0-ios/iossimulator-arm64/GymApp.Mobile.iOS.app"
