@@ -35,7 +35,7 @@ jobs:
           dotnet workload install ios --version "$IOS_WORKLOAD_SET_VERSION"
 
       - name: Build for iOS Simulator
-        run: dotnet build "$IOS_PROJECT" -c Debug -r iossimulator-arm64 -p:EnableCodeSigning=false
+        run: dotnet build "$IOS_PROJECT" -c Debug -r iossimulator-arm64
 
       - name: Launch GymApp and verify the login screen
         id: startup
@@ -56,6 +56,7 @@ jobs:
           udid="${device%% *}"
 
           xcrun swiftc .github/scripts/verify-ios-login.swift -o "$RUNNER_TEMP/verify-ios-login"
+          codesign --verify --deep "$app"
           xcrun simctl bootstatus "$udid" -b
           xcrun simctl install "$udid" "$app"
           launch=$(xcrun simctl launch --stdout="$PWD/ios-startup/app-stdout.log" \
@@ -76,8 +77,12 @@ jobs:
           done
 
           cat ios-startup/recognized-text.txt
-          xcrun simctl spawn "$udid" log show --last 2m \
-            --predicate "process == \"$executable\"" > ios-startup/simulator.log || true
+          tail -n 60 ios-startup/app-stderr.log
+          xcrun simctl spawn "$udid" log show --last 3m --info \
+            --predicate "process == \"$executable\" OR eventMessage CONTAINS[c] \"$bundle_id\"" \
+            > ios-startup/simulator.log || true
+          find "$HOME/Library/Logs/DiagnosticReports" -maxdepth 2 -type f \
+            -name 'GymApp*.ips' -exec cp {} ios-startup/ \; 2>/dev/null || true
           echo "::error::GymApp exited or the login screen did not appear."
           exit 1
 
