@@ -11,6 +11,10 @@
     <PackageReference Include="Avalonia.iOS" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(SdkIsSimulator)' == 'true'">
+    <CustomEntitlements Include="application-identifier" Type="String" Value="com.morhulj.gymapp" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\GymApp.Mobile\GymApp.Mobile.csproj" />
   </ItemGroup>

@@ -54,7 +54,11 @@ internal sealed class KeychainSessionStore : ISessionStore
     private static void CheckStatus(SecStatusCode status)
     {
         if (status != SecStatusCode.Success)
-            throw new InvalidOperationException($"Keychain operation failed ({status}).");
+        {
+            var message = $"Keychain operation failed ({status}).";
+            Console.Error.WriteLine(message);
+            throw new InvalidOperationException(message);
+        }
     }
 }
 

@@ -18,3 +18,10 @@ if !missingLabels.isEmpty {
     print("Missing login labels: \(missingLabels.joined(separator: ", "))")
     exit(1)
 }
+
+let screenText = visibleText.joined(separator: " ")
+if screenText.localizedCaseInsensitiveContains("read your saved sign-in") ||
+    screenText.localizedCaseInsensitiveContains("checking saved sign-in") {
+    print("Saved sign-in did not finish cleanly.")
+    exit(1)
+}
