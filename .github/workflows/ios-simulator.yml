@@ -1,0 +1,49 @@
+name: iOS Simulator build
+
+on:
+  push:
+    branches: [codex/ios-port]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      DOTNET_SDK_VERSION: '10.0.302'
+      IOS_WORKLOAD_SET_VERSION: '10.0.302.1'
+      IOS_PROJECT: GymApp.Mobile/GymApp.Mobile.iOS/GymApp.Mobile.iOS.csproj
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+
+      - name: Set up the iOS workload
+        run: |
+          dotnet new globaljson --sdk-version "$DOTNET_SDK_VERSION" --roll-forward disable
+          dotnet --version
+          xcodebuild -version
+          xcrun --sdk iphonesimulator --show-sdk-version
+          dotnet workload install ios --version "$IOS_WORKLOAD_SET_VERSION"
+
+      - name: Build for iOS Simulator
+        run: dotnet build "$IOS_PROJECT" -c Debug -r iossimulator-arm64 -p:EnableCodeSigning=false
+
+      - name: Archive the simulator app
+        run: |
+          app="$(dirname "$IOS_PROJECT")/bin/Debug/net10.0-ios/iossimulator-arm64/GymApp.Mobile.iOS.app"
+          ditto -c -k --keepParent "$app" GymApp-iOS-Simulator-arm64.zip
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: GymApp-iOS-Simulator-arm64
+          path: GymApp-iOS-Simulator-arm64.zip
+          if-no-files-found: error
