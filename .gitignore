@@ -5,3 +5,5 @@ obj/
 *.user
 *.suo
 GymApp/firebase-credentials.json
+*.p12
+*.mobileprovision

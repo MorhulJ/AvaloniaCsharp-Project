@@ -1,0 +1,121 @@
+name: iOS device package
+
+on:
+  push:
+    branches: [codex/ios-port]
+    tags: ['ios-ipa-*']
+    paths:
+      - .github/workflows/ios-ipa.yml
+      - GymApp.Mobile/**
+      - GymApp/**
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      DOTNET_SDK_VERSION: '10.0.302'
+      IOS_WORKLOAD_SET_VERSION: '10.0.302.1'
+      IOS_PROJECT: GymApp.Mobile/GymApp.Mobile.iOS/GymApp.Mobile.iOS.csproj
+      SIGN_IPA: ${{ startsWith(github.ref, 'refs/tags/ios-ipa-') }}
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+
+      - name: Set up the iOS workload
+        run: |
+          dotnet new globaljson --sdk-version "$DOTNET_SDK_VERSION" --roll-forward disable
+          xcodebuild -version
+          dotnet workload install ios --version "$IOS_WORKLOAD_SET_VERSION"
+
+      - name: Install Apple signing assets
+        if: env.SIGN_IPA == 'true'
+        env:
+          IOS_DISTRIBUTION_P12_BASE64: ${{ secrets.IOS_DISTRIBUTION_P12_BASE64 }}
+          IOS_DISTRIBUTION_P12_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_P12_PASSWORD }}
+          IOS_APP_STORE_PROFILE_BASE64: ${{ secrets.IOS_APP_STORE_PROFILE_BASE64 }}
+        run: |
+          if [[ -z "$IOS_DISTRIBUTION_P12_BASE64" || -z "$IOS_DISTRIBUTION_P12_PASSWORD" || -z "$IOS_APP_STORE_PROFILE_BASE64" ]]; then
+            echo "::error::Configure all three Apple signing secrets before pushing an ios-ipa-* tag."
+            exit 1
+          fi
+
+          umask 077
+          certificate="$RUNNER_TEMP/distribution.p12"
+          profile="$RUNNER_TEMP/app-store.mobileprovision"
+          profile_plist="$RUNNER_TEMP/app-store-profile.plist"
+          keychain="$RUNNER_TEMP/ios-signing.keychain-db"
+          trap 'rm -f "$certificate" "$profile" "$profile_plist"' EXIT
+          printf '%s' "$IOS_DISTRIBUTION_P12_BASE64" | base64 -D > "$certificate"
+          printf '%s' "$IOS_APP_STORE_PROFILE_BASE64" | base64 -D > "$profile"
+
+          security cms -D -i "$profile" -o "$profile_plist"
+          profile_uuid=$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$profile_plist")
+          application_id=$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' "$profile_plist")
+          if [[ "$application_id" != *.com.morhulj.gymapp ]] ||
+            /usr/libexec/PlistBuddy -c 'Print :ProvisionedDevices' "$profile_plist" >/dev/null 2>&1 ||
+            [[ "$(/usr/libexec/PlistBuddy -c 'Print :ProvisionsAllDevices' "$profile_plist" 2>/dev/null)" == true ]]; then
+            echo "::error::Use an App Store Connect provisioning profile for com.morhulj.gymapp."
+            exit 1
+          fi
+
+          profiles_dir="$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
+          mkdir -p "$profiles_dir"
+          cp "$profile" "$profiles_dir/$profile_uuid.mobileprovision"
+
+          keychain_password=$(openssl rand -hex 24)
+          security create-keychain -p "$keychain_password" "$keychain"
+          security set-keychain-settings -lut 3600 "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+          security import "$certificate" -P "$IOS_DISTRIBUTION_P12_PASSWORD" -A -t cert -f pkcs12 -k "$keychain"
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$keychain_password" "$keychain"
+          security list-keychains -d user -s "$keychain"
+
+          printf 'IOS_PROFILE_UUID=%s\nIOS_SIGNING_KEYCHAIN=%s\n' "$profile_uuid" "$keychain" >> "$GITHUB_ENV"
+
+      - name: Build the device IPA
+        run: |
+          signing_args=(-p:EnableCodeSigning=false)
+          if [[ "$SIGN_IPA" == true ]]; then
+            signing_args=(-p:EnableCodeSigning=true '-p:CodesignKey=Apple Distribution'
+              "-p:CodesignProvision=$IOS_PROFILE_UUID" "-p:CodesignKeychain=$IOS_SIGNING_KEYCHAIN")
+          fi
+
+          dotnet build "$IOS_PROJECT" -c Release -r ios-arm64 \
+            -p:BuildIpa=true "-p:IpaPackagePath=$RUNNER_TEMP/GymApp.ipa" \
+            "-p:ApplicationVersion=$GITHUB_RUN_NUMBER" "${signing_args[@]}"
+
+      - name: Verify the device package and icon
+        run: |
+          ditto -x -k "$RUNNER_TEMP/GymApp.ipa" "$RUNNER_TEMP/ipa-check"
+          app="$RUNNER_TEMP/ipa-check/Payload/GymApp.Mobile.iOS.app"
+          manifest="$app/Info.plist"
+          executable=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$manifest")
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleIcons:CFBundlePrimaryIcon:CFBundleIconName' "$manifest" | grep -Fx AppIcon
+          xcrun vtool -show-build "$app/$executable" | grep -Ei '^[[:space:]]*platform[[:space:]]+IOS$'
+          if [[ "$SIGN_IPA" == true ]]; then
+            test -s "$app/embedded.mobileprovision"
+            codesign --verify --deep --strict "$app"
+          fi
+
+      - uses: actions/upload-artifact@v7
+        if: env.SIGN_IPA == 'true'
+        with:
+          name: GymApp-iOS-IPA
+          path: ${{ runner.temp }}/GymApp.ipa
+          if-no-files-found: error
+          retention-days: 3
